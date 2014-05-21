@@ -72,7 +72,7 @@ Function::call(const fn_call& fn)
     // Extract caller before pushing ourself on the call stack
     VM& vm = getVM(fn); 
 
-    as_object* caller = vm.calling() ? &vm.currentCall().function() : 0;
+    as_object* caller = vm.calling() ? &vm.currentCall().function() : nullptr;
 
     // Set up local stack frame, for parameters and locals.
     FrameGuard guard(getVM(fn), *this);
@@ -127,7 +127,7 @@ Function::call(const fn_call& fn)
     setLocal(cf, NSV::PROP_THIS, fn.this_ptr ? fn.this_ptr : as_value());
 
     as_object* super = fn.super ? fn.super :
-        fn.this_ptr ? fn.this_ptr->get_super() : 0;
+        fn.this_ptr ? fn.this_ptr->get_super() : nullptr;
 
     // Add 'super' (SWF6+ only)
     if (super && swfversion > 5) {

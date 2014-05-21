@@ -100,12 +100,12 @@ namespace {
 NetStream_as::NetStream_as(as_object* owner)
     :
     ActiveRelay(owner),
-    _netCon(0),
+    _netCon(nullptr),
     _bufferTime(100), 
     _imageframe(),
     _parser(),
     _inputPos(0),
-    _invalidatedVideoCharacter(0),
+    _invalidatedVideoCharacter(nullptr),
     _decoding_state(DEC_NONE),
     _videoDecoder(),
     _videoInfoKnown(false),
@@ -132,7 +132,7 @@ netstream_class_init(as_object& where, const ObjectURI& uri)
     // NetStream is genuinely a built-in class, but its constructor calls
     // several native functions. It also calls NetConnection.call.
     registerBuiltinClass(where, netstream_new, attachNetStreamInterface,
-            NULL, uri); 
+            nullptr, uri);
 }
 
 void
@@ -196,7 +196,7 @@ long
 NetStream_as::bufferLength()
 {
 #ifdef USE_MEDIA
-    if (_parser.get() == NULL) return 0;
+    if (_parser.get() == nullptr) return 0;
     return _parser->getBufferLength();
 #endif  // USE_MEDIA
 }
@@ -681,7 +681,7 @@ NetStream_as::decodeNextAudioFrame()
                     "no more video frames in input"),
                     this);
 #endif
-        return 0;
+        return nullptr;
     }
 
     // TODO: make the buffer cursored later ?
@@ -1453,7 +1453,7 @@ BufferedAudioStreamer::attachAuxStreamer()
         log_debug(_("attachAuxStreamer called while already attached"));
         // Let's detach first..
         _soundHandler->unplugInputStream(_auxStreamer);
-        _auxStreamer=0;
+        _auxStreamer=nullptr;
     }
 
     try {
@@ -1476,7 +1476,7 @@ BufferedAudioStreamer::detachAuxStreamer()
         return;
     }
     _soundHandler->unplugInputStream(_auxStreamer);
-    _auxStreamer = 0;
+    _auxStreamer = nullptr;
 }
 
 // audio callback, possibly running in a separate thread
@@ -1495,7 +1495,7 @@ BufferedAudioStreamer::BufferedAudioStreamer(sound::sound_handler* handler)
     _soundHandler(handler),
     _audioQueue(),
     _audioQueueSize(0),
-    _auxStreamer(0)
+    _auxStreamer(nullptr)
 {
 }
 

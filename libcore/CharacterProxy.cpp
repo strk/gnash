@@ -38,7 +38,7 @@ CharacterProxy::checkDangling() const
                             "(%s) for later rebinding", _ptr->getTarget(), typeName(*_ptr),
                 _tgt);
 #endif
-		_ptr = 0;
+		_ptr = nullptr;
 	}
 }
 
@@ -61,7 +61,7 @@ CharacterProxy::setReachable() const
 DisplayObject*
 findDisplayObjectByTarget(const std::string& tgtstr, movie_root& mr)
 {
-	if (tgtstr.empty()) return 0;
+	if (tgtstr.empty()) return nullptr;
 	return mr.findCharacterByTarget(tgtstr);
 }
 

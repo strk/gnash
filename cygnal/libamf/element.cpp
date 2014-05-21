@@ -65,7 +65,7 @@ const char *astype_str[] = {
 
 /// \brief Create a new Element with no data type.
 Element::Element()
-    : _name(0),
+    : _name(nullptr),
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -83,7 +83,7 @@ Element::~Element()
 ///
 /// @param data The double to use as the value for this Element.
 Element::Element(double indata)
-    : _name(0),
+    : _name(nullptr),
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -96,7 +96,7 @@ Element::Element(double indata)
 ///
 /// @param num The double to use as the value of the property.
 Element::Element(const string &name, double num)
-    : _name(0),
+    : _name(nullptr),
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -109,7 +109,7 @@ Element::Element(const string &name, double num)
 ///
 /// @remarks This assume the data string is already NULL terminated.
 Element::Element(const string &indata)
-    : _name(0),
+    : _name(nullptr),
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -118,7 +118,7 @@ Element::Element(const string &indata)
 
 /// \overload Element(const std::string &data)
 Element::Element(const char *indata)
-    : _name(0),
+    : _name(nullptr),
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -131,7 +131,7 @@ Element::Element(const char *indata)
 ///
 /// @param data The ASCII string to use as the value of the property.
 Element::Element(const string &name, const string &data)
-    : _name(0),
+    : _name(nullptr),
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -142,7 +142,7 @@ Element::Element(const string &name, const string &data)
 ///
 /// @param data The boolean to use as the value for this Element.
 Element::Element(bool data)
-    : _name(0),
+    : _name(nullptr),
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -155,7 +155,7 @@ Element::Element(bool data)
 ///
 /// @param data The boolean to use as the value of the property.
 Element::Element(const string &name, bool indata)
-    : _name(0),
+    : _name(nullptr),
       _type(NOTYPE)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -214,7 +214,7 @@ Element::clear()
 {
 //    GNASH_REPORT_FUNCTION;
 	delete[] _name;
-	_name = 0;
+	_name = nullptr;
 	_buffer.reset();
 }
 
@@ -287,7 +287,7 @@ Element::to_string() const
 	}
 	return "NULL";
     }
-    return 0;
+    return nullptr;
 }
 
 /// \brief Cast the data in this Element to a boolean value.
@@ -313,7 +313,7 @@ Element::to_reference()
     if (_buffer) {
 	return _buffer->reference();
     }
-    return 0;
+    return nullptr;
 }
 
 const std::uint8_t *
@@ -323,7 +323,7 @@ Element::to_reference() const
     if (_buffer) {
 	return _buffer->reference();
     }
-    return 0;
+    return nullptr;
 }
 
 /// \brief Test equivalance against another Element.
@@ -480,7 +480,7 @@ Element::encode(bool notobject)
 	if (!notobject) {
 	    *buf = Element::OBJECT_AMF0;
 	}
-	if (_name > static_cast<char *>(0)) {
+	if (_name > static_cast<char *>(nullptr)) {
 	    size_t length = getNameSize();
 	    std::uint16_t enclength = length;
 	    swapBytes(&enclength, 2);
@@ -1451,7 +1451,7 @@ void
 Element::setName(std::uint8_t *name, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    if ((size > 0) && (name != 0)) {
+    if ((size > 0) && (name != nullptr)) {
 	_name = new char[size+1];
 	std::copy(name, name+size, _name);
 	*(_name + size) = 0;
@@ -1469,7 +1469,7 @@ void
 Element::check_buffer(size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_buffer == 0) {
+    if (_buffer == nullptr) {
 	_buffer.reset(new Buffer(size));
     } else {
 	if (_buffer->size() < size) {

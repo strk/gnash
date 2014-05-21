@@ -147,8 +147,8 @@ VideoConverterFfmpeg::convert(const ImgBuf& src)
     if (!_swsContext.get()) {
 
         _swsContext.reset(new SwsContextWrapper(sws_getContext(width, height,
-            src_pixFmt, width, height, dst_pixFmt, SWS_BILINEAR, NULL, NULL,
-            NULL)));
+            src_pixFmt, width, height, dst_pixFmt, SWS_BILINEAR, nullptr, nullptr,
+            nullptr)));
 
         if (!_swsContext->getContext()) {
 
@@ -162,7 +162,7 @@ VideoConverterFfmpeg::convert(const ImgBuf& src)
 #endif
 
 
-    AVPicture srcpicture = {{src.data, 0, 0, 0},
+    AVPicture srcpicture = {{src.data, nullptr, nullptr, nullptr},
         {static_cast<int>(src.stride[0]), 0, 0, 0}};
     
     

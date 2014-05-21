@@ -299,7 +299,7 @@ LogFile::LogFile()
     _state(CLOSED),
     _stamp(true),
     _write(false),
-    _listener(NULL)
+    _listener(nullptr)
 {
 }
 

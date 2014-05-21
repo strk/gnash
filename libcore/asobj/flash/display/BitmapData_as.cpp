@@ -600,7 +600,7 @@ BitmapData_as::BitmapData_as(as_object* owner,
         std::unique_ptr<image::GnashImage> im)
     :
     _owner(owner),
-    _cachedBitmap(0)
+    _cachedBitmap(nullptr)
 {
     assert(im->width() <= 2880);
     assert(im->height() <= 2880);
@@ -630,7 +630,7 @@ void
 BitmapData_as::dispose()
 {
     if (_cachedBitmap) _cachedBitmap->dispose();
-    _cachedBitmap = 0;
+    _cachedBitmap = nullptr;
     _image.reset();
     updateObjects();
 }

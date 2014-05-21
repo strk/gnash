@@ -79,7 +79,7 @@ attachMouseInterface(as_object& o)
     AsBroadcaster::initialize(o);
 
     Global_as& gl = getGlobal(o);
-    as_object* null = 0;
+    as_object* null = nullptr;
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 7);
 }
 

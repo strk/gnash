@@ -114,7 +114,7 @@ static RTMPStatusMsgCode rtmp_msg_code_list[] = {
     { "SharedObject.No.Read.Access",             RTMPMsg::SO_NO_READ_ACCESS },
     { "SharedObject.No.Write.Access",            RTMPMsg::SO_NO_WRITE_ACCESS },
     { "SharedObject.Persistence.Mismatch",       RTMPMsg::SO_PERSISTENCE_MISMATCH },
-    { 0, RTMPMsg::NC_CONNECT_FAILED }
+    { nullptr, RTMPMsg::NC_CONNECT_FAILED }
 };
 
 // All the result messages from the server are ASCII text, so they have to be parsed to

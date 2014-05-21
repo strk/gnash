@@ -252,7 +252,7 @@ ExternalInterface::parseXML(const std::string &xml)
             start = end;
             end = xml.find("</number>");
             std::string str = xml.substr(start, end-start);
-            double num = strtod(str.c_str(), NULL);
+            double num = strtod(str.c_str(), nullptr);
             value.set_double(num);
         } else if (tag == "<string>") {
             start = end;

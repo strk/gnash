@@ -61,7 +61,7 @@ public:
         _down(false),
         _over(false),
         _up(false),
-        _definitionTag(0),
+        _definitionTag(nullptr),
         _buttonLayer(0)
     {
     }

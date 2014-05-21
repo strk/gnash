@@ -522,7 +522,7 @@ void
 xml_class_init(as_object& where, const ObjectURI& uri)
 {
     Global_as& gl = getGlobal(where);
-    as_object* cl = gl.createClass(&xml_new, 0);
+    as_object* cl = gl.createClass(&xml_new, nullptr);
 
     as_function* ctor = getMember(gl, NSV::CLASS_XMLNODE).to_function();
 

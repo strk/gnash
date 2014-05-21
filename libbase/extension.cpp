@@ -199,7 +199,7 @@ Extension::scanDir(const std::string& dirlist)
         
         struct dirent *entry;
 
-        while ((entry = readdir(libdir)) != NULL) {
+        while ((entry = readdir(libdir)) != nullptr) {
             // We only want shared libraries that end with the suffix, otherwise
             // we get all the duplicates.
             std::string name(entry->d_name);

@@ -189,7 +189,7 @@ RTMP::headerSize(std::uint8_t header)
 }
 
 RTMP::RTMP() 
-    : _handshake(0),
+    : _handshake(nullptr),
       _packet_size(0),
       _mystery_word(0),
       _timeout(1)
@@ -763,7 +763,7 @@ RTMP::decodeMsgBody(std::uint8_t *data, size_t size)
 	return msg;
     }
 
-    if (name->to_string() != 0) {
+    if (name->to_string() != nullptr) {
 	msg->setMethodName(name->to_string());
     }
     
@@ -782,7 +782,7 @@ RTMP::decodeMsgBody(std::uint8_t *data, size_t size)
 	// object is deleted 
         std::shared_ptr<cygnal::Element> el = amf_obj.extractAMF(ptr, tooFar);
 	ptr += amf_obj.totalsize();
-        if (el == 0) {
+        if (el == nullptr) {
 	    break;
 	}
 	msg->addObject(el);
@@ -830,7 +830,7 @@ RTMP::encodeBytesRead()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)0);
+    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)nullptr);
 }
 
 void
@@ -845,7 +845,7 @@ RTMP::encodeServer()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)0);
+    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)nullptr);
 }
 
 void 
@@ -860,7 +860,7 @@ RTMP::encodeClient()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)0);
+    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)nullptr);
 }
 
 void 
@@ -875,7 +875,7 @@ RTMP::encodeAudioData()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)0);
+    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)nullptr);
 }
 
 void 
@@ -890,7 +890,7 @@ RTMP::encodeVideoData()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)0);
+    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)nullptr);
 }
 
 void 
@@ -905,7 +905,7 @@ RTMP::encodeNotify()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)0);
+    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)nullptr);
 }
 
 void 
@@ -920,7 +920,7 @@ RTMP::encodeSharedObj()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)0);
+    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)nullptr);
 }
 
 void 
@@ -935,7 +935,7 @@ RTMP::encodeInvoke()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)0);
+    return std::shared_ptr<cygnal::Buffer>((cygnal::Buffer*)nullptr);
 }
 void 
 RTMP::decodeInvoke()
@@ -1069,7 +1069,7 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 			ret, size-nbytes);
 	}
 #else
-	if (data != 0) {
+	if (data != nullptr) {
 	    bigbuf->append(data + nbytes, partial);
 	}
 #endif
@@ -1324,14 +1324,14 @@ RTMP::split(std::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    if (data == 0) {
+    if (data == nullptr) {
 	log_error(_("Buffer pointer is invalid."));
     }
 
     std::shared_ptr<RTMP::queues_t> channels(new RTMP::queues_t);
 	
     // split the buffer at the chunksize boundary
-    std::uint8_t *ptr = 0;
+    std::uint8_t *ptr = nullptr;
     std::shared_ptr<rtmp_head_t> rthead(new rtmp_head_t);
     size_t pktsize = 0;
     //size_t nbytes = 0;
@@ -1385,7 +1385,7 @@ RTMP::split(std::uint8_t *data, size_t size)
 #if 1
 	    // Red5 version 5 sends out PING messages with a 1 byte header. I think this
 	    // may be a bug in Red5, but we should handle it anyway.
-	    if (chunk == 0) {
+	    if (chunk == nullptr) {
  		cerr << "Chunk wasn't allocated! " << (rthead->bodysize + rthead->head_size) 
                      << std::endl;
 		chunk.reset(new cygnal::Buffer(rthead->bodysize + rthead->head_size));

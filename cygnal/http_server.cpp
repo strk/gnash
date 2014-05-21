@@ -185,7 +185,7 @@ HTTPServer::processGetRequest(Handler *hand, int fd, cygnal::Buffer *buf)
 //    cerr << "YYYYYYY: " << (char *)buf->reference() << endl;
 //    cerr << hexify(buf->reference(), buf->allocated(), false) << endl;
     
-    if (buf == 0) {
+    if (buf == nullptr) {
      //	log_debug("Queue empty, net connection dropped for fd #%d", getFileFd());
 	log_debug("Queue empty, net connection dropped for fd #%d", fd);
 //	cygnal::Buffer buf;
@@ -282,7 +282,7 @@ HTTPServer::processPostRequest(int fd, cygnal::Buffer * /* bufFIXME */)
     }
     
     buf = _que.pop();
-    if (buf == 0) {
+    if (buf == nullptr) {
 	log_debug("Queue empty, net connection dropped for fd #%d",
 		  getFileFd());
 	return buf;
@@ -291,7 +291,7 @@ HTTPServer::processPostRequest(int fd, cygnal::Buffer * /* bufFIXME */)
     
     clearHeader();
     std::uint8_t *data = processHeaderFields(buf.get());
-    size_t length = strtol(getField("content-length").c_str(), NULL, 0);
+    size_t length = strtol(getField("content-length").c_str(), nullptr, 0);
     std::shared_ptr<cygnal::Buffer> content(new cygnal::Buffer(length));
     int ret = 0;
     if (buf->allocated() - (data - buf->reference()) ) {
@@ -819,8 +819,8 @@ HTTPServer::extractRTMPT(std::uint8_t *data)
 	}
     }
 
-    _index = strtol(indx.c_str(), NULL, 0);
-    _clientid = strtol(cid.c_str(), NULL, 0);
+    _index = strtol(indx.c_str(), nullptr, 0);
+    _clientid = strtol(cid.c_str(), nullptr, 0);
     end =  body.find("\r\n", start);
 //     if (end != string::npos) {
 //         cmd = HTTPServer::CLOSE;

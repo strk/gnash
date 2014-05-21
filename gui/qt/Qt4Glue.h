@@ -82,7 +82,7 @@ private:
 class Qt4Glue
 {
   public:
-    Qt4Glue() : _drawing_area(NULL) {}
+    Qt4Glue() : _drawing_area(nullptr) {}
     virtual ~Qt4Glue() { }
     virtual bool init(int argc, char **argv[]) = 0;
 

@@ -957,7 +957,7 @@ private:
 public:
       
     virtual Renderer* startInternalRender(image::GnashImage& /*im*/) {
-        return 0;
+        return nullptr;
     }
 
     virtual void endInternalRender() {}
@@ -1296,7 +1296,7 @@ public:
 
     if (target_x == to_connect.ap.x &&
         target_y == to_connect.ap.y) {
-      return NULL;
+      return nullptr;
     }
   
     for (std::list<const Path*>::const_iterator it = path_refs.begin(), end = path_refs.end();
@@ -1320,7 +1320,7 @@ public:
     }
   
   
-    return NULL;  
+    return nullptr;
   }
   
   PathVec normalize_paths(const PathVec &paths)

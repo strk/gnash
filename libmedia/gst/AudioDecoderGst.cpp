@@ -32,7 +32,7 @@ namespace gst {
 AudioDecoderGst::AudioDecoderGst(SoundInfo& info)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
-    gst_init (NULL, NULL);
+    gst_init (nullptr, nullptr);
 
     GstCaps* srccaps = gst_caps_new_simple ("audio/mpeg",
 		"mpegversion", G_TYPE_INT, 1,
@@ -48,9 +48,9 @@ AudioDecoderGst::AudioDecoderGst(SoundInfo& info)
 AudioDecoderGst::AudioDecoderGst(const AudioInfo& info)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
-    gst_init (NULL, NULL);
+    gst_init (nullptr, nullptr);
 
-    GstCaps* srccaps=0;
+    GstCaps* srccaps=nullptr;
 
     if (info.type == CODEC_TYPE_FLASH && info.codec == AUDIO_CODEC_MP3)
     {
@@ -225,7 +225,7 @@ AudioDecoderGst::pullBuffers(std::uint32_t&  outputSize)
   
     if (!outputSize) {
         log_debug(_("Pushed data, but there's nothing to pull (yet)"));
-        return 0;   
+        return nullptr;
     }
     
     std::uint8_t* rbuf = new std::uint8_t[outputSize];
@@ -261,7 +261,7 @@ AudioDecoderGst::decode(const std::uint8_t* input, std::uint32_t inputSize,
     bool success = swfdec_gst_decoder_push(&_decoder, gstbuf);
     if (!success) {
         log_error(_("AudioDecoderGst: buffer push failed."));
-        return 0;
+        return nullptr;
     }
 
     decodedData = inputSize;
@@ -289,7 +289,7 @@ AudioDecoderGst::decode(const EncodedAudioFrame& ef, std::uint32_t& outputSize)
     bool success = swfdec_gst_decoder_push(&_decoder, gstbuf);
     if (!success) {
         log_error(_("AudioDecoderGst: buffer push failed."));
-        return 0;
+        return nullptr;
     }
 
     return pullBuffers(outputSize);

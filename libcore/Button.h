@@ -121,7 +121,7 @@ public:
     //
     /// @param init     An init object, which can be passed when constructing
     ///                 Buttons with attachMovie, but is never used.
-    virtual void construct(as_object* init = 0);
+    virtual void construct(as_object* init = nullptr);
 
 #ifdef USE_SWFTREE
     // Override to append button DisplayObjects info, see dox in DisplayObject.h

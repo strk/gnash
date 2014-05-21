@@ -311,7 +311,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
 
     Movie* m = ptr->get_root();
     as_object* o = getObjectWithPrototype(getGlobal(fn), NSV::CLASS_MOVIE_CLIP);
-    MovieClip* mc = new MovieClip(o, 0, m, ptr);
+    MovieClip* mc = new MovieClip(o, nullptr, m, ptr);
 
     VM& vm = getVM(fn);
     mc->set_name(getURI(vm, fn.arg(0).to_string()));
@@ -496,7 +496,7 @@ movieclip_attachMovie(const fn_call& fn)
     newch->set_name(getURI(vm, newname));
     newch->setDynamic();
 
-    as_object* initObj(0);
+    as_object* initObj(nullptr);
 
     if (fn.nargs > 3 ) {
         initObj = toObject(fn.arg(3), getVM(fn));
@@ -1402,7 +1402,7 @@ movieclip_setMask(const fn_call& fn)
     if ( arg.is_null() || arg.is_undefined() )
     {
         // disable mask
-        maskee->setMask(0);
+        maskee->setMask(nullptr);
     }
     else
     {
@@ -2057,8 +2057,8 @@ movieclip_attachBitmap(const fn_call& fn)
 
     int depth = toInt(fn.arg(1), getVM(fn));
 
-    DisplayObject* bm = new Bitmap(getRoot(fn), 0, bd, ptr);
-    ptr->attachCharacter(*bm, depth, 0);
+    DisplayObject* bm = new Bitmap(getRoot(fn), nullptr, bd, ptr);
+    ptr->attachCharacter(*bm, depth, nullptr);
 
     return as_value();
 }

@@ -69,7 +69,7 @@ DisplayObject*
 DefineMorphShapeTag::createDisplayObject(Global_as& gl,
         DisplayObject* parent) const
 {
-    return new MorphShape(getRoot(gl), 0, this, parent);
+    return new MorphShape(getRoot(gl), nullptr, this, parent);
 }
 
 void

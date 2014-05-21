@@ -112,7 +112,7 @@ private:
 GifInput::GifInput(std::shared_ptr<IOChannel> in)
     :
     Input(in),
-    _gif(0),
+    _gif(nullptr),
     _currentRow(0)
 {
 }

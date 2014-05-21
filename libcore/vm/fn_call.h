@@ -119,12 +119,12 @@ public:
     ///                     calculated from the this pointer (if that is not
     ///                     null) whenever a function requires it.
     fn_call(as_object* this_in, const as_environment& env_in,
-            Args& args, as_object* sup = 0, bool isNew = false)
+            Args& args, as_object* sup = nullptr, bool isNew = false)
         :
         this_ptr(this_in),
         super(sup),
         nargs(args.size()),
-        callerDef(0),
+        callerDef(nullptr),
         _env(env_in),
         _new(isNew)
     {
@@ -134,9 +134,9 @@ public:
     fn_call(as_object* this_in, const as_environment& env_in)
         :
         this_ptr(this_in),
-        super(0),
+        super(nullptr),
         nargs(0),
-        callerDef(0),
+        callerDef(nullptr),
         _env(env_in),
         _new(false)
 	{
@@ -252,7 +252,7 @@ struct IsDisplayObject
 {
     typedef T value_type;
     value_type* operator()(const as_object* o) const {
-        if (!o) return 0;
+        if (!o) return nullptr;
         return dynamic_cast<T*>(o->displayObject());
     }
 };

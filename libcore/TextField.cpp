@@ -89,7 +89,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     _borderColor(0,0,0,255),
     _textColor(def.color()),
     _alignment(def.alignment()),
-    _font(0),
+    _font(nullptr),
     m_cursor(0u),
     _glyphcount(0u),
     _scroll(0u),
@@ -156,7 +156,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     _borderColor(0, 0, 0, 255),
     _textColor(0, 0, 0, 255),
     _alignment(ALIGN_LEFT),
-    _font(0),
+    _font(nullptr),
     m_cursor(0u),
     _glyphcount(0u),
     _scroll(0u),
@@ -774,10 +774,10 @@ TextField::mouseEvent(const event_id& ev)
 InteractiveObject*
 TextField::topmostMouseEntity(std::int32_t x, std::int32_t y)
 {
-    if (!visible()) return 0;
+    if (!visible()) return nullptr;
     
     // Not selectable, so don't catch mouse events!
-    if (!_selectable) return 0;
+    if (!_selectable) return nullptr;
 
     SWFMatrix m = getMatrix(*this);
     point p(x, y);
@@ -785,7 +785,7 @@ TextField::topmostMouseEntity(std::int32_t x, std::int32_t y)
 
     if (_bounds.point_test(p.x, p.y)) return this;
 
-    return 0;
+    return nullptr;
 }
 
 void
@@ -1478,31 +1478,31 @@ TextField::handleChar(std::wstring::const_iterator& it,
                                         
 										(pixelsToTwips(std::strtol(
                                         attloc->second.substr(1,attloc->second.length()-1).data(),
-                                        NULL,10))));
+                                        nullptr,10))));
                                     newrec.setYOffset(PADDING_TWIPS +
                                         newrec.textHeight() +
                                         (fontLeading - fontDescent));
                                     _fontHeight += pixelsToTwips(std::strtol(
                                         attloc->second.substr(1,attloc->second.length()-1).data(),
-                                        NULL,10));
+                                        nullptr,10));
                                 } else if (firstchar == "-") {
                                     newrec.setTextHeight(rec.textHeight() -
                                         (pixelsToTwips(std::strtol(
                                         attloc->second.substr(1,attloc->second.length()-1).data(),
-                                        NULL,10))));
+                                        nullptr,10))));
                                     newrec.setYOffset(PADDING_TWIPS +
                                         newrec.textHeight() +
                                         (fontLeading - fontDescent));
                                     _fontHeight -= pixelsToTwips(std::strtol(
                                         attloc->second.substr(1,attloc->second.length()-1).data(),
-                                        NULL,10));
+                                        nullptr,10));
                                 } else {
                                     newrec.setTextHeight(pixelsToTwips(std::strtol(
-                                        attloc->second.data(), NULL, 10)));
+                                        attloc->second.data(), nullptr, 10)));
                                     newrec.setYOffset(PADDING_TWIPS + newrec.textHeight() +
                                         (fontLeading - fontDescent));
                                     _fontHeight = pixelsToTwips(std::strtol(
-                                        attloc->second.data(), NULL, 10));
+                                        attloc->second.data(), nullptr, 10));
                                 }
                             }
                             handleChar(it, e, x, y, newrec, last_code,
@@ -1567,7 +1567,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             if (attloc != attributes.end()) {
                                 //textformat BLOCKINDENT attribute
                                 setBlockIndent(pixelsToTwips(std::strtol(
-                                        attloc->second.data(), NULL, 10)));
+                                        attloc->second.data(), nullptr, 10)));
                                 if (newrec.xOffset() == std::max(0, originalleftmargin +
                                     originalindent + originalblockindent) + PADDING_TWIPS) {
                                     //if beginning of line, indent
@@ -1581,7 +1581,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             if (attloc != attributes.end()) {
                                 //textformat INDENT attribute
                                 setIndent(pixelsToTwips(std::strtol(
-                                    attloc->second.data(), NULL, 10)));
+                                    attloc->second.data(), nullptr, 10)));
                                 if (newrec.xOffset() == std::max(0, originalleftmargin +
                                     originalindent + getBlockIndent()) + PADDING_TWIPS) {
                                     //if beginning of line, indent
@@ -1595,13 +1595,13 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             if (attloc != attributes.end()) {
                                 //textformat LEADING attribute
                                 setLeading(pixelsToTwips(std::strtol(
-                                        attloc->second.data(), NULL, 10)));
+                                        attloc->second.data(), nullptr, 10)));
                             }
                             attloc = attributes.find("LEFTMARGIN");
                             if (attloc != attributes.end()) {
                                 //textformat LEFTMARGIN attribute
                                 setLeftMargin(pixelsToTwips(std::strtol(
-                                        attloc->second.data(), NULL, 10)));
+                                        attloc->second.data(), nullptr, 10)));
                                 if (newrec.xOffset() == std::max(0, originalleftmargin +
                                     getIndent() + getBlockIndent()) + PADDING_TWIPS) {
                                     //if beginning of line, indent
@@ -1615,7 +1615,7 @@ TextField::handleChar(std::wstring::const_iterator& it,
                             if (attloc != attributes.end()) {
                                 //textformat RIGHTMARGIN attribute
                                 setRightMargin(pixelsToTwips(std::strtol(
-                                        attloc->second.data(), NULL, 10)));
+                                        attloc->second.data(), nullptr, 10)));
                                 //FIXME:Should not apply this to this line if we are not at
                                 //beginning of line. Not sure how to do that.
                             }
@@ -1892,7 +1892,7 @@ TextField::VariableRef
 TextField::parseTextVariableRef(const std::string& variableName) const
 {
     VariableRef ret;
-    ret.first = 0;
+    ret.first = nullptr;
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
     log_debug("VariableName: %s", variableName);

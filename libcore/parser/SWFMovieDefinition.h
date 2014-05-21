@@ -309,7 +309,7 @@ public:
 #endif
 
         PlayListMap::const_iterator it = m_playlist.find(frame_number);
-        if ( it == m_playlist.end() ) return NULL;
+        if ( it == m_playlist.end() ) return nullptr;
         else return &(it->second);
     }
 
@@ -355,11 +355,11 @@ public:
     /// TOCHECK:
     /// The _root reference of the newly created movie_root
     /// will be set to a newly created Movie.
-    Movie* createMovie(Global_as& gl, DisplayObject* parent = 0);
+    Movie* createMovie(Global_as& gl, DisplayObject* parent = nullptr);
 
     virtual DisplayObject* createDisplayObject(Global_as&, DisplayObject*)
         const {
-        return 0;
+        return nullptr;
     }
 
     virtual const std::string& get_url() const { return _url; }

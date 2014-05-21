@@ -363,7 +363,7 @@ public:
     /// (1) Construct this instance as an ActionScript object.
     ///     See constructAsScriptObject() method, including constructing
     ///     registered class and adding properties.
-    virtual void construct(as_object* initObj = 0);
+    virtual void construct(as_object* initObj = nullptr);
 
     /// Mark this sprite as destroyed
     //
@@ -492,7 +492,7 @@ public:
     /// @param init_object
     ///     If not null, will be used to copy properties over.
     MovieClip* duplicateMovieClip(const std::string& newname,
-        int newdepth, as_object* init_object = 0);
+        int newdepth, as_object* init_object = nullptr);
 
     /// Called when a mouse event affects this MovieClip
     virtual void mouseEvent(const event_id& id) {

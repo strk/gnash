@@ -35,7 +35,7 @@ StaticText::getStaticText(std::vector<const SWF::TextRecord*>& to,
         return this;
     }
     
-    return 0;
+    return nullptr;
 }
 
 void

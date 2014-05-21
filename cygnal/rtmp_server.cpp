@@ -134,7 +134,7 @@ RTMPServer::processClientHandShake(int fd)
     // just sent.
     std::shared_ptr<cygnal::Buffer> handshake2 = RTMP::recvMsg(fd);
     // See if we have data in the handshake, we should have 1536 bytes
-    if (handshake2 == 0) {
+    if (handshake2 == nullptr) {
 	log_error(_("failed to read the handshake from the client."));
 	return tcurl;		// nc is empty
     } else {
@@ -421,7 +421,7 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
     std::uint8_t *ptr = buf.reference();
     AMF amf;
     
-    if (ptr == 0) {
+    if (ptr == nullptr) {
 	return false;
     }
 
@@ -466,7 +466,7 @@ RTMPServer::packetRead(cygnal::Buffer &buf)
     while ( size < static_cast<std::uint16_t>(_header.bodysize) - 24 ) {
 	if (ptr) {
 	    el = amf_obj.extractProperty(ptr, tooFar);
-	    if (el != 0) {
+	    if (el != nullptr) {
 		size += amf_obj.totalsize();
 		ptr += amf_obj.totalsize();
 //		_properties[el->getName()] = el;
@@ -1200,7 +1200,7 @@ RTMPServer::createClientID()
     std::uint64_t value = 0;
 # ifdef HAVE_GETTIMEOFDAY
     timeval tv;
-    gettimeofday(&tv, NULL);
+    gettimeofday(&tv, nullptr);
     random_time_bits = ((uint64_t)tv.tv_usec << 16) ^ tv.tv_sec;
 # else
     random_time_bits = time(NULL);
@@ -1408,14 +1408,14 @@ rtmp_handler(Network::thread_params_t *args)
     do {
 	// If there is no data left from the previous chunk, process
 	// that before reading more data.
-	if (pkt != 0) {
+	if (pkt != nullptr) {
 	    log_network("data left from previous packet");
 	} else {
 	    pkt = rtmp->recvMsg(args->netfd);
 	}
 	
-	if (pkt != 0) {
-	    std::uint8_t *tmpptr = 0;
+	if (pkt != nullptr) {
+	    std::uint8_t *tmpptr = nullptr;
 	    if (pkt->allocated()) {
 		std::shared_ptr<RTMP::queues_t> que = rtmp->split(*pkt);
 		if (!que) {
@@ -1599,14 +1599,14 @@ rtmp_handler(Network::thread_params_t *args)
 			      if (rtmp->sendMsg(args->netfd, 6,
 					RTMP::HEADER_12, 0,
 					RTMP::AUDIO_DATA, RTMPMsg::FROM_SERVER,
-					0, 0)) {
+					nullptr, 0)) {
 			      }
 			      // Send an empty Video packet to get
 			      // things started.
 			      if (rtmp->sendMsg(args->netfd, 5,
 					RTMP::HEADER_12, 0,
 					RTMP::VIDEO_DATA, RTMPMsg::FROM_SERVER,
-					0, 0)) {
+					nullptr, 0)) {
 			      }
 			      sleep(1); // FIXME: debugging crap
 			      // Send the User Control - Stream Start

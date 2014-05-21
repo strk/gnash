@@ -41,7 +41,7 @@ class gnashGstBuffer : public image::ImageRGB
 {
 public:
   gnashGstBuffer(GstBuffer* buf, int width, int height)
-  : image::ImageRGB(NULL, width, height),
+  : image::ImageRGB(nullptr, width, height),
     _buffer(buf)
   {}
   

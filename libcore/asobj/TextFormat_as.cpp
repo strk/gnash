@@ -584,7 +584,7 @@ textformat_getTextExtent(const fn_call& fn)
     // getTextExtent currently only takes account of device fonts we don't
     // need it.
 
-    Font* f = 0;
+    Font* f = nullptr;
     if (relay->font()) {
         const std::string& name = *relay->font();
         const movie_definition* md = getRoot(fn).getRootMovie().definition();

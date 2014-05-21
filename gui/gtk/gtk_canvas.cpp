@@ -66,7 +66,7 @@ struct _GnashCanvas
 
 G_DEFINE_TYPE(GnashCanvas, gnash_canvas, GTK_TYPE_DRAWING_AREA)
 
-static GObjectClass *parent_class = NULL;
+static GObjectClass *parent_class = nullptr;
 
 static void gnash_canvas_class_init(GnashCanvasClass *gnash_canvas_class);
 static void gnash_canvas_init(GnashCanvas *canvas);
@@ -83,7 +83,7 @@ namespace {
 GtkWidget *
 gnash_canvas_new ()
 {
-    return GTK_WIDGET(g_object_new (GNASH_TYPE_CANVAS, NULL));
+    return GTK_WIDGET(g_object_new (GNASH_TYPE_CANVAS, nullptr));
 }
 
 static void

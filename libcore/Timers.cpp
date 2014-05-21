@@ -56,7 +56,7 @@ Timer::Timer(as_object* this_ptr, const ObjectURI& methodName,
     :
     _interval(ms),
     _start(std::numeric_limits<unsigned long>::max()),
-    _function(0),
+    _function(nullptr),
     _methodName(methodName),
     _object(this_ptr),
     _args(args),

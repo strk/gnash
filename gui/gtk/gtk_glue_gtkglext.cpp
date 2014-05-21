@@ -41,13 +41,13 @@ GtkGlExtGlue::~GtkGlExtGlue()
 //    GNASH_REPORT_FUNCTION;
     if (_glconfig) {
         g_object_unref (G_OBJECT (_glconfig));
-        _glconfig = NULL;
+        _glconfig = nullptr;
     }
     
     GdkGLContext *glcontext = gtk_widget_get_gl_context (_drawing_area);
     if (glcontext) {
        g_object_unref (G_OBJECT (glcontext));
-       glcontext = NULL;
+       glcontext = nullptr;
     }
 }
 
@@ -94,7 +94,7 @@ GtkGlExtGlue::prepDrawingArea(GtkWidget *drawing_area)
 //    GNASH_REPORT_FUNCTION;
     _drawing_area = drawing_area;
     gtk_widget_set_gl_capability(_drawing_area, _glconfig,
-                                 NULL, TRUE, GDK_GL_RGBA_TYPE);
+                                 nullptr, TRUE, GDK_GL_RGBA_TYPE);
 }
 
 Renderer*

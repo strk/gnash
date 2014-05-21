@@ -146,7 +146,7 @@ PropertyList::getProperty(const ObjectURI& uri) const
     kcl.check(uri.name);
 #endif // GNASH_STATS_PROPERTY_LOOKUPS
 	iterator found = iterator_find(_props, uri, getVM(_owner));
-	if (found == _props.end()) return 0;
+	if (found == _props.end()) return nullptr;
 	return const_cast<Property*>(&(*found));
 }
 
@@ -277,7 +277,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri, as_function& getter,
 	}
 
 	// destructive getter doesn't need a setter
-	Property a(uri, &getter, 0, flagsIfMissing, true);
+	Property a(uri, &getter, nullptr, flagsIfMissing, true);
 
 	_props.push_back(a);
 
@@ -298,7 +298,7 @@ PropertyList::addDestructiveGetter(const ObjectURI& uri,
 	if (found != _props.end()) return false; 
 
 	// destructive getter doesn't need a setter
-	Property a(uri, getter, 0, flagsIfMissing, true);
+	Property a(uri, getter, nullptr, flagsIfMissing, true);
 	_props.push_back(a);
 
 #ifdef GNASH_DEBUG_PROPERTY

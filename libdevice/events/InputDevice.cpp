@@ -126,7 +126,7 @@ InputDevice::readData(size_t size)
     tval.tv_sec  = 0;
     tval.tv_usec = 1;
     errno = 0;
-    int ret = ::select(_fd+1, &fdset, NULL, NULL, &tval);
+    int ret = ::select(_fd+1, &fdset, nullptr, nullptr, &tval);
     if (ret == 0) {
 //            log_debug(_("The pipe for fd #%d timed out waiting to read"), fd);
         return inbuf;

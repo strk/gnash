@@ -78,7 +78,7 @@ as_function::construct(as_object& newobj, const as_environment& env,
     
     // Don't set a super so that it will be constructed only if required
     // by the function.
-    fn_call fn(&newobj, env, args, 0, true);
+    fn_call fn(&newobj, env, args, nullptr, true);
     as_value ret;
 
     try {

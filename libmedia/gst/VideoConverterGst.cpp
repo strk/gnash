@@ -30,9 +30,9 @@ namespace gst {
 VideoConverterGst::VideoConverterGst(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC dstFormat)
     : VideoConverter(srcFormat, dstFormat)
 {
-    _decoder.bin = 0;
+    _decoder.bin = nullptr;
 
-    gst_init (NULL, NULL);
+    gst_init (nullptr, nullptr);
     
     GstElementFactory* colorspacefactory = gst_element_factory_find ("ffmpegcolorspace");
     if (!colorspacefactory) {
@@ -153,7 +153,7 @@ VideoConverterGst::convert(const ImgBuf& src)
     ret.reset(new ImgBuf(_dst_fmt, GST_BUFFER_DATA(retbuffer),
                          GST_BUFFER_SIZE(retbuffer), src.width, src.height));
 
-    GST_BUFFER_MALLOCDATA(retbuffer) = 0; // don't free
+    GST_BUFFER_MALLOCDATA(retbuffer) = nullptr; // don't free
     gst_buffer_unref(retbuffer);
     
     ret->dealloc = g_free;

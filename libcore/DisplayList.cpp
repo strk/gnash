@@ -149,10 +149,10 @@ DisplayList::getDisplayObjectAtDepth(int depth) const
         if (ch->get_depth() == depth) return ch;
 
         // non-existent (chars are ordered by depth)
-        if (ch->get_depth() > depth) return 0;
+        if (ch->get_depth() > depth) return nullptr;
     }
 
-    return 0;
+    return nullptr;
 
 }
 
@@ -168,7 +168,7 @@ DisplayList::getDisplayObjectByName(string_table& st, const ObjectURI& uri,
     container_type::const_iterator it =
         std::find_if(_charsByDepth.begin(), e, NameEquals(st, uri, caseless));
 
-    if (it == e) return 0;
+    if (it == e) return nullptr;
     
     return *it;
 

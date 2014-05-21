@@ -217,7 +217,7 @@ AsBroadcaster::init(as_object& where, const ObjectURI& uri)
 {
     // AsBroadcaster is a class, even though it doesn't look much like one.
     // Its prototype has no properties.
-    registerBuiltinClass(where, emptyFunction, 0,
+    registerBuiltinClass(where, emptyFunction, nullptr,
             attachAsBroadcasterStaticInterface, uri);
 }
 

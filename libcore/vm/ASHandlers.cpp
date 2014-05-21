@@ -462,7 +462,7 @@ ActionNextFrame(ActionExec& thread)
 #endif
 
     DisplayObject* tgtch = env.target();
-    MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
+    MovieClip* tgt = tgtch ? tgtch->to_movie() : nullptr;
     if (tgt) tgt->goto_frame(tgt->get_current_frame() + 1);
     else {
         log_debug("ActionNextFrame: as_environment target is null "
@@ -480,7 +480,7 @@ ActionPrevFrame(ActionExec& thread)
 #endif
 
     DisplayObject* tgtch = env.target();
-    MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
+    MovieClip* tgt = tgtch ? tgtch->to_movie() : nullptr;
     if (tgt) tgt->goto_frame(tgt->get_current_frame() - 1);
     else log_debug("ActionPrevFrame: as_environment target is null or not a sprite");
 }
@@ -495,7 +495,7 @@ ActionPlay(ActionExec& thread)
 #endif
 
     DisplayObject* tgtch = env.target();
-    MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
+    MovieClip* tgt = tgtch ? tgtch->to_movie() : nullptr;
     if (tgt) tgt->setPlayState(MovieClip::PLAYSTATE_PLAY);
     else log_debug("ActionPlay: as_environment target is null or not a sprite");
 }
@@ -510,7 +510,7 @@ ActionStop(ActionExec& thread)
 #endif
 
     DisplayObject* tgtch = env.target();
-    MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
+    MovieClip* tgt = tgtch ? tgtch->to_movie() : nullptr;
     if (tgt) tgt->setPlayState(MovieClip::PLAYSTATE_STOP);
     else log_debug("ActionStop: as_environment target is null or not a sprite");
 }
@@ -553,7 +553,7 @@ ActionGotoFrame(ActionExec& thread)
     size_t frame = code.read_int16(thread.getCurrentPC() + 3);
 
     DisplayObject* tgtch = env.target();
-    MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
+    MovieClip* tgt = tgtch ? tgtch->to_movie() : nullptr;
 
     // frame number within this tag is hard-coded and 0-based
     if (tgt) tgt->goto_frame(frame);
@@ -624,7 +624,7 @@ ActionWaitForFrame(ActionExec& thread)
     std::uint8_t skip = code[thread.getCurrentPC()+5];
 
     DisplayObject* target = env.target();
-    MovieClip* target_sprite = target ? target->to_movie() : 0;
+    MovieClip* target_sprite = target ? target->to_movie() : nullptr;
     if (!target_sprite) {
         log_error(_("%s: environment target is null or not a MovieClip"),
                 __FUNCTION__);
@@ -674,7 +674,7 @@ ActionGotoLabel(ActionExec& thread)
 
     const char* frame_label = code.read_string(thread.getCurrentPC()+3);
     DisplayObject *target = env.target();
-    MovieClip *target_sprite = target ? target->to_movie() : 0;
+    MovieClip *target_sprite = target ? target->to_movie() : nullptr;
     if (!target_sprite) {
         log_error(_("GotoLabel: environment target is null or not a "
                     "MovieClip"));
@@ -1690,7 +1690,7 @@ ActionWaitForFrameExpression(ActionExec& thread)
     as_value framespec = env.pop();
 
     DisplayObject* tgtch = env.target();
-    MovieClip* target_sprite = tgtch ? tgtch->to_movie() : 0;
+    MovieClip* target_sprite = tgtch ? tgtch->to_movie() : nullptr;
     if (!target_sprite) {
         log_error(_("%s: environment target is null or not a MovieClip"),
             __FUNCTION__);
@@ -1963,7 +1963,7 @@ ActionCallFrame(ActionExec& thread)
     std::string target_path;
     std::string frame_var;
 
-    DisplayObject* target = 0;
+    DisplayObject* target = nullptr;
     if (parsePath(target_frame, target_path, frame_var)) {
         target = findTarget(env, target_path);
     }
@@ -1974,7 +1974,7 @@ ActionCallFrame(ActionExec& thread)
 
     env.drop(1);
 
-    MovieClip* target_sprite = target ? target->to_movie() : 0;
+    MovieClip* target_sprite = target ? target->to_movie() : nullptr;
     if (target_sprite) {
         target_sprite->call_frame_actions(frame_var);
     }
@@ -2013,7 +2013,7 @@ ActionGotoExpression(ActionExec& thread)
     std::string target_path;
     std::string frame_var;
 
-    DisplayObject* target = NULL;
+    DisplayObject* target = nullptr;
     if (parsePath(target_frame, target_path, frame_var)) {
         target = findTarget(env, target_path);
     }
@@ -2026,7 +2026,7 @@ ActionGotoExpression(ActionExec& thread)
         frame_var = target_frame;
     }
 
-    MovieClip *target_sprite = target ? target->to_movie() : NULL;
+    MovieClip *target_sprite = target ? target->to_movie() : nullptr;
     if (target_sprite) {
         size_t frame_number;
         if (!target_sprite->get_frame_number(frame_var, frame_number)) {
@@ -2076,7 +2076,7 @@ ActionDelete(ActionExec& thread)
 
     std::string propertyname = env.top(0).to_string();
 
-    as_object* obj(0);
+    as_object* obj(nullptr);
 
     // Behaviour is different according to version. For SWF7 and above,
     // the delete fails if there aren't two items on the stack. For SWF6
@@ -2210,7 +2210,7 @@ ActionCallFunction(ActionExec& thread)
     // is dropped from the stack.
     const std::string& funcname = env.pop().to_string();
 
-    as_object* super(0);
+    as_object* super(nullptr);
 
     as_object* this_ptr;
     as_value function = thread.getVariable(funcname, &this_ptr);
@@ -2734,7 +2734,7 @@ ActionCallMethod(ActionExec& thread)
     as_object* method_obj; // The method to call, as an object
 
     // The object to be the 'this' pointer during the call.
-    as_object* this_ptr(0);
+    as_object* this_ptr(nullptr);
 
     // Will be used to find super later
     ObjectURI methURI;
@@ -2797,7 +2797,7 @@ ActionCallMethod(ActionExec& thread)
     if (func && func->isBuiltin()) {
         // Do not construct super if method is a builtin
         // TODO: check if this is correct!!
-        super = 0;
+        super = nullptr;
     }
     else {
         super = obj->get_super(methURI);
@@ -2915,7 +2915,7 @@ ActionInstanceOf(ActionExec& thread)
 
     // Get the "instance" (but avoid implicit conversion of primitive values!)
     as_object* instance = env.top(1).is_object() ?
-        safeToObject(getVM(thread.env), env.top(1)) : 0;
+        safeToObject(getVM(thread.env), env.top(1)) : nullptr;
 
     // Invalid args!
     if (!super || ! instance) {
@@ -3253,7 +3253,7 @@ ActionTry(ActionExec& thread)
     std::uint16_t catchSize = code.read_uint16(i); i += 2;
     std::uint16_t finallySize = code.read_uint16(i); i += 2;
 
-    const char* catchName = NULL;
+    const char* catchName = nullptr;
     std::uint8_t catchRegister = 0;
 
     if (!doFinally) finallySize = 0;
@@ -3451,7 +3451,7 @@ safeToObject(VM& vm, const as_value& val)
         return toObject(val, vm);
     }
     catch (const GnashException&) {
-        return 0;
+        return nullptr;
     }
 }
 
@@ -3565,7 +3565,7 @@ commonGetURL(as_environment& env, as_value target,
             sendVarsMethod, loadTargetFlag, loadVariableFlag);
 
     DisplayObject* target_ch = findTarget(env, target_string);
-    MovieClip* target_movie = target_ch ? target_ch->to_movie() : 0;
+    MovieClip* target_movie = target_ch ? target_ch->to_movie() : nullptr;
 
     if (loadVariableFlag) {
         log_debug("getURL2 loadVariable");

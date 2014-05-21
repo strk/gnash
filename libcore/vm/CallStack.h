@@ -85,7 +85,7 @@ public:
     /// @return     A pointer to the value in the register or 0 if no such
     ///             register exists.
     const as_value* getLocalRegister(size_t i) const {
-        if (i >= _registers.size()) return 0;
+        if (i >= _registers.size()) return nullptr;
         return &_registers[i];
     }
 

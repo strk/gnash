@@ -108,7 +108,7 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
     log_debug(_("The device on %s says its name is %s"), filespec, name);
     // /dev/mxc_ts is the Touchscreen driver used by the Freescale Babbage board
     // For some reason it has an empty device info structure other than the name.
-    if (strstr(name, "mxc_ts") != 0) {
+    if (strstr(name, "mxc_ts") != nullptr) {
         _device_info.bustype = BUS_HOST;
     }
     log_debug(_("vendor %04hx product %04hx version %04hx"),
@@ -162,10 +162,10 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
       case BUS_I8042:
           // This is for keyboards and mice
           log_debug(_("is an I8042 bus type"));
-          if (strstr(name, "keyboard") != 0) {
+          if (strstr(name, "keyboard") != nullptr) {
               _type = InputDevice::KEYBOARD;
           } else {
-              if (strstr(name, "Mouse") != 0) {
+              if (strstr(name, "Mouse") != nullptr) {
                   _type = InputDevice::MOUSE;
               }
           }
@@ -194,11 +194,11 @@ EventDevice::init(const std::string &filespec, size_t /* size */)
       case BUS_HOST:
           // log_debug("is Host bus type");
           // ON the Babbage board, this is the evdev driver version 1.0.0 
-          if (strstr(name, "mxc_ts") != 0) {
+          if (strstr(name, "mxc_ts") != nullptr) {
               log_debug(_("Babbage Touchscreen found!"));
               _type = InputDevice::TABLET;
           }
-          if (strstr(name, "mxckpd") != 0) {
+          if (strstr(name, "mxckpd") != nullptr) {
               log_debug(_("Babbage Power Button found!"));
               _type = InputDevice::POWERBUTTON;
           }

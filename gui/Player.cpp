@@ -204,7 +204,7 @@ Player::Player()
     _doRender(true),
     _doSound(true),
     _exitTimeout(0),
-    _movieDef(0),
+    _movieDef(nullptr),
     _maxAdvances(0),
 #ifdef GNASH_FPS_DEBUG
     _fpsDebugTime(0.0),
@@ -361,12 +361,12 @@ Player::load_movie()
     }
     catch (const GnashException& er) {
         std::cerr << er.what() << std::endl;
-        md = NULL;
+        md = nullptr;
     }
 
     if (!md) {
         fprintf(stderr, "Could not load movie '%s'\n", _infile.c_str());
-        return NULL;
+        return nullptr;
     }
 
     return md;
@@ -782,7 +782,7 @@ Player::CallbacksHandler::notify(const std::string& command,
         //log_debug("allowscale: %s", args);
         if (noCaseCompare(args, "true")) _gui.allowScale(true);
         else {
-            if (strtol(args.c_str(), NULL, 0)) _gui.allowScale(true);
+            if (strtol(args.c_str(), nullptr, 0)) _gui.allowScale(true);
             else _gui.allowScale(false);
         }
         return;

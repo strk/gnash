@@ -102,11 +102,11 @@ public:
     T* get(const Key& name) {
         Init();
         if (name.empty()) {
-            return _handlers.empty() ? 0 : _handlers.begin()->second();
+            return _handlers.empty() ? nullptr : _handlers.begin()->second();
         }
 
         typename Handlers::const_iterator it = _handlers.find(name);
-        if (it == _handlers.end()) return 0;
+        if (it == _handlers.end()) return nullptr;
         return it->second();
     }
 

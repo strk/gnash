@@ -159,7 +159,7 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 	    if (name == "keep-alive") {
 		_keepalive = true;
 		if ((value != "on") && (value != "off")) {
-		    _max_requests = strtol(value.c_str(), NULL, 0);
+		    _max_requests = strtol(value.c_str(), nullptr, 0);
 		    // log_debug("Setting Max Requests for Keep-Alive to %d", _max_requests);
 		}
 	    }
@@ -169,7 +169,7 @@ HTTP::processHeaderFields(cygnal::Buffer *buf)
 		}
 	    }
 	    if (name == "content-length") {
-		_filesize = strtol(value.c_str(), NULL, 0);
+		_filesize = strtol(value.c_str(), nullptr, 0);
 		log_debug(_("Setting Content Length to %d"), _filesize);
 	    }
 	    if (name == "content-type") {
@@ -639,7 +639,7 @@ HTTP::getContentLength()
     //    GNASH_REPORT_FUNCTION;
     std::string length = getField("content-length");
     if (length.size() > 0) {
-	return static_cast<size_t>(strtol(length.c_str(), NULL, 0));
+	return static_cast<size_t>(strtol(length.c_str(), nullptr, 0));
     }
 
     return 0;
@@ -1378,7 +1378,7 @@ HTTP::recvChunked(std::uint8_t *data, size_t size)
 	// extract the total size of the chunk
 	std::string bytes(data, start-2);
 	size_t sizesize = start-data;
-	total = static_cast<size_t>(strtol(bytes.c_str(), NULL, 16));
+	total = static_cast<size_t>(strtol(bytes.c_str(), nullptr, 16));
 	log_debug(_("%s: Total size for first chunk is: %d, data size %d (%d)"),
 		  __PRETTY_FUNCTION__, total, size, sizesize);
 	buf.reset(new cygnal::Buffer(total+2));
@@ -1427,7 +1427,7 @@ HTTP::recvChunked(std::uint8_t *data, size_t size)
 		    if (start != buf->reference()+ret) {
 			// extract the total size of the chunk
 			std::string bytes(buf->reference(), start-2);
-			total = static_cast<size_t>(strtol(bytes.c_str(), NULL, 16));
+			total = static_cast<size_t>(strtol(bytes.c_str(), nullptr, 16));
 			// The total size of the last chunk is always "0"
 			if (total == 0) {
 			    log_debug(_("%s: end of chunks!"), __PRETTY_FUNCTION__);

@@ -136,7 +136,7 @@ public:
             _callbacks.erase(it);
             return callback;
         }
-        return 0;
+        return nullptr;
     }
 
 protected:
@@ -424,7 +424,7 @@ void
 netconnection_class_init(as_object& where, const ObjectURI& uri)
 {
     registerBuiltinClass(where, netconnection_new,
-            attachNetConnectionInterface, 0, uri);
+            attachNetConnectionInterface, nullptr, uri);
 }
 
 void
@@ -733,7 +733,7 @@ netconnection_call(const fn_call& fn)
 #endif
 
     // TODO: arg(1) is the response object. let it know when data comes back
-    as_object* asCallback(0);
+    as_object* asCallback(nullptr);
     if (fn.nargs > 1) {
 
         if (fn.arg(1).is_object()) {

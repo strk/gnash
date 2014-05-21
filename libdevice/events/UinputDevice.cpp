@@ -65,7 +65,7 @@ UinputDevice::scanForDevice()
         "/dev/input/event4",
         "/dev/uinput",
         "/dev/input/uinput",
-        0
+        nullptr
     };
 
     int i = 0;
@@ -192,7 +192,7 @@ UinputDevice::moveTo(int x, int y)
 
     input_event ev = input_event();
     
-    gettimeofday(&ev.time, NULL);
+    gettimeofday(&ev.time, nullptr);
     ev.type = EV_ABS;
     ev.code = ABS_X;
     ev.value = x;

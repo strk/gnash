@@ -97,7 +97,7 @@ MediaHandlerGst::createVideoDecoder(const VideoInfo& info)
     int width = info.width;
     int height = info.height;
 
-    std::uint8_t* extradata = 0;
+    std::uint8_t* extradata = nullptr;
     size_t datasize = 0;
 
     ExtraVideoInfoFlv* extrainfo = dynamic_cast<ExtraVideoInfoFlv*>(info.extra.get());

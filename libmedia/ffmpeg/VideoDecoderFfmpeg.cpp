@@ -50,7 +50,7 @@ namespace {
     VaapiContextFfmpeg* get_vaapi_context(AVCodecContext* avctx);
     void set_vaapi_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx);
     void clear_vaapi_context(AVCodecContext* avctx);
-    void reset_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx = 0);
+    void reset_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx = nullptr);
     PixelFormat get_format(AVCodecContext* avctx, const PixelFormat* fmt);
 #if LIBAVCODEC_VERSION_MAJOR >= 55
     int get_buffer(AVCodecContext* avctx, AVFrame* pic, int flags);
@@ -117,7 +117,7 @@ private:
 
 VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width, int height)
     :
-    _videoCodec(NULL)
+    _videoCodec(nullptr)
 {
 
     CODECID codec_id = flashToFfmpegCodec(format);
@@ -127,7 +127,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width, int hei
 
 VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
     :
-    _videoCodec(NULL)
+    _videoCodec(nullptr)
 {
 
     CODECID codec_id = AV_CODEC_ID_NONE;
@@ -146,7 +146,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
         throw MediaException(msg.str());
     }
 
-    std::uint8_t* extradata=0;
+    std::uint8_t* extradata=nullptr;
     int extradataSize=0;
     if (info.extra.get())
     {
@@ -218,7 +218,7 @@ VideoDecoderFfmpeg::init(enum CODECID codecId, int /*width*/, int /*height*/,
 #endif
 
 #if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(53,8,0)
-    int ret = avcodec_open2(ctx, _videoCodec, NULL);
+    int ret = avcodec_open2(ctx, _videoCodec, nullptr);
 #else
     int ret = avcodec_open(ctx, _videoCodec);
 #endif
@@ -293,7 +293,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 
         _swsContext.reset(new SwsContextWrapper(
             sws_getContext(width, height, srcPixFmt, width, height,
-                pixFmt, SWS_BILINEAR, NULL, NULL, NULL)
+                pixFmt, SWS_BILINEAR, nullptr, nullptr, nullptr)
         ));
         
         // Check that the context was assigned.
@@ -464,7 +464,7 @@ get_vaapi_context(AVCodecContext* avctx)
     return static_cast<VaapiContextFfmpeg *>(avctx->hwaccel_context);
 #else
     UNUSED(avctx);
-	return 0;
+	return nullptr;
 #endif
 }
 
@@ -501,7 +501,7 @@ reset_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx)
     set_vaapi_context(avctx, vactx);
 
     avctx->thread_count = 1;
-    avctx->draw_horiz_band = 0;
+    avctx->draw_horiz_band = nullptr;
     if (vactx) {
         avctx->slice_flags = SLICE_FLAG_CODED_ORDER|SLICE_FLAG_ALLOW_FIELD;
     }

@@ -59,7 +59,7 @@ VM::VM(movie_root& root, VirtualClock& clock)
 	_stack(),
     _shLib(new SharedObjectLibrary(*this)),
     _rng(clock.elapsed()),
-    _constantPool(0)
+    _constantPool(nullptr)
 {
 	NSV::loadStrings(_stringTable);
     _global->registerClasses();
@@ -199,7 +199,7 @@ VM::getRegister(size_t index)
 
     // Otherwise it can be in the global registers.
     if (index < _globalRegisters.size()) return &_globalRegisters[index];
-    return 0;
+    return nullptr;
 }
 
 void
@@ -276,9 +276,9 @@ NativeFunction*
 VM::getNative(unsigned int x, unsigned int y) const
 {
     AsNativeTable::const_iterator row = _asNativeTable.find(x);
-    if (row == _asNativeTable.end()) return 0;
+    if (row == _asNativeTable.end()) return nullptr;
     FuncMap::const_iterator col = row->second.find(y);
-    if (col == row->second.end()) return 0;
+    if (col == row->second.end()) return nullptr;
     Global_as::ASFunction fun = col->second;
 
     NativeFunction* f = new NativeFunction(*_global, fun);

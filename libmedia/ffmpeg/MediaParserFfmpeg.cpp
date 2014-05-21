@@ -323,12 +323,12 @@ MediaParserFfmpeg::getBytesLoaded() const
 MediaParserFfmpeg::MediaParserFfmpeg(std::unique_ptr<IOChannel> stream)
 	:
 	MediaParser(std::move(stream)),
-	_inputFmt(0),
-	_formatCtx(0),
+	_inputFmt(nullptr),
+	_formatCtx(nullptr),
 	_videoStreamIndex(-1),
-	_videoStream(0),
+	_videoStream(nullptr),
 	_audioStreamIndex(-1),
-	_audioStream(0),
+	_audioStream(nullptr),
 	_lastParsedPosition(0)
 {
 	initializeParser();
@@ -376,7 +376,7 @@ MediaParserFfmpeg::initializeParser()
 		  0, // write flags
 		  this, // opaque pointer to pass to the callbacks
 		  MediaParserFfmpeg::readPacketWrapper, // packet reader callback
-		  NULL, // packet writer callback
+		  nullptr, // packet writer callback
 		  MediaParserFfmpeg::seekMediaWrapper // seeker callback
 		  );
     
@@ -405,7 +405,7 @@ MediaParserFfmpeg::initializeParser()
 
     _formatCtx->pb = _avIOCxt;
 
-    if (avformat_open_input(&_formatCtx, "", _inputFmt, NULL) < 0)
+    if (avformat_open_input(&_formatCtx, "", _inputFmt, nullptr) < 0)
 #endif
     {
         throw IOException("MediaParserFfmpeg couldn't open input stream");
@@ -422,7 +422,7 @@ MediaParserFfmpeg::initializeParser()
 #else
     AVDictionary* md = _formatCtx->metadata;
     if (md) {
-        AVDictionaryEntry* tag = av_dict_get(md, "album", 0,
+        AVDictionaryEntry* tag = av_dict_get(md, "album", nullptr,
                 AV_DICT_MATCH_CASE);
 #endif
         if (tag && tag->value) {

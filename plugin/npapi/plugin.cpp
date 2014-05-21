@@ -147,10 +147,10 @@ static const char* getPluginDescription();
 static const char*
 getPluginDescription() 
 {
-    static const char* desc = NULL;
+    static const char* desc = nullptr;
     if (!desc) {
         desc = std::getenv("GNASH_PLUGIN_DESCRIPTION");
-        if (desc == NULL) desc = PLUGIN_DESCRIPTION;
+        if (desc == nullptr) desc = PLUGIN_DESCRIPTION;
     }
     return desc;
 }
@@ -215,7 +215,7 @@ NS_PluginInitialize()
     // First, check for XEmbed support. The NPAPI Gnash plugin
     // only works with XEmbed, so tell the plugin API to fail if
     // XEmbed is not found.
-    err = NPN_GetValue(NULL,NPNVSupportsXEmbedBool,
+    err = NPN_GetValue(nullptr,NPNVSupportsXEmbedBool,
                        (void *)&supportsXEmbed);
 
     if (err != NPERR_NO_ERROR || !supportsXEmbed) {
@@ -228,7 +228,7 @@ NS_PluginInitialize()
     // GTK is not strictly required, but we do use the Glib main event loop,
     // so lack of GTK means reduced functionality.
     NPNToolkitType toolkit;
-    err = NPN_GetValue(NULL, NPNVToolkit, &toolkit);
+    err = NPN_GetValue(nullptr, NPNVToolkit, &toolkit);
 
     if (err != NPERR_NO_ERROR || toolkit != NPNVGtk2) {
         gnash::log_error("NPAPI ERROR: No GTK2 support in this browser! Have version %d", (int)toolkit);
@@ -240,7 +240,7 @@ NS_PluginInitialize()
     Check for environment variables.
     */
     char* opts = std::getenv("GNASH_OPTIONS");
-    if (opts != NULL) {
+    if (opts != nullptr) {
         gnash::log_debug("GNASH_OPTIONS: %s", opts);
         
         // Should the plugin wait for gdb to be attached?
@@ -265,7 +265,7 @@ NS_PluginInitialize()
     newGnashRc.append("/gnashpluginrc");
 #endif
 
-    const char *home = NULL;
+    const char *home = nullptr;
 #if defined(__amigaos4__)
     //on AmigaOS we have a GNASH: assign that point to program dir
     home = "/gnash";
@@ -398,7 +398,7 @@ NS_NewPluginInstance(nsPluginCreateData * aCreateDataStruct)
     // gnash::log_debug(__PRETTY_FUNCTION__);
 
     if(!aCreateDataStruct) {
-        return NULL;
+        return nullptr;
     }
 
     return new gnash::nsPluginInstance(aCreateDataStruct);

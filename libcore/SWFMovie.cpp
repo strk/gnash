@@ -86,9 +86,9 @@ SWF::DefinitionTag*
 SWFMovie::exportedCharacter(const std::string& symbol)
 {
     const std::uint16_t id = _def->exportID(symbol);
-    if (!id) return 0;
+    if (!id) return nullptr;
     Characters::iterator it = _characters.find(id);
-    if (it == _characters.end()) return 0;
+    if (it == _characters.end()) return nullptr;
     return _def->getDefinitionTag(id);
 }
 

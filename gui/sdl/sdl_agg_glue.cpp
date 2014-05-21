@@ -32,10 +32,10 @@ namespace gnash
 
 SdlAggGlue::SdlAggGlue()
 	:
-_sdl_surface(NULL),
-_offscreenbuf(NULL),
-_screen(NULL),
-_agg_renderer(NULL)
+_sdl_surface(nullptr),
+_offscreenbuf(nullptr),
+_screen(nullptr),
+_agg_renderer(nullptr)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -191,7 +191,7 @@ SdlAggGlue::render(int minx, int miny, int maxx, int maxy)
         static_cast<Uint16>(maxx - minx),
         static_cast<Uint16>(maxy - miny)};
     SDL_SetClipRect(_screen, &clip);
-    SDL_BlitSurface(_sdl_surface, 0, _screen, 0);
+    SDL_BlitSurface(_sdl_surface, nullptr, _screen, nullptr);
     SDL_UpdateRect(_screen, clip.x, clip.y, clip.w, clip.h);
 }
 

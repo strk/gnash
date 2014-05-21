@@ -56,7 +56,7 @@ filter_factory::read(SWFStream& in, bool read_multiple, Filters* store)
 
     for (int i = 0; i < count; ++i)
     {
-        BitmapFilter *the_filter = NULL;
+        BitmapFilter *the_filter = nullptr;
 
         in.ensureBytes(1);
         filter_types filter_type = static_cast<filter_types> (in.read_u8());

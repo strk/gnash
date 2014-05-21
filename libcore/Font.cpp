@@ -117,7 +117,7 @@ Font::get_glyph(int index, bool embedded) const
     }
 
     // TODO: should we log an error here ?
-    return 0;
+    return nullptr;
 }
 
 void
@@ -330,14 +330,14 @@ Font::ftProvider() const
     if (_name.empty()) {
         log_error(_("No name associated with this font, can't use device "
 		    "fonts (should I use a default one?)"));
-        return 0;
+        return nullptr;
     }
 
     _ftProvider = FreetypeGlyphsProvider::createFace(_name, _bold, _italic);
     
     if (!_ftProvider.get()) {
         log_error(_("Could not create a freetype face %s"), _name);
-        return 0;
+        return nullptr;
     }
     
     return _ftProvider.get();

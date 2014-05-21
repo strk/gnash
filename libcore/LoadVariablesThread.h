@@ -102,7 +102,7 @@ public:
 	bool inProgress()
 	{
 		// TODO: should we mutex-protect this ?
-		return ( _thread.get() != NULL );
+		return ( _thread.get() != nullptr );
 	}
 
 	/// Mutex-protected inspector for thread completion

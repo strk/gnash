@@ -58,8 +58,8 @@ GstElement* GstUtil::get_audiosink_element()
     
     if(sAudioSink.find('!') != std::string::npos) //Found a non-trivial pipeline - bin it
     {
-        element = gst_parse_bin_from_description(sAudioSink.c_str(), true, NULL);
-        if(element != NULL)
+        element = gst_parse_bin_from_description(sAudioSink.c_str(), true, nullptr);
+        if(element != nullptr)
         {
            std::ostringstream o;
            o << numGnashRcSinks++;
@@ -68,20 +68,20 @@ GstElement* GstUtil::get_audiosink_element()
     }
     else //Found a trivial pipeline that doesn't need a bin
     {
-        element = gst_element_factory_make(sAudioSink.c_str(), NULL);
+        element = gst_element_factory_make(sAudioSink.c_str(), nullptr);
     }
     
     if(!element)
     {
         log_debug(_("Unable to retrieve a valid audio sink from ~/.gnashrc"));
         
-        element = gst_element_factory_make("autoaudiosink", NULL);
+        element = gst_element_factory_make("autoaudiosink", nullptr);
         
         if(!element)
         {
             log_debug(_("Unable to retrieve a valid audio sink from autoaudiosink"));
             
-            element = gst_element_factory_make("gconfaudiosink", NULL);
+            element = gst_element_factory_make("gconfaudiosink", nullptr);
             
             if(!element)
                 log_error(_("Unable to retrieve a valid audio sink from gconfaudiosink\n%s"),
@@ -124,9 +124,9 @@ GstUtil::check_missing_plugins(GstCaps* caps)
         return false;
     }
 
-    char* details[] =  { detail, 0 };
+    char* details[] =  { detail, nullptr };
 
-    GstInstallPluginsReturn ret = gst_install_plugins_sync(details, NULL);
+    GstInstallPluginsReturn ret = gst_install_plugins_sync(details, nullptr);
     g_free(details[0]);
 
     // FIXME: what about partial success?

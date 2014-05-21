@@ -111,8 +111,8 @@ Gui::Gui(RunResources& r) :
     ,fps_timer_interval(0.0)
     ,frames_dropped(0)
 #endif
-    ,_movieDef(0)
-    ,_stage(0)
+    ,_movieDef(nullptr)
+    ,_stage(nullptr)
     ,_stopped(false)
     ,_started(false)
     ,_showUpdatedRegions(false)
@@ -155,8 +155,8 @@ Gui::Gui(unsigned long xid, float scale, bool loop, RunResources& r)
     ,fps_timer_interval(0.0)
     ,frames_dropped(0)
 #endif        
-    ,_movieDef(0)
-    ,_stage(0)
+    ,_movieDef(nullptr)
+    ,_stage(nullptr)
     ,_stopped(false)
     ,_started(false)
     ,_showUpdatedRegions(false)
@@ -984,7 +984,7 @@ Gui::advanceMovie(bool doDisplay)
     }
     
     if (_screenShotter.get() && _renderer.get()) {
-        _screenShotter->screenShot(*_renderer, _advances, doDisplay ? 0 : &dis);
+        _screenShotter->screenShot(*_renderer, _advances, doDisplay ? nullptr : &dis);
     }
     
     // Only increment advances and check for exit condition when we've

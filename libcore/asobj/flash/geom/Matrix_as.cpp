@@ -135,7 +135,7 @@ instanceOfMatrix(const fn_call& fn)
 
     as_function* ctor = getClassConstructor(fn, "flash.geom.Matrix");
     if (obj->instanceOf(ctor)) return obj;
-    return 0;
+    return nullptr;
 }
 
 /// Return an exact copy of the matrix.

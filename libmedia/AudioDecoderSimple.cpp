@@ -368,7 +368,7 @@ AudioDecoderSimple::decode(const std::uint8_t* input, std::uint32_t inputSize,
         std::uint32_t& outputSize, std::uint32_t& decodedBytes)
 {
 
-	unsigned char* decodedData = NULL;
+	unsigned char* decodedData = nullptr;
 	std::uint32_t outsize = 0;
 
     switch (_codec) {
@@ -461,7 +461,7 @@ AudioDecoderSimple::decode(const std::uint8_t* input, std::uint32_t inputSize,
 	// If we need to convert samplerate or/and from mono to stereo...
 	if (outsize > 0 && (_sampleRate != 44100 || !_stereo)) {
 
-		std::int16_t* adjusted_data = 0;
+		std::int16_t* adjusted_data = nullptr;
 		int	adjusted_size = 0;
 		int sample_count = outsize / (_stereo ? 4 : 2); // samples are of size 2
 
@@ -478,7 +478,7 @@ AudioDecoderSimple::decode(const std::uint8_t* input, std::uint32_t inputSize,
 			delete[] tmp_raw_buffer;
 			outputSize = 0;
 			decodedBytes = 0;
-			return NULL;
+			return nullptr;
 		}
 
 		// Move the new data to the sound-struct

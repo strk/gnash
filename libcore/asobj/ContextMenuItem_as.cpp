@@ -40,7 +40,7 @@ void
 contextmenuitem_class_init(as_object& where, const ObjectURI& uri)
 {
     registerBuiltinClass(where, contextmenuitem_ctor,
-            attachContextMenuItemInterface, 0, uri);
+            attachContextMenuItemInterface, nullptr, uri);
 }
 
 namespace {

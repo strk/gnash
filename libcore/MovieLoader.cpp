@@ -131,7 +131,7 @@ MovieLoader::processRequest(Request& r)
 {
     const URL& url = r.getURL();
     bool usePost = r.usePost();
-    const std::string* postdata = usePost ? &(r.getPostData()) : 0;
+    const std::string* postdata = usePost ? &(r.getPostData()) : nullptr;
 
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
     log_debug("Movie loader thread processing request for target %s",
@@ -140,7 +140,7 @@ MovieLoader::processRequest(Request& r)
 
 	boost::intrusive_ptr<movie_definition> md (
         MovieFactory::makeMovie(url, _movieRoot.runResources(),
-                                NULL, true, postdata)
+                                nullptr, true, postdata)
     );
     r.setCompleted(md);
 
@@ -437,7 +437,7 @@ MovieLoader::loadMovie(const std::string& urlstr,
     log_debug("MovieLoader::loadMovie(%s, %s)", url.str(), target);
 
     const std::string* postdata = (method == MovieClip::METHOD_POST) ? &data
-                                                                     : 0;
+                                                                     : nullptr;
 
 #ifdef GNASH_DEBUG_LOCKING
     log_debug("loadMovie: lock on requests: trying");

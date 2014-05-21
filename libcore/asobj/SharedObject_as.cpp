@@ -199,7 +199,7 @@ public:
     SharedObject_as(as_object& owner)
         :
         _owner(owner),
-        _data(0),
+        _data(nullptr),
         _connected(false)
     { 
     }
@@ -479,17 +479,17 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     assert (!objName.empty());
 
     // already warned about it at construction time
-    if (_solSafeDir.empty()) return 0;
+    if (_solSafeDir.empty()) return nullptr;
 
     if (rcfile.getSOLLocalDomain() && !_baseDomain.empty()) 
     {
         log_security(_("Attempting to open SOL file from non "
                        "localhost-loaded SWF"));
-        return 0;
+        return nullptr;
     }
 
     // Check that the name is valid; if not, return null
-    if (!validateName(objName)) return 0;
+    if (!validateName(objName)) return nullptr;
 
     // The 'root' argument, otherwise known as localPath, specifies where
     // in the SWF path the SOL should be stored. It cannot be outside this
@@ -514,7 +514,7 @@ SharedObjectLibrary::getLocal(const std::string& objName,
             log_security(_("SharedObject path %s is outside the SWF domain "
                         "%s. Cannot access this object."), localPath, 
                         _baseDomain);
-            return 0;
+            return nullptr;
         }
 
         requestedPath = localPath.path();
@@ -527,7 +527,7 @@ SharedObjectLibrary::getLocal(const std::string& objName,
             log_security(_("SharedObject path %s is not part of the SWF path "
                         "%s. Cannot access this object."), requestedPath, 
                         _basePath);
-            return 0;
+            return nullptr;
         }
 
     }
@@ -563,7 +563,7 @@ SharedObjectLibrary::getLocal(const std::string& objName,
 
     // Otherwise create a new one and register to the lib
     SharedObject_as* sh = createSharedObject(*_vm.getGlobal());
-    if (!sh) return 0;
+    if (!sh) return nullptr;
 
     sh->setObjectName(objName);
 
@@ -959,7 +959,7 @@ readSOL(VM& vm, const std::string& filespec)
             if (!rd(as)) {
                 log_error(_("SharedObject: error parsing SharedObject '%s'"),
                         filespec);
-                return 0;
+                return nullptr;
             }
 
             log_debug("parsed sol member named '%s' (len %s),  value '%s'",
@@ -978,7 +978,7 @@ readSOL(VM& vm, const std::string& filespec)
     catch (std::exception& e) {
         log_error(_("readSOL: Reading SharedObject %s: %s"),
 		  filespec, e.what());
-        return 0;
+        return nullptr;
     }
 
 }
@@ -994,7 +994,7 @@ SharedObject_as*
 createSharedObject(Global_as& gl)
 {
     as_function* ctor = getMember(gl, NSV::CLASS_SHARED_OBJECT).to_function();
-    if (!ctor) return 0;
+    if (!ctor) return nullptr;
     as_environment env(getVM(gl));
     fn_call::Args args;
     as_object* o = constructInstance(*ctor, env, args);

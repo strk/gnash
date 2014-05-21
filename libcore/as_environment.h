@@ -151,7 +151,7 @@ private:
 /// @param retTarget   If not null, the pointer will be set to the actual
 ///                    object containing the found variable (if found).
 as_value getVariable(const as_environment& ctx, const std::string& varname,
-    const as_environment::ScopeStack& scope, as_object** retTarget = 0);
+    const as_environment::ScopeStack& scope, as_object** retTarget = nullptr);
 
 /// Given a path to variable, set its value.
 //
@@ -206,7 +206,7 @@ DSOEXPORT bool parsePath(const std::string& var_path, std::string& path,
 /// @param path    Variable path. 
 /// @param scope   The Scope stack to use for lookups.
 DSOEXPORT as_object* findObject(const as_environment& ctx, const std::string& path,
-        const as_environment::ScopeStack* scope = 0);
+        const as_environment::ScopeStack* scope = nullptr);
 
 /// Find the DisplayObject referenced by the given path.
 //

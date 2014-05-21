@@ -43,7 +43,7 @@ namespace {
 void
 textrenderer_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, textrenderer_ctor, 0,
+    registerBuiltinClass(where, textrenderer_ctor, nullptr,
             attachTextRendererStaticProperties, uri);
 }
 

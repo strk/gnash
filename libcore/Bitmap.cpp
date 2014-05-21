@@ -51,7 +51,7 @@ Bitmap::Bitmap(movie_root& mr, as_object* object,
     :
     DisplayObject(mr, object, parent),
     _def(def),
-    _bitmapData(0),
+    _bitmapData(nullptr),
     _width(def->get_width_pixels()),
     _height(def->get_height_pixels())
 {
@@ -67,7 +67,7 @@ Bitmap::bitmap() const
 {
     if (_def) return _def->bitmap();
     if (_bitmapData) return _bitmapData->bitmapInfo();
-    return 0;
+    return nullptr;
 }
 
 void
@@ -150,7 +150,7 @@ Bitmap::update()
     set_invalidated();
 
     if (_bitmapData->disposed()) {
-        _bitmapData = 0;
+        _bitmapData = nullptr;
         _shape.clear();
     }
 }

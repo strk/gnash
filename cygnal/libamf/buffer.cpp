@@ -142,7 +142,7 @@ Buffer::init(size_t size)
 
 /// \brief Create a new Buffer with the default size
 Buffer::Buffer() 
-    : _seekptr(0)
+    : _seekptr(nullptr)
 {
 //    GNASH_REPORT_FUNCTION;
     _nbytes = cygnal::NETBUFSIZE;
@@ -151,7 +151,7 @@ Buffer::Buffer()
     
 /// \brief Create a new Buffer with a size other than the default
 Buffer::Buffer(size_t nbytes)
-    : _seekptr(0)
+    : _seekptr(nullptr)
 {
 //    GNASH_REPORT_FUNCTION;
     _nbytes = nbytes;
@@ -180,7 +180,7 @@ Buffer::~Buffer()
 		  (void *)_data.get(), _nbytes,
 		  (float)((now.tv_sec - _stamp.tv_sec) + ((now.tv_nsec - _stamp.tv_nsec)/1e9)));
 #endif
-        _seekptr = 0;
+        _seekptr = nullptr;
         _nbytes = 0;
     }
 }
@@ -567,8 +567,8 @@ Buffer::remove(std::uint8_t c)
 
 //    log_debug("Byte is at %x", (void *)start);
     
-    if (start == 0) {
-	return 0;
+    if (start == nullptr) {
+	return nullptr;
     }
     
     std::copy(start + 1, end(), start);

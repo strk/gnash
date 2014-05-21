@@ -102,9 +102,9 @@ mysql_ctor(const fn_call& fn)
 
 
 MySQL::MySQL() :
-    _db(NULL),
-    _result(NULL),
-    _row(NULL)
+    _db(nullptr),
+    _result(nullptr),
+    _row(nullptr)
 {
 }
 
@@ -134,7 +134,7 @@ MySQL::fetch_row()
     if (_result) {
         return fetch_row(_result);
     }
-    return NULL;
+    return nullptr;
 }
 
 MYSQL_ROW
@@ -163,7 +163,7 @@ MySQL::store_result()
     if (_db) {
         return store_result(_db);
     }
-    return NULL;
+    return nullptr;
 }
 
 MYSQL_RES *
@@ -182,12 +182,12 @@ MySQL::connect(const char* host, const char* dbname, const char* user, const cha
     // also deallocates the connection handle
     disconnect();
     
-    if ((_db = mysql_init(NULL)) == NULL ) {
+    if ((_db = mysql_init(nullptr)) == nullptr ) {
         log_error(_("Couldn't initialize database"));
         return false;
     }
     
-    if (mysql_real_connect(_db, host, user, passwd, dbname, 0, NULL, 0) == NULL) {
+    if (mysql_real_connect(_db, host, user, passwd, dbname, 0, nullptr, 0) == nullptr) {
 	log_error(_("Couldn't connect to database"));
 	return false;
     }
@@ -285,9 +285,9 @@ bool
 MySQL::disconnect()
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_db != NULL) {
+    if (_db != nullptr) {
         mysql_close(_db);    
-        _db = NULL;
+        _db = nullptr;
     }
     return true;
 }

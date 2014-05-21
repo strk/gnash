@@ -45,7 +45,7 @@ namespace {
 void
 Error_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, error_ctor, attachErrorInterface, 0, uri);   
+    registerBuiltinClass(where, error_ctor, attachErrorInterface, nullptr, uri);
 }
 
 

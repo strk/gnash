@@ -47,7 +47,7 @@ GC::GC(GcRoot& root)
 #endif
     char* gcgap = std::getenv("GNASH_GC_TRIGGER_THRESHOLD");
     if (gcgap) {
-        const size_t gap = std::strtoul(gcgap, NULL, 0);
+        const size_t gap = std::strtoul(gcgap, nullptr, 0);
         _maxNewCollectablesCount = gap;
     }
 }

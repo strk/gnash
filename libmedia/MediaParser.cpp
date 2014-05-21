@@ -140,7 +140,7 @@ MediaParser::peekNextVideoFrame() const
 	}
 #endif
 
-	if (!_videoInfo.get() || _videoFrames.empty()) return 0;
+	if (!_videoInfo.get() || _videoFrames.empty()) return nullptr;
 	return _videoFrames.front();
 }
 
@@ -266,7 +266,7 @@ MediaParser::peekNextAudioFrame() const
 		const_cast<MediaParser*>(this)->parseNextChunk();
 	}
 #endif
-	if (!_audioInfo.get() || _audioFrames.empty()) return 0;
+	if (!_audioInfo.get() || _audioFrames.empty()) return nullptr;
 	return _audioFrames.front();
 }
 

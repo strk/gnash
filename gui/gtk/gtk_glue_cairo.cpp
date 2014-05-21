@@ -29,10 +29,10 @@ namespace gnash
 {
 
 GtkCairoGlue::GtkCairoGlue()
-  : _cairo_handle(0),
-    _cairo_offscreen(0),
-    _renderer(0),
-    _image(0)
+  : _cairo_handle(nullptr),
+    _cairo_offscreen(nullptr),
+    _renderer(nullptr),
+    _image(nullptr)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -129,7 +129,7 @@ cairoFormatFromVisual(const GdkVisual* visual, cairo_format_t* format /*out*/)
       *format = CAIRO_FORMAT_ARGB32;
       break;
     default:
-      format = NULL;
+      format = nullptr;
       return false;
   }
   return true;
@@ -144,12 +144,12 @@ GtkCairoGlue::createGdkImageSurface(const int& width, const int& height)
   cairo_format_t format;
 
   if (!cairoFormatFromVisual(visual, &format)) {
-    return NULL;
+    return nullptr;
   }
 
   _image = gdk_image_new (GDK_IMAGE_FASTEST, visual, width, height);
   if (!_image) {
-    return NULL;
+    return nullptr;
   }
 
   cairo_surface_t* surface =
@@ -159,8 +159,8 @@ GtkCairoGlue::createGdkImageSurface(const int& width, const int& height)
   if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
     cairo_surface_destroy(surface);
     gdk_image_destroy(_image);
-    _image = 0;
-    return NULL;
+    _image = nullptr;
+    return nullptr;
   }
 
   return surface;
@@ -176,7 +176,7 @@ GtkCairoGlue::createSimilarSurface(const int& width, const int& height)
 
   if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
     cairo_surface_destroy(surface);
-    return NULL;
+    return nullptr;
   }
   return surface;
 }
@@ -189,7 +189,7 @@ GtkCairoGlue::createMemorySurface(const int& width, const int& height)
 
   if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
     cairo_surface_destroy(surface);
-    return NULL;
+    return nullptr;
   }
   return surface;
 }
@@ -202,7 +202,7 @@ GtkCairoGlue::configure(GtkWidget *const /*widget*/,
 
     if (_image) {
       gdk_image_destroy(_image);
-      _image = 0;
+      _image = nullptr;
     }
 
     cairo_surface_t* surface = createGdkImageSurface(event->width, event->height);

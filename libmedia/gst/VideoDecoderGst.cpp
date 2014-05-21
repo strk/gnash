@@ -33,7 +33,7 @@ VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
     _height(0)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
-    gst_init (NULL, NULL);
+    gst_init (nullptr, nullptr);
 
     setup(caps);
 }
@@ -59,14 +59,14 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type,
     _height(0)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
-    gst_init (NULL, NULL);
+    gst_init (nullptr, nullptr);
 
   GstCaps* caps;  
   switch (codec_type) {
     case VIDEO_CODEC_H264:
     {
       caps = gst_caps_new_simple ("video/x-h264",
-                                      NULL);
+                                      nullptr);
 
       if (extradata && extradatasize) {
 
@@ -78,20 +78,20 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type,
     } 
     case VIDEO_CODEC_H263:
       caps = gst_caps_new_simple ("video/x-flash-video",
-                                      NULL);
+                                      nullptr);
       break;
     case VIDEO_CODEC_VP6:
       caps = gst_caps_new_simple ("video/x-vp6-flash",
-                                      NULL);
+                                      nullptr);
       break;
     case VIDEO_CODEC_VP6A:
       caps = gst_caps_new_simple ("video/x-vp6-alpha",
-                                      NULL);
+                                      nullptr);
       break;      
     case VIDEO_CODEC_SCREENVIDEO:
     case VIDEO_CODEC_SCREENVIDEO2:
       caps = gst_caps_new_simple ("video/x-flash-screen",
-                                      NULL);
+                                      nullptr);
       break;
     case NO_VIDEO_CODEC:
       throw MediaException(_("Video codec is zero.  Streaming video expected later."));

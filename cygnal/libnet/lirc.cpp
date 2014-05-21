@@ -36,7 +36,7 @@ const int TIMEOUT = 10;
 const int BUTTONSIZE = 10;
 
 Lirc::Lirc() 
-    : _sockname("/tmp/lircd"), _button(0)
+    : _sockname("/tmp/lircd"), _button(nullptr)
 {
 //    GNASH_REPORT_FUNCTION;
     _button = new char[BUTTONSIZE];
@@ -45,7 +45,7 @@ Lirc::Lirc()
 Lirc::~Lirc()
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_button != 0) {
+    if (_button != nullptr) {
 	delete _button;
     }
     closeNet();

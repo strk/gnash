@@ -51,7 +51,7 @@ namespace gnash {
 
 SharedMem::SharedMem(size_t size)
     :
-    _addr(0),
+    _addr(nullptr),
     _size(size),
     _semid(0),
     _shmid(0),
@@ -82,7 +82,7 @@ SharedMem::~SharedMem()
         // Note that this isn't completely reliable.
         if (!ds.shm_nattch) {
             log_debug(_("No shared memory users left. Removing segment and semaphore."));
-            ::shmctl(_shmid, IPC_RMID, 0);
+            ::shmctl(_shmid, IPC_RMID, nullptr);
             ::semctl(_semid, IPC_RMID, 0);
         }
     }
@@ -219,7 +219,7 @@ SharedMem::attach()
         return false;
     }
 
-    _addr = static_cast<iterator>(::shmat(_shmid, 0, 0));
+    _addr = static_cast<iterator>(::shmat(_shmid, nullptr, 0));
 
     if (!_addr) {
         log_error(_("Unable to attach shared memory: %s"),

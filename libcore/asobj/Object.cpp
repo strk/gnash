@@ -222,7 +222,7 @@ object_addproperty(const fn_call& fn)
         return as_value(false);
     }
 
-    as_function* setter = NULL;
+    as_function* setter = nullptr;
     const as_value& setterval = fn.arg(2);
     if (!setterval.is_null())
     {

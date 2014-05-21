@@ -1520,7 +1520,7 @@ array_new(const fn_call& fn)
     as_object* ao = fn.isInstantiation() ? ensure<ValidThis>(fn) :
                                            getGlobal(fn).createArray();
 
-    ao->setRelay(0);
+    ao->setRelay(nullptr);
     ao->setArray();
     ao->init_member(NSV::PROP_LENGTH, 0.0);
 

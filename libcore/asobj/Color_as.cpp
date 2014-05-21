@@ -64,7 +64,7 @@ void
 color_class_init(as_object& where, const ObjectURI& uri)
 {
     as_object* cl = registerBuiltinClass(where, color_ctor,
-            attachColorInterface, 0, uri);
+            attachColorInterface, nullptr, uri);
 
     as_object* proto = toObject(
         getMember(*cl, NSV::PROP_PROTOTYPE), getVM(where));
@@ -243,7 +243,7 @@ color_ctor(const fn_call& fn)
     obj->set_member(NSV::PROP_TARGET, target);
 
     Global_as& gl = getGlobal(fn);
-    as_object* null = 0;
+    as_object* null = nullptr;
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, obj, null, 7);
 
 	return as_value(); 
@@ -275,7 +275,7 @@ getTarget(as_object* obj, const fn_call& fn)
     if (sp) return sp;
     DisplayObject* o = findTarget(fn.env(), target.to_string());
     if (o) return o->to_movie();
-    return 0;
+    return nullptr;
 }
 
 } // anonymous namespace 

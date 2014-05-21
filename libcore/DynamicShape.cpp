@@ -27,7 +27,7 @@ namespace gnash {
 
 DynamicShape::DynamicShape()
 	:
-	_currpath(0),
+	_currpath(nullptr),
 	_currfill(0),
 	_currline(0),
 	_x(0),
@@ -39,7 +39,7 @@ void
 DynamicShape::clear()
 {
 	_shape.clear();
-	_currpath = 0; 
+	_currpath = nullptr;
 	_currfill = _currline = 0; 
 	_currsubshape.clear();
 	// TODO: worth setting _changed=true ? 
@@ -89,7 +89,7 @@ DynamicShape::endFill()
 
 	// Remove reference to the "current" path, as
 	// next drawing will happen on a different one
-	_currpath = 0;
+	_currpath = nullptr;
 	// Remove fill information
 	_currfill = 0;
 }

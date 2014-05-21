@@ -35,9 +35,9 @@ Qt4CairoGlue::Qt4CairoGlue()
 :
   _width(0),
   _height(0),
-  _renderer(0),
-  _cairo_handle(0),
-  _cairo_surface(0)
+  _renderer(nullptr),
+  _cairo_handle(nullptr),
+  _cairo_surface(nullptr)
 {
 }
 

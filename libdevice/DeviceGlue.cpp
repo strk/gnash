@@ -51,7 +51,7 @@ DeviceGlue::setDevice(renderer::GnashDevice::dtype_t dtype)
 #ifdef BUILD_RAWFB_DEVICE
         case renderer::GnashDevice::RAWFB:
         {
-            _device.reset(new renderer::rawfb::RawFBDevice(0, 0));
+            _device.reset(new renderer::rawfb::RawFBDevice(0, nullptr));
             break;
         }
 #endif

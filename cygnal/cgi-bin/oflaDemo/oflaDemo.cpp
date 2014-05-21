@@ -316,7 +316,7 @@ demoService::getListOfAvailableFiles(const std::string &path,
 #else
 	// The Adobe media server and Red5 sort the directories
 	// alphabetically, so we do too.
-	int ret = scandir(path.c_str(), &namelist, 0, alphasort);
+	int ret = scandir(path.c_str(), &namelist, nullptr, alphasort);
 	for (int i=0; i<ret; ++i) {
 	    entry = namelist[i];
 #endif	

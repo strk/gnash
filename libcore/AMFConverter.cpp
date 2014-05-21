@@ -343,7 +343,7 @@ Reader::operator()(as_value& val, Type t)
                 return true;
             
             case NULL_AMF0:
-                val = static_cast<as_object*>(0);
+                val = static_cast<as_object*>(nullptr);
                 return true;
             
             // Object types need access to Global_as to create objects.

@@ -150,7 +150,7 @@ FBAggGlue::createRenderHandler()
 
     if (!_device) {
         log_error(_("No Device layer initialized yet!"));
-        return 0;
+        return nullptr;
     }
     
     const int width     = _device->getWidth();
@@ -176,18 +176,18 @@ FBAggGlue::createRenderHandler()
         rawfb->getBlueOffset(),  rawfb->getBlueSize(),
         rawfb->getDepth());
 
-    Renderer_agg_base *agg_handler = 0;
+    Renderer_agg_base *agg_handler = nullptr;
     if (pixelformat) {
 	agg_handler = create_Renderer_agg(pixelformat);
     } else {
 	log_error(_("The pixel format of your framebuffer could not be detected."));
-	return 0;
+	return nullptr;
     }
     
-    assert(agg_handler != NULL);
+    assert(agg_handler != nullptr);
 
     // Get the memory buffer to have AGG render into.
-    std::uint8_t *mem = 0;
+    std::uint8_t *mem = nullptr;
     if (rawfb->isSingleBuffered()) {
         log_debug(_("Double buffering disabled"));
         mem = rawfb->getFBMemory();

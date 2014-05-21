@@ -294,10 +294,10 @@ ExternalInterface::parseXML(const std::string &xml)
             end = xml.find("</number>");
             std::string str = xml.substr(start, end-start);
             if (str.find(".") != std::string::npos) {
-                double num = strtod(str.c_str(), NULL);
+                double num = strtod(str.c_str(), nullptr);
                 DOUBLE_TO_NPVARIANT(num, value);
             } else {
-                int num = strtol(str.c_str(), NULL, 0);
+                int num = strtol(str.c_str(), nullptr, 0);
                 INT32_TO_NPVARIANT(num, value);
             }
         } else if (tag == "<string>") {
@@ -323,7 +323,7 @@ ExternalInterface::parseXML(const std::string &xml)
               for (it=props.begin(); it != props.end(); ++it) {
                   NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
                   GnashNPVariant& value = it->second;
-                  NPN_SetProperty(NULL, obj, id, &value.get());
+                  NPN_SetProperty(nullptr, obj, id, &value.get());
               }
               OBJECT_TO_NPVARIANT(obj, value);
             }
@@ -339,7 +339,7 @@ ExternalInterface::parseXML(const std::string &xml)
               for (it=props.begin(); it != props.end(); ++it) {
                   NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
                   GnashNPVariant& value = it->second;
-                  NPN_SetProperty(NULL, obj, id, &value.get());
+                  NPN_SetProperty(nullptr, obj, id, &value.get());
               }
               OBJECT_TO_NPVARIANT(obj, value);
             }

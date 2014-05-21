@@ -277,7 +277,7 @@ void
 VideoInputGst::getNames(std::vector<std::string>& names)
 {
     // Make sure gst is initialized
-    gst_init(NULL, NULL);
+    gst_init(nullptr, nullptr);
     
     std::vector<GnashWebcam*> cams;
     // Check for devices
@@ -305,7 +305,7 @@ VideoInputGst::VideoInputGst()
     _muted(true),
     _quality(0)
 {
-    gst_init(NULL,NULL);
+    gst_init(nullptr,nullptr);
     
     // TODO: there is really no need to store all the cameras, as a
     // VideoInput class should correspond to one camera.
@@ -365,7 +365,7 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
     GstElement *element;
     element = gst_element_factory_make ("videotestsrc", "vidtestsrc");
     
-    if (element == NULL) {
+    if (element == nullptr) {
         log_error(_("%s: Could not create video test source."), __FUNCTION__);
 	return;
     } else {
@@ -380,7 +380,7 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
     //find v4l devices
     GstPropertyProbe *probe;
     GValueArray *devarr;
-    element = NULL;
+    element = nullptr;
     
     element = gst_element_factory_make ("v4lsrc", "v4lvidsrc");
     if ( ! element ) {
@@ -394,9 +394,9 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
         return;
     }
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-    for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+    for (size_t i = 0; devarr != nullptr && i < devarr->n_values; ++i) {
         GValue *val;
-        gchar *dev_name = NULL;
+        gchar *dev_name = nullptr;
         
         val = g_value_array_get_nth (devarr, i);
         g_object_set (element, "device", g_value_get_string (val), NULL);
@@ -425,16 +425,16 @@ VideoInputGst::findVidDevs(std::vector<GnashWebcam*>& cameraList)
     }
     
     //find v4l2 devices
-    probe = NULL;
-    devarr = NULL;
-    element = NULL;
+    probe = nullptr;
+    devarr = nullptr;
+    element = nullptr;
     
     element = gst_element_factory_make ("v4l2src", "v4l2vidsrc");
     probe = GST_PROPERTY_PROBE (element);
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-    for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+    for (size_t i = 0; devarr != nullptr && i < devarr->n_values; ++i) {
         GValue *val;
-        gchar *dev_name = NULL;
+        gchar *dev_name = nullptr;
         
         val = g_value_array_get_nth (devarr, i);
         g_object_set (element, "device", g_value_get_string (val), NULL);
@@ -645,7 +645,7 @@ VideoInputGst::getSelectedCaps(gint dev_select)
 {
     GstElement *pipeline;
     gchar *command;
-    GError *error = NULL;
+    GError *error = nullptr;
     GstStateChangeReturn return_val;
     GstBus *bus;
     GstMessage *message;
@@ -669,11 +669,11 @@ VideoInputGst::getSelectedCaps(gint dev_select)
             data_struct->getGstreamerSrc(), data_struct->getDevLocation());
     }
     pipeline = gst_parse_launch(command, &error);
-    if ((pipeline != NULL) && (error == NULL)) {
+    if ((pipeline != nullptr) && (error == nullptr)) {
         //Wait at most 5 seconds for the pipeline to start playing
         gst_element_set_state (pipeline, GST_STATE_PLAYING);
         return_val = 
-            gst_element_get_state (pipeline, NULL, NULL, 5 * GST_SECOND);
+            gst_element_get_state (pipeline, nullptr, nullptr, 5 * GST_SECOND);
         
         //errors on bus?
         bus = gst_element_get_bus (pipeline);
@@ -687,7 +687,7 @@ VideoInputGst::getSelectedCaps(gint dev_select)
         }
         
         //if everything above worked properly, begin probing for values
-        if ((return_val == GST_STATE_CHANGE_SUCCESS) && (message == NULL)) {
+        if ((return_val == GST_STATE_CHANGE_SUCCESS) && (message == nullptr)) {
             GstElement *src;
             GstPad *pad;
             GstCaps *caps;
@@ -831,12 +831,12 @@ VideoInputGst::setWebcam(size_t dev_select)
 gboolean
 VideoInputGst::webcamCreateSourceBin() 
 {
-    GError *error = NULL;
-    gchar *command = NULL;
+    GError *error = nullptr;
+    gchar *command = nullptr;
     
     GnashWebcamPrivate* webcam = _globalWebcam;
 
-    if(webcam->_webcamDevice == NULL) {
+    if(webcam->_webcamDevice == nullptr) {
         log_debug("%s: You don't have any webcams chosen, using videotestsrc",
             __FUNCTION__);
         webcam->_webcamSourceBin = gst_parse_bin_from_description (
@@ -846,7 +846,7 @@ VideoInputGst::webcamCreateSourceBin()
             capsfilter name=capsfilter");
     }
     else {
-        WebcamVidFormat *format = NULL;
+        WebcamVidFormat *format = nullptr;
         
         std::ostringstream ss;
         ss << _width << 'x' << _height;
@@ -883,10 +883,10 @@ VideoInputGst::webcamCreateSourceBin()
         
         //if format isn't set, something is still going wrong, make generic
         //components and see if they work!
-        if (format == NULL) {
-            if (error != NULL) {
+        if (format == nullptr) {
+            if (error != nullptr) {
                 g_error_free (error);
-                error = NULL;
+                error = nullptr;
             }
             webcam->_webcamSourceBin = 
                 gst_parse_bin_from_description ("videotestsrc name=video_source",
@@ -896,7 +896,7 @@ VideoInputGst::webcamCreateSourceBin()
                 "video_source");
             
             //if there are still errors, something's up, return out of function
-            if (error != NULL) {
+            if (error != nullptr) {
                 g_error_free (error);
                 return false;
             }
@@ -927,7 +927,7 @@ VideoInputGst::webcamCreateSourceBin()
             
             webcam->_webcamSourceBin =
                 gst_parse_bin_from_description (command, TRUE, &error);
-            if (webcam->_webcamSourceBin == NULL) {
+            if (webcam->_webcamSourceBin == nullptr) {
                 log_error(_("%s: Creation of the webcam_source_bin failed"),
                     __FUNCTION__);
                 log_error(_("the error was %s"), error->message);
@@ -974,8 +974,8 @@ VideoInputGst::checkForSupportedFramerate(GnashWebcamPrivate *webcam,
 gboolean
 VideoInputGst::webcamChangeSourceBin() 
 {
-    GError *error = NULL;
-    gchar *command = NULL;
+    GError *error = nullptr;
+    gchar *command = nullptr;
     
     assert(_globalWebcam);
 
@@ -986,11 +986,11 @@ VideoInputGst::webcamChangeSourceBin()
     //delete the old source bin
     gst_bin_remove(GST_BIN(_globalWebcam->_webcamMainBin),
             _globalWebcam->_webcamSourceBin);
-    _globalWebcam->_webcamSourceBin = NULL;
+    _globalWebcam->_webcamSourceBin = nullptr;
     
     GnashWebcamPrivate* webcam = _globalWebcam;
     
-    if(webcam->_webcamDevice == NULL) {
+    if(webcam->_webcamDevice == nullptr) {
         log_debug("%s: You don't have any webcams chosen, using videotestsrc",
             __FUNCTION__);
         webcam->_webcamSourceBin = gst_parse_bin_from_description (
@@ -1000,7 +1000,7 @@ VideoInputGst::webcamChangeSourceBin()
             capsfilter name=capsfilter");
     }
     else {
-        WebcamVidFormat *format = NULL;
+        WebcamVidFormat *format = nullptr;
         
         std::ostringstream ss;
         ss << _width << 'x' << _height;
@@ -1056,10 +1056,10 @@ VideoInputGst::webcamChangeSourceBin()
         
         //if format isn't set, something is still going wrong, make generic
         //components and see if they work!
-        if (format == NULL) {
-            if (error != NULL) {
+        if (format == nullptr) {
+            if (error != nullptr) {
                 g_error_free (error);
-                error = NULL;
+                error = nullptr;
             }
             webcam->_webcamSourceBin = 
                 gst_parse_bin_from_description ("videotestsrc name=video_source",
@@ -1069,7 +1069,7 @@ VideoInputGst::webcamChangeSourceBin()
                 "video_source");
             
             //if there are still errors, something's up, return out of function
-            if (error != NULL) {
+            if (error != nullptr) {
                 g_error_free (error);
                 return false;
             }
@@ -1100,7 +1100,7 @@ VideoInputGst::webcamChangeSourceBin()
             
             webcam->_webcamSourceBin =
                 gst_parse_bin_from_description (command, TRUE, &error);
-            if (webcam->_webcamSourceBin == NULL) {
+            if (webcam->_webcamSourceBin == nullptr) {
                 log_error(_("%s: Creation of the webcam_source_bin failed"),
                     __FUNCTION__);
                 log_error(_("the error was %s"), error->message);
@@ -1172,16 +1172,16 @@ VideoInputGst::webcamCreateMainBin()
 
     assert(webcam->_webcamSourceBin);
     
-    if ((tee = gst_element_factory_make ("tee", "tee")) == NULL) {
+    if ((tee = gst_element_factory_make ("tee", "tee")) == nullptr) {
         log_error(_("%s: problem creating tee element"), __FUNCTION__);
         return false;
     }
-    if ((save_queue = gst_element_factory_make("queue", "save_queue")) == NULL) {
+    if ((save_queue = gst_element_factory_make("queue", "save_queue")) == nullptr) {
         log_error(_("%s: problem creating save_queue element"), __FUNCTION__);
         return false;
     }
     if ((video_display_queue = 
-        gst_element_factory_make("queue", "video_display_queue")) == NULL) {
+        gst_element_factory_make("queue", "video_display_queue")) == nullptr) {
         log_error(_("%s: problem creating video_display_queue element"),
                   __FUNCTION__);
         return false;
@@ -1214,7 +1214,7 @@ VideoInputGst::webcamCreateMainBin()
     
     //add ghostpad to save_queue (allows connections between bins)
     pad = gst_element_get_pad (save_queue, "src");
-    if (pad == NULL) {
+    if (pad == nullptr) {
         log_error(_("%s: couldn't get save_queue_src_pad"), __FUNCTION__);
         return false;
     }
@@ -1224,7 +1224,7 @@ VideoInputGst::webcamCreateMainBin()
     
     //add ghostpad to video_display_queue
     pad = gst_element_get_pad (video_display_queue, "src");
-    if (pad == NULL) {
+    if (pad == nullptr) {
         log_error(_("%s: couldn't get video_display_queue_pad"), __FUNCTION__);
         return false;
     }
@@ -1254,13 +1254,13 @@ VideoInputGst::webcamCreateDisplayBin()
     
     webcam->_videoDisplayBin = gst_bin_new("video_display_bin");
     
-    if (webcam->_videoDisplayBin == NULL) {
+    if (webcam->_videoDisplayBin == nullptr) {
         log_error(_("%s: something went wrong creating the new video_display_bin"),
             __FUNCTION__);
         return false;
     }
     
-    if ((video_scale = gst_element_factory_make("videoscale", "video_scale")) == NULL) {
+    if ((video_scale = gst_element_factory_make("videoscale", "video_scale")) == nullptr) {
         log_error(_("%s: problem creating video_scale element"), __FUNCTION__);
         return false;
     }
@@ -1269,7 +1269,7 @@ VideoInputGst::webcamCreateDisplayBin()
         g_object_set (video_scale, "method", 1, NULL);
     }
     
-    if ((video_sink = gst_element_factory_make("autovideosink", "video_sink")) == NULL) {
+    if ((video_sink = gst_element_factory_make("autovideosink", "video_sink")) == nullptr) {
         log_error(_("%s: problem creating the video_sink element"), __FUNCTION__);
         return false;
     }
@@ -1303,7 +1303,7 @@ VideoInputGst::webcamMakeVideoDisplayLink()
 
     GnashWebcamPrivate* webcam = _globalWebcam;
 
-    if (gst_bin_get_by_name(GST_BIN(webcam->_pipeline), "video_display_bin") == NULL) {
+    if (gst_bin_get_by_name(GST_BIN(webcam->_pipeline), "video_display_bin") == nullptr) {
         gst_object_ref(webcam->_videoDisplayBin);
         gst_bin_add (GST_BIN(webcam->_pipeline), webcam->_videoDisplayBin);
     }
@@ -1366,7 +1366,7 @@ VideoInputGst::webcamMakeVideoSaveLink()
 {
     GnashWebcamPrivate* webcam = _globalWebcam;
 
-    if (gst_bin_get_by_name(GST_BIN(webcam->_pipeline), "video_save_bin") == NULL) {
+    if (gst_bin_get_by_name(GST_BIN(webcam->_pipeline), "video_save_bin") == nullptr) {
         gst_object_ref(webcam->_videoSaveBin);
         gst_bin_add(GST_BIN(webcam->_pipeline), webcam->_videoSaveBin);
     }
@@ -1449,34 +1449,34 @@ VideoInputGst::webcamCreateSaveBin()
     
     if ((video_save_csp =
         gst_element_factory_make("ffmpegcolorspace", "video_save_csp"))
-            == NULL) {
+            == nullptr) {
         log_error(_("%s: problem with creating video_save_csp element"),
             __FUNCTION__);
         return false;
     }
-    if ((video_enc = gst_element_factory_make("theoraenc", "video_enc")) == NULL) {
+    if ((video_enc = gst_element_factory_make("theoraenc", "video_enc")) == nullptr) {
         log_error(_("%s: problem with creating video_enc element"), __FUNCTION__);
         return false;
     } else {
         g_object_set (video_enc, "keyframe-force", 1, NULL);
     }
     
-    if ((video_save_rate = gst_element_factory_make("videorate", "video_save_rate")) == NULL) {
+    if ((video_save_rate = gst_element_factory_make("videorate", "video_save_rate")) == nullptr) {
         log_error(_("%s: problem with creating video_save_rate element"), __FUNCTION__);
         return false;
     }
-    if ((video_save_scale = gst_element_factory_make("videoscale", "video_save_scale")) == NULL) {
+    if ((video_save_scale = gst_element_factory_make("videoscale", "video_save_scale")) == nullptr) {
         log_error(_("%s: problem with creating video_save_scale element"), __FUNCTION__);
         return false;
     } else {
         //Use bilinear scaling
         g_object_set (video_save_scale, "method", 1, NULL);
     }
-    if ((mux = gst_element_factory_make("oggmux", "mux")) == NULL) {
+    if ((mux = gst_element_factory_make("oggmux", "mux")) == nullptr) {
         log_error(_("%s: problem with creating mux element"), __FUNCTION__);
         return false;
     }
-    if ((webcam->_videoFileSink = gst_element_factory_make("filesink", "video_file_sink")) == NULL) {
+    if ((webcam->_videoFileSink = gst_element_factory_make("filesink", "video_file_sink")) == nullptr) {
         log_error(_("%s: problem with creating video_file_sink element"), __FUNCTION__);
         return false;
     } else {
@@ -1578,7 +1578,7 @@ WebcamVidFormat::WebcamVidFormat() {
     width = -1;
     height = -1;
     numFramerates = -1;
-    framerates = NULL;
+    framerates = nullptr;
 }
 
 /// Default constructor for the FramerateFraction class. This constructor prepares
@@ -1601,8 +1601,8 @@ FramerateFraction::FramerateFraction(gint num, gint denom) {
 /// structure for data that will come in later. Also creates a blank hash table
 /// and array.
 GnashWebcam::GnashWebcam() {
-    setElementPtr(NULL);
-    supportedResolutions = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+    setElementPtr(nullptr);
+    supportedResolutions = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, nullptr);
     videoFormats = g_array_new (FALSE, FALSE, sizeof (WebcamVidFormat));
     numVideoFormats = 0;
 }
@@ -1610,20 +1610,20 @@ GnashWebcam::GnashWebcam() {
 /// Constructor that initializes all GnashWebcamPrivate variables to have
 /// data dropped in later.
 GnashWebcamPrivate::GnashWebcamPrivate() {
-    _pipeline = NULL;
-    _webcamSourceBin = NULL;
-    _webcamMainBin = NULL;
-    _videoDisplayBin = NULL;
-    _videoSaveBin = NULL;
-    _videoSource = NULL;
-    _capsFilter = NULL;
-    _videoFileSink = NULL;
-    _videoEnc = NULL;
+    _pipeline = nullptr;
+    _webcamSourceBin = nullptr;
+    _webcamMainBin = nullptr;
+    _videoDisplayBin = nullptr;
+    _videoSaveBin = nullptr;
+    _videoSource = nullptr;
+    _capsFilter = nullptr;
+    _videoFileSink = nullptr;
+    _videoEnc = nullptr;
     
     _pipelineIsPlaying = false;
-    _webcamDevice = NULL;
+    _webcamDevice = nullptr;
        
-    _currentFormat = NULL;
+    _currentFormat = nullptr;
     _eosTimeoutId = 0;
 };
 

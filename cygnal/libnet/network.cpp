@@ -226,7 +226,7 @@ Network::createServer(std::string hostname, short port)
     }
 
     // error, wasn't able to create a socket
-    if (it == 0) {
+    if (it == nullptr) {
         log_error(_("unable to create socket: %s"), strerror(errno));
         return -1;
     }
@@ -338,9 +338,9 @@ Network::newConnection(bool block, int fd)
 	tval.tv_sec = _timeout;
 	tval.tv_nsec = 0;
         if (block) {
-	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &blockset);
+	    ret = pselect(fd+1, &fdset, nullptr, nullptr, nullptr, &blockset);
 	} else {
-	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &blockset);
+	    ret = pselect(fd+1, &fdset, nullptr, nullptr, &tval, &blockset);
 	}
 	if (sig_number) {
 	    log_debug("Have a SIGINT interrupt waiting!");
@@ -459,7 +459,7 @@ Network::connectSocket(const string &sockname)
         tval.tv_sec = 5;
         tval.tv_usec = 0;
 
-        ret = ::select(_sockfd+1, &fdset, NULL, NULL, &tval);
+        ret = ::select(_sockfd+1, &fdset, nullptr, nullptr, &tval);
 
         // If interrupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
@@ -575,7 +575,7 @@ Network::createClient(const string &hostname, short port)
     req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
     req.ai_socktype = SOCK_STREAM;
     
-    if ((code = getaddrinfo(hostname.c_str(), 0, &req, &ans)) != 0) {
+    if ((code = getaddrinfo(hostname.c_str(), nullptr, &req, &ans)) != 0) {
         log_error(_("getaddrinfo() failed with code: #%d - %s\n"),
                   code, gai_strerror(code));
         return false;
@@ -653,7 +653,7 @@ Network::createClient(const string &hostname, short port)
         tval.tv_sec = 5;
         tval.tv_usec = 0;
 
-        ret = ::select(_sockfd+1, &fdset, NULL, NULL, &tval);
+        ret = ::select(_sockfd+1, &fdset, nullptr, nullptr, &tval);
 
         // If interrupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
@@ -945,7 +945,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 	sigemptyset(&blockset);        
         // sigaddset(&blockset, SIGINT); /* Block SIGINT */
 //        sigaddset(&blockset, SIGPIPE); /* Block SIGPIPE */
-        sigprocmask(SIG_BLOCK, &blockset, NULL);
+        sigprocmask(SIG_BLOCK, &blockset, nullptr);
 
 	// Trap ^C (SIGINT) so we can kill all the threads
 // 	struct sigaction  act;
@@ -958,7 +958,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 #endif
         if (timeout == 0) {
 #ifdef HAVE_PSELECT
-	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &blockset);
+	    ret = pselect(fd+1, &fdset, nullptr, nullptr, nullptr, &blockset);
 #else
 	    ret = select(fd+1, &fdset, NULL, NULL, NULL);
 #endif
@@ -966,7 +966,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 #ifdef HAVE_PSELECT
 	    tval.tv_sec = timeout;
 	    tval.tv_nsec = 0;
-	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &blockset);
+	    ret = pselect(fd+1, &fdset, nullptr, nullptr, &tval, &blockset);
 	    sigpending(&pending);
 	    if (sigismember(&pending, SIGINT)) {
 		log_debug("Have a pending SIGINT interrupt waiting!");
@@ -1136,7 +1136,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 	sigemptyset(&blockset);        
         // sigaddset(&blockset, SIGINT); /* Block SIGINT */
         sigaddset(&blockset, SIGPIPE);
-        sigprocmask(SIG_BLOCK, &blockset, NULL);
+        sigprocmask(SIG_BLOCK, &blockset, nullptr);
 #else
 	struct timeval tval;
 #endif
@@ -1147,7 +1147,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 #ifdef HAVE_PSELECT
 	tval.tv_sec = timeout;
 	tval.tv_nsec = 0;
-	ret = pselect(fd+1, NULL, &fdset, NULL, &tval, &blockset);
+	ret = pselect(fd+1, nullptr, &fdset, nullptr, &tval, &blockset);
 	sigpending(&pending);
 	if (sigismember(&pending, SIGINT)) {
 	    log_debug("Have a pending SIGINT interrupt waiting!");
@@ -1327,7 +1327,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 
     log_debug(_("%s: waiting for %d fds"), __FUNCTION__, limit);
 
-    if ((fds == 0) || (limit == 0)) {
+    if ((fds == nullptr) || (limit == 0)) {
 	return hits;
     }
     
@@ -1341,7 +1341,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 	sigemptyset(&blockset);         /* Block SIGINT */
 //        sigaddset(&blockset, SIGINT);
 //        sigaddset(&blockset, SIGPIPE);
-        sigprocmask(SIG_BLOCK, &blockset, NULL);
+        sigprocmask(SIG_BLOCK, &blockset, nullptr);
 
 	tval.tv_sec = 5; // FIXME: was _timeout;
 	tval.tv_nsec = 0;
@@ -1491,7 +1491,7 @@ Network::waitForNetData(int limit, fd_set files)
     struct timeval tval;
     tval.tv_sec = 0;
     tval.tv_usec = timeout * 1000; // was 1000000
-    int ret = select(limit+1, &fdset, NULL, NULL, &tval);
+    int ret = select(limit+1, &fdset, nullptr, nullptr, &tval);
 #endif
     // If interrupted by a system call, try again
     if (ret == -1 && errno == EINTR) {
@@ -1656,7 +1656,7 @@ Network::sniffBytesReady(int fd)
     struct timeval tval;
     tval.tv_sec = 0;
     tval.tv_usec = 10;
-    if (select(fd+1, &fdset, NULL, NULL, &tval)) {
+    if (select(fd+1, &fdset, nullptr, nullptr, &tval)) {
  	if (FD_ISSET(fd, &fdset)) {
 #ifndef _WIN32
 	    ioctl(fd, FIONREAD, &bytes);

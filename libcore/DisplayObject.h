@@ -234,7 +234,7 @@ public:
         // MovieClip must override this
         // and any other DisplayObject will have
         // a parent!
-        assert(_parent != NULL);
+        assert(_parent != nullptr);
         return _parent->get_environment();
     }
 
@@ -263,7 +263,7 @@ public:
         _parent = parent;
     }
 
-    virtual MovieClip* to_movie() { return 0; }
+    virtual MovieClip* to_movie() { return nullptr; }
 
     int get_depth() const { return _depth; }
 
@@ -474,7 +474,7 @@ public:
     /// @ return    0 if this object is not a StaticText or contains no text.
     virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&,
             size_t&) {
-        return 0;
+        return nullptr;
     }
 
 	virtual SWFRect getBounds() const = 0;
@@ -636,7 +636,7 @@ public:
     /// Override this function for InteractiveObjects.
 	virtual InteractiveObject* topmostMouseEntity(std::int32_t,
             std::int32_t) {
-        return 0;
+        return nullptr;
     }
 	
     /// Find highest depth DisplayObject whose shape contains the given
@@ -650,7 +650,7 @@ public:
             return this;
         }
         
-        return 0;
+        return nullptr;
     }
 
     /// Return whether this DisplayObject has been invalidated or not
@@ -760,7 +760,7 @@ public:
     /// as the first thing.
     ///
     /// This handles all ActionScript construction and initialization events.
-    virtual void construct(as_object* /*init*/ = 0)
+    virtual void construct(as_object* /*init*/ = nullptr)
     {
         saveOriginalTarget();
     }
@@ -1159,7 +1159,7 @@ isReferenceable(const DisplayObject& d)
 inline as_object*
 getObject(const DisplayObject* d)
 {
-    return d ? d->object() : 0;
+    return d ? d->object() : nullptr;
 }
 
 /// Stream operator for DisplayObject blend mode.

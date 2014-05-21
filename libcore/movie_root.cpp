@@ -137,8 +137,8 @@ movie_root::movie_root(VirtualClock& clock, const RunResources& runResources)
     _gc(*this),
     _runResources(runResources),
     _vm(*this, clock),
-    _interfaceHandler(0),
-    _fsCommandHandler(0),
+    _interfaceHandler(nullptr),
+    _fsCommandHandler(nullptr),
     _stageWidth(1),
     _stageHeight(1),
     m_background_color(255, 255, 255, 255),
@@ -147,9 +147,9 @@ movie_root::movie_root(VirtualClock& clock, const RunResources& runResources)
     _mouseY(0),
     _lastTimerId(0),
     _lastKeyEvent(key::INVALID),
-    _currentFocus(0),
+    _currentFocus(nullptr),
     _movies(),
-    _rootMovie(0),
+    _rootMovie(nullptr),
     _invalidated(true),
     _disableScripts(false),
     _processingActionLevel(PRIORITY_SIZE),
@@ -286,7 +286,7 @@ as_function*
 movie_root::getRegisteredClass(const SWF::DefinitionTag* sprite) const
 {
     RegisteredClasses::const_iterator it = _registeredClasses.find(sprite);
-    if (it == _registeredClasses.end()) return 0;
+    if (it == _registeredClasses.end()) return nullptr;
     return it->second;
 }
 
@@ -305,7 +305,7 @@ movie_root::cleanupAndCollect()
     _vm.getStack().clear();
 
     // Reset the constant pool
-    _vm.setConstantPool(0);
+    _vm.setConstantPool(nullptr);
 
     cleanupDisplayList();
     _gc.fuzzyCollect();
@@ -315,7 +315,7 @@ movie_root::cleanupAndCollect()
 void
 movie_root::setLevel(unsigned int num, Movie* movie)
 {
-    assert(movie != NULL);
+    assert(movie != nullptr);
     assert(static_cast<unsigned int>(movie->get_depth()) ==
                             num + DisplayObject::staticDepthOffset);
 
@@ -510,7 +510,7 @@ movie_root::getLevel(unsigned int num) const
     Levels::const_iterator i =
         _movies.find(num + DisplayObject::staticDepthOffset);
 
-    if (i == _movies.end()) return 0;
+    if (i == _movies.end()) return nullptr;
 
     return i->second;
 }
@@ -1154,7 +1154,7 @@ movie_root::getActiveEntityUnderPointer() const
 DisplayObject*
 movie_root::getDraggingCharacter() const
 {
-    return _dragState ? _dragState->getCharacter() : 0;
+    return _dragState ? _dragState->getCharacter() : nullptr;
 }
 
 const DisplayObject*
@@ -1814,7 +1814,7 @@ movie_root::getTopmostMouseEntity(std::int32_t x, std::int32_t y) const
         if (ret) return ret;
     }
 
-    return 0;
+    return nullptr;
 }
 
 const DisplayObject *
@@ -1827,7 +1827,7 @@ movie_root::findDropTarget(std::int32_t x, std::int32_t y,
         const DisplayObject* ret = i->second->findDropTarget(x, y, dragging);
         if (ret) return ret;
     }
-    return 0;
+    return nullptr;
 }
 
 /// This should store a callback object in movie_root.
@@ -2105,7 +2105,7 @@ movie_root::set_background_alpha(float alpha)
 DisplayObject*
 movie_root::findCharacterByTarget(const std::string& tgtstr) const
 {
-    if (tgtstr.empty()) return 0;
+    if (tgtstr.empty()) return nullptr;
 
     // NOTE: getRootMovie() would be problematic in case the original
     //       root movie is replaced by a load to _level0... 
@@ -2129,7 +2129,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr) const
             log_debug("Evaluating DisplayObject target path: element"
                       "'%s' of path '%s' not found", part, tgtstr);
 #endif
-            return NULL;
+            return nullptr;
         }
         if (to == std::string::npos) break;
         from = to + 1;
@@ -2362,7 +2362,7 @@ isLevelTarget(int version, const std::string& name, unsigned int& levelno)
         return false;
     }
     // getting 0 here for "_level" is intentional
-    levelno = std::strtoul(name.c_str() + 6, NULL, 0); 
+    levelno = std::strtoul(name.c_str() + 6, nullptr, 0);
     return true;
 }
 
@@ -2555,7 +2555,7 @@ generate_mouse_button_events(movie_root& mr, MouseButtonState& ms)
                     ms.activeEntity->mouseEvent(
                             event_id(event_id::RELEASE_OUTSIDE));
                     // We got out of active entity
-                    ms.activeEntity = 0; // so we don't get RollOut next...
+                    ms.activeEntity = nullptr; // so we don't get RollOut next...
                     need_redisplay = true;
                 }
             }
@@ -2622,7 +2622,7 @@ getBuiltinObject(movie_root& mr, const ObjectURI& cl)
     Global_as& gl = *mr.getVM().getGlobal();
 
     as_value val;
-    if (!gl.get_member(cl, &val)) return 0;
+    if (!gl.get_member(cl, &val)) return nullptr;
     return toObject(val, mr.getVM());
 }
 

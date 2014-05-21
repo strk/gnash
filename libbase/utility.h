@@ -96,7 +96,7 @@ std::string typeName(const T& inst)
 #if defined(__GNUC__) && __GNUC__ > 2
 	int status;
 	char* typeNameUnmangled = 
-		abi::__cxa_demangle (typeName.c_str(), NULL, NULL,
+		abi::__cxa_demangle (typeName.c_str(), nullptr, nullptr,
 				     &status);
 	if (status == 0)
 	{

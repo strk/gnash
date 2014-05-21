@@ -84,7 +84,7 @@ public:
 	/// and then call MovieClip::construct
 	///
 	/// It's intended to be called by movie_root::setLevel().
-    void construct(as_object* init = 0);
+    void construct(as_object* init = nullptr);
 
     /// Get the URL of the SWFMovie's definition.
     const std::string& url() const {

@@ -397,7 +397,7 @@ class DSOEXPORT HostFunctionReport
 public:
     // Only print function tracing messages when multiple -v
     // options have been supplied. 
-    HostFunctionReport() : _func(0) {
+    HostFunctionReport() : _func(nullptr) {
         log_debug("entering");
     }
 

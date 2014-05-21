@@ -144,10 +144,10 @@ InflaterIOChannel::reset()
         return;
     }
 
-    m_zstream.next_in = 0;
+    m_zstream.next_in = nullptr;
     m_zstream.avail_in = 0;
 
-    m_zstream.next_out = 0;
+    m_zstream.next_out = nullptr;
     m_zstream.avail_out = 0;
 
     // Rewind the underlying stream.

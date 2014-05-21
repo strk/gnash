@@ -264,7 +264,7 @@ Sound_as::Sound_as(as_object* owner)
     _mediaHandler(getRunResources(*owner).mediaHandler()),
     _startTime(0),
     _leftOverData(),
-    _leftOverPtr(0),
+    _leftOverPtr(nullptr),
     _leftOverSize(0),
     _inputStream(nullptr),
     remainingLoops(0),
@@ -378,7 +378,7 @@ Sound_as::probeAudio()
             if (!isStreaming) {
                 stopProbeTimer(); // will be re-started on Sound.start()
             }
-            bool success = _mediaParser->getAudioInfo() != 0;
+            bool success = _mediaParser->getAudioInfo() != nullptr;
             callMethod(&owner(), NSV::PROP_ON_LOAD, success);
 
             // TODO: check if this should be called anyway.
@@ -405,7 +405,7 @@ Sound_as::probeAudio()
             if ( isStreaming ) {
                 _mediaParser.reset(); // no use for this anymore...
             }
-            _inputStream = 0;
+            _inputStream = nullptr;
             _soundCompleted = false;
             stopProbeTimer();
 
@@ -564,7 +564,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     /// the media parser
     if (_inputStream) {
         _soundHandler->unplugInputStream(_inputStream);
-        _inputStream = 0;
+        _inputStream = nullptr;
     }
     
     /// Mark sound as not being loaded
@@ -625,7 +625,7 @@ sound::InputStream*
 Sound_as::attachAuxStreamerIfNeeded()
 {
     media::AudioInfo* audioInfo =  _mediaParser->getAudioInfo();
-    if (!audioInfo) return 0;
+    if (!audioInfo) return nullptr;
 
     // the following may throw an exception
     _audioDecoder.reset(_mediaHandler->createAudioDecoder(*audioInfo).release());
@@ -736,7 +736,7 @@ Sound_as::start(double secOff, int loops)
         _soundHandler->startSound(
                     soundId,
                     loops,
-                    0, // envelopes
+                    nullptr, // envelopes
                     true, // allow multiple instances (checked)
                     inPoint
                     );
@@ -760,7 +760,7 @@ Sound_as::stop(int si)
         if (externalSound) {
             if ( _inputStream ) {
                 _soundHandler->unplugInputStream(_inputStream);
-                _inputStream=0;
+                _inputStream=nullptr;
             }
         } else {
             if ( ! _attachedCharacter ) {
@@ -895,7 +895,7 @@ Sound_as::getAudio(std::int16_t* samples, unsigned int nSamples, bool& atEOF)
 
         if (_leftOverSize == 0) {
             _leftOverData.reset();
-            _leftOverPtr = 0;
+            _leftOverPtr = nullptr;
         }
 
     }

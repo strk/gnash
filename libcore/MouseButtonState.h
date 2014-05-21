@@ -39,8 +39,8 @@ public:
 
 	MouseButtonState()
 		:
-        activeEntity(0),
-        topmostEntity(0),
+        activeEntity(nullptr),
+        topmostEntity(nullptr),
 		wasDown(false),
 		isDown(false),
 		wasInsideActiveEntity(false)

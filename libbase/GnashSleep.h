@@ -39,7 +39,7 @@ inline void gnashSleep(time_t useconds)
 #else
     const time_t m = 1000000;
     const struct timespec t = { useconds / m, (useconds % m) * 1000 };
-    ::nanosleep(&t, 0);
+    ::nanosleep(&t, nullptr);
 #endif
 }
 

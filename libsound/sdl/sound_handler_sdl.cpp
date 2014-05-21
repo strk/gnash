@@ -86,7 +86,7 @@ SDL_sound_handler::openAudio()
     //512 - not enough for  videostream
     audioSpec.samples = 1024;   
 
-    if (SDL_OpenAudio(&audioSpec, NULL) < 0) {
+    if (SDL_OpenAudio(&audioSpec, nullptr) < 0) {
             boost::format fmt = boost::format(_("Couldn't open SDL audio: %s"))
                 % SDL_GetError();
         throw SoundException(fmt.str());

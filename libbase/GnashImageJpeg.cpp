@@ -171,7 +171,7 @@ public:
     {
         // Discard existing bytes in our buffer.
         m_pub.bytes_in_buffer = 0;
-        m_pub.next_input_byte = NULL;
+        m_pub.next_input_byte = nullptr;
     }
 
     /// Set up the given decompress object to read from the given
@@ -199,7 +199,7 @@ private:
         m_pub.resync_to_restart = jpeg_resync_to_restart;
         m_pub.term_source = term_source;
         m_pub.bytes_in_buffer = 0;
-        m_pub.next_input_byte = NULL;
+        m_pub.next_input_byte = nullptr;
     }
 
     // Source stream
@@ -214,7 +214,7 @@ private:
 JpegInput::JpegInput(std::shared_ptr<IOChannel> in)
     :
     Input(in),
-    _errorOccurred(0),
+    _errorOccurred(nullptr),
     _jmpBuf(),
     _compressorOpened(false)
 {
@@ -235,7 +235,7 @@ JpegInput::~JpegInput()
         reinterpret_cast<rw_source_IOChannel*>(m_cinfo.src);
 
     delete src;
-    m_cinfo.src = NULL;
+    m_cinfo.src = nullptr;
 
     jpeg_destroy_decompress(&m_cinfo);
 }
@@ -548,7 +548,7 @@ public:
 
         // Clean ourselves up.
         delete dest;
-        cinfo->dest = NULL;
+        cinfo->dest = nullptr;
     }
 
 private:    

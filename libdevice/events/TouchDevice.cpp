@@ -85,7 +85,7 @@ TouchDevice::init(const std::string &filespec, size_t /* size */)
     }
     
     _tsDev = ts_open(devname, 1);  //Open tslib non-blocking
-    if (_tsDev == 0) {
+    if (_tsDev == nullptr) {
         log_error(_("Could not open touchscreen %s: %s"), devname,
                   strerror(errno));
         return false;
@@ -114,7 +114,7 @@ TouchDevice::check()
     // Tslib should be setup so the output is pretty clean.
     struct ts_sample event;
     
-    if (_tsDev == 0) {
+    if (_tsDev == nullptr) {
         return false;           // No tslib device initialized, exit!
     }
     
@@ -299,7 +299,7 @@ TouchDevice::scanForDevices()
     struct ts_types touch[] = {
         {InputDevice::TOUCHSCREEN, "/dev/input/ts0"},
         {InputDevice::TOUCHSCREEN, "/dev/ts"},
-        {InputDevice::UNKNOWN, 0}
+        {InputDevice::UNKNOWN, nullptr}
     };
 
     int i = 0;

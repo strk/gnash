@@ -155,7 +155,7 @@ fileio_ctor(const fn_call& fn)
 
 FileIO::FileIO()
     :
-    _stream(0)
+    _stream(nullptr)
 {
 }
 
@@ -340,7 +340,7 @@ FileIO::fclose()
 //    GNASH_REPORT_FUNCTION;
     if (_stream) {
         int ret = ::fclose(_stream);
-        _stream = 0;
+        _stream = nullptr;
         return ret;
     }
     return -1;
@@ -576,7 +576,7 @@ fileio_scandir(const fn_call& fn)
 	
     struct dirent **namelist;
 	
-	const int n = ::scandir(dir.c_str(), &namelist, 0, alphasort);
+	const int n = ::scandir(dir.c_str(), &namelist, nullptr, alphasort);
 	
 	if (n < 0) {
 	    return as_value(false);

@@ -483,7 +483,7 @@ void
 localconnection_class_init(as_object& where, const ObjectURI& uri)
 {
     registerBuiltinClass(where, localconnection_new,
-            attachLocalConnectionInterface, 0, uri);
+            attachLocalConnectionInterface, nullptr, uri);
 }
 
 void
@@ -687,7 +687,7 @@ removeListener(const std::string& name, SharedMem& mem)
     // No listeners if the first byte is 0.
     if (!*ptr) return;
 
-    SharedMem::iterator found = 0;
+    SharedMem::iterator found = nullptr;
 
     SharedMem::iterator next;
     

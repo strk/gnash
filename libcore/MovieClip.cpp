@@ -152,7 +152,7 @@ public:
     MouseEntityFinder(point wp, point pp)
         :
         _highestHiddenDepth(std::numeric_limits<int>::min()),
-        _m(NULL),
+        _m(nullptr),
         _candidates(),
         _wp(wp),
         _pp(pp),
@@ -390,7 +390,7 @@ public:
         _x(x),
         _y(y),
         _dragging(dragging),
-        _dropch(0),
+        _dropch(nullptr),
         _candidates(),
         _checked(false)
     {}
@@ -632,7 +632,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
     //             to properly queue actions back on the global queue.
     //
     _callingFrameActions = true;
-    PoolGuard poolGuard(getVM(*getObject(this)), 0);
+    PoolGuard poolGuard(getVM(*getObject(this)), nullptr);
     const PlayList* playlist = _def->getPlaylist(frame_number);
     if (playlist) {
         PlayList::const_iterator it = playlist->begin();
@@ -666,7 +666,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Can't clone root of the movie"));
         );
-        return 0;
+        return nullptr;
     }
 
     MovieClip* parent = parent_ch->to_movie();
@@ -675,7 +675,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
             log_error(_("%s parent is not a movieclip, can't clone"),
                 getTarget());
         );
-        return 0;
+        return nullptr;
     }
 
     as_object* o = getObjectWithPrototype(getGlobal(*getObject(this)), 
@@ -820,8 +820,8 @@ MovieClip::pathElement(const ObjectURI& uri)
 
     // See if it's a member
     as_value tmp;
-    if (!obj->as_object::get_member(uri, &tmp)) return 0;
-    if (!tmp.is_object()) return 0;
+    if (!obj->as_object::get_member(uri, &tmp)) return nullptr;
+    if (!tmp.is_object()) return nullptr;
 
     if (tmp.is_sprite()) {
         return getObject(tmp.toDisplayObject(true));
@@ -1248,12 +1248,12 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
             log_swferror(_("MovieClip::add_display_object(): "
                     "unknown cid = %d"), tag->getID());
         );
-        return NULL;
+        return nullptr;
     }
     
     DisplayObject* existing_char = dlist.getDisplayObjectAtDepth(tag->getDepth());
     
-    if (existing_char) return NULL;
+    if (existing_char) return nullptr;
 
     Global_as& gl = getGlobal(*getObject(this));
     VM& vm = getVM(*getObject(this));
@@ -1297,9 +1297,9 @@ MovieClip::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dli
     // clip_depth is not used in MOVE tag(at least no related tests). 
     dlist.moveDisplayObject(
         tag->getDepth(), 
-        tag->hasCxform() ? &tag->getCxform() : NULL,
-        tag->hasMatrix() ? &tag->getMatrix() : NULL,
-        tag->hasRatio() ? &ratio : NULL);
+        tag->hasCxform() ? &tag->getCxform() : nullptr,
+        tag->hasMatrix() ? &tag->getMatrix() : nullptr,
+        tag->hasRatio() ? &ratio : nullptr);
 }
 
 void
@@ -1309,7 +1309,7 @@ MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
     // A MovieClip without a definition cannot have any ControlTags, so this
     // should not be called.
     assert(_def);
-    assert(tag != NULL);
+    assert(tag != nullptr);
 
     const std::uint16_t id = tag->getID();
 
@@ -1477,7 +1477,7 @@ MovieClip::pointInHitableShape(std::int32_t x, std::int32_t y) const
 InteractiveObject*
 MovieClip::topmostMouseEntity(std::int32_t x, std::int32_t y)
 {
-    if (!visible()) return 0;
+    if (!visible()) return nullptr;
 
     // point is in parent's space, we need to convert it in world space
     point wp(x, y);
@@ -1493,7 +1493,7 @@ MovieClip::topmostMouseEntity(std::int32_t x, std::int32_t y)
 
     if (mouseEnabled()) {
         if (pointInVisibleShape(wp.x, wp.y)) return this;
-        return 0;
+        return nullptr;
     }
 
     SWFMatrix m = getMatrix(*this);
@@ -1514,9 +1514,9 @@ const DisplayObject*
 MovieClip::findDropTarget(std::int32_t x, std::int32_t y,
         DisplayObject* dragging) const
 {
-    if (this == dragging) return 0; // not here...
+    if (this == dragging) return nullptr; // not here...
 
-    if (!visible()) return 0; // isn't me !
+    if (!visible()) return nullptr; // isn't me !
 
     DropTargetFinder finder(x, y, dragging);
     _displayList.visitAll(finder);
@@ -1532,7 +1532,7 @@ MovieClip::findDropTarget(std::int32_t x, std::int32_t y,
     // does it hit us ?
     if (hitTestDrawable(x, y)) return this;
 
-    return 0;
+    return nullptr;
 }
 
 bool
@@ -1626,7 +1626,7 @@ MovieClip::getDisplayListObject(const ObjectURI& uri)
     DisplayObject* ch = _displayList.getDisplayObjectByName(st, uri,
             caseless(*obj));
 
-    if (!ch) return 0;
+    if (!ch) return nullptr;
 
     // Found object.
 
@@ -1682,7 +1682,7 @@ MovieClip::constructAsScriptObject()
         dynamic_cast<const sprite_definition*>(_def.get());
 
     // We won't "construct" top-level movies
-    as_function* ctor = def ? stage().getRegisteredClass(def) : 0;
+    as_function* ctor = def ? stage().getRegisteredClass(def) : nullptr;
 
 #ifdef GNASH_DEBUG
     log_debug("Attached movieclips %s registered class is %p",
@@ -2123,11 +2123,11 @@ MovieClip::TextFields*
 textfieldVar(MovieClip::TextFieldIndex* t, const ObjectURI& name)
 {
     // nothing allocated yet...
-    if (!t) return 0;
+    if (!t) return nullptr;
 
     // TODO: should variable name be considered case-insensitive ?
     MovieClip::TextFieldIndex::iterator it = t->find(name);
-    if (it == t->end()) return 0;
+    if (it == t->end()) return nullptr;
     return &(it->second);
 } 
 

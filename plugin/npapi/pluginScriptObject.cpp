@@ -247,7 +247,7 @@ GnashPluginScriptObject::initializeIdentifiers()
 
 // Constructor
 GnashPluginScriptObject::GnashPluginScriptObject()
-    : _nppinstance (0),
+    : _nppinstance (nullptr),
       _controlfd(-1),
       _hostfd(-1)
 {

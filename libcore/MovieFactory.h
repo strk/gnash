@@ -83,8 +83,8 @@ public:
     /// NOTE: when POSTing, the movies library won't be used.
     static DSOEXPORT boost::intrusive_ptr<movie_definition> makeMovie(
         const URL& url, const RunResources& runResources,
-        const char* real_url = 0, bool startLoaderThread = true,
-        const std::string* postdata = 0);
+        const char* real_url = nullptr, bool startLoaderThread = true,
+        const std::string* postdata = nullptr);
     
     /// Load a movie from an already opened stream.
     //

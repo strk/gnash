@@ -37,7 +37,7 @@ struct UnivocalPath
     FILL_LEFT
   };
   
-  UnivocalPath() : _path(NULL), _fill_type(FILL_LEFT) {}
+  UnivocalPath() : _path(nullptr), _fill_type(FILL_LEFT) {}
 
   UnivocalPath(const Path* path, fill_type filltype)
     : _path(path),

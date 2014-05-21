@@ -69,7 +69,7 @@ Socket::connected() const
         tval.tv_sec = 0;
         tval.tv_usec = 103;
             
-        const int ret = ::select(_socket + 1, NULL, &fdset, NULL, &tval);
+        const int ret = ::select(_socket + 1, nullptr, &fdset, nullptr, &tval);
         
         // Select timeout
         if (ret == 0) continue;
@@ -126,7 +126,7 @@ namespace {
 
 addrinfo* getAddrInfo(const std::string& hostname, std::uint16_t port)
 {
-    addrinfo req = addrinfo(), *ans = 0;
+    addrinfo req = addrinfo(), *ans = nullptr;
     
     req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
     req.ai_socktype = SOCK_STREAM;
@@ -136,7 +136,7 @@ addrinfo* getAddrInfo(const std::string& hostname, std::uint16_t port)
     if (code != 0) {
         log_error(_("getaddrinfo() failed with code: #%d - %s"),
                  code, gai_strerror(code));
-        return 0;
+        return nullptr;
     }
 
     return ans;
@@ -177,7 +177,7 @@ Socket::connect(const std::string& hostname, std::uint16_t port)
             char clienthost [INET6_ADDRSTRLEN] = {};
             int code = getnameinfo(ot->ai_addr, ot->ai_addrlen,
                                clienthost, sizeof(clienthost),
-                               NULL, 0, NI_NUMERICHOST);
+                               nullptr, 0, NI_NUMERICHOST);
 
             if (code != 0) {
                 log_error(_("getnameinfo() failed: %1%"), gai_strerror(code));

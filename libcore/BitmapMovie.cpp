@@ -30,7 +30,7 @@ BitmapMovie::BitmapMovie(as_object* object, const BitmapMovieDefinition* def,
 {
     assert(def);
     assert(object);
-    Bitmap* bm = new Bitmap(stage(), 0, def, this);
+    Bitmap* bm = new Bitmap(stage(), nullptr, def, this);
 
     const int depth = 1 + DisplayObject::staticDepthOffset;
     placeDisplayObject(bm, depth);

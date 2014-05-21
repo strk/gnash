@@ -40,20 +40,20 @@ namespace gst {
 
 MediaParserGst::MediaParserGst(std::unique_ptr<IOChannel> stream)
     : MediaParser(std::move(stream)),
-      _bin(NULL),
-      _srcpad(NULL),
-      _audiosink(NULL),
-      _videosink(NULL),
+      _bin(nullptr),
+      _srcpad(nullptr),
+      _audiosink(nullptr),
+      _videosink(nullptr),
       _demux_probe_ended(false)
 {
-    gst_init (NULL, NULL);
+    gst_init (nullptr, nullptr);
 
     _bin = gst_bin_new ("NULL");
     if (!_bin) {
         throw GnashException(_("MediaParserGst couldn't create a bin"));
     }
 
-    GstElement* typefind = gst_element_factory_make("typefind", NULL);
+    GstElement* typefind = gst_element_factory_make("typefind", nullptr);
     if (!typefind) {
         throw GnashException(_("MediaParserGst couldn't create a typefind element."));
     }
@@ -251,7 +251,7 @@ print_caps(GstCaps* caps)
 void
 MediaParserGst::link_to_fakesink(GstPad* pad)
 {
-    GstElement* fakesink = gst_element_factory_make("fakesink", NULL);
+    GstElement* fakesink = gst_element_factory_make("fakesink", nullptr);
     
     if (!fakesink) {
         throw MediaException(_("MediaParserGst Failed to create fakesink."));
@@ -380,7 +380,7 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
     
     bool already_parsed = parsed || framed;
     
-    GstPad* final_pad = 0;
+    GstPad* final_pad = nullptr;
     
     if (already_parsed) {
         final_pad = new_pad;
@@ -396,7 +396,7 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
             return;
         }
 
-        GstElement* parserel = gst_element_factory_create (parserfactory, NULL);
+        GstElement* parserel = gst_element_factory_create (parserfactory, nullptr);
         gst_object_unref (parserfactory);
         if (!parserel) {
             log_error(_("MediaParserGst: Failed to find a parser. We'll continue, "
@@ -523,7 +523,7 @@ MediaParserGst::cb_chain_func_video (GstPad *pad, GstBuffer *buffer)
         frame_num = GST_BUFFER_OFFSET(buffer);
     }
 
-    EncodedVideoFrame* frame = new EncodedVideoFrame(NULL, GST_BUFFER_SIZE(buffer), frame_num, timestamp);
+    EncodedVideoFrame* frame = new EncodedVideoFrame(nullptr, GST_BUFFER_SIZE(buffer), frame_num, timestamp);
 
     frame->extradata.reset(new EncodedExtraGstData(buffer));
     

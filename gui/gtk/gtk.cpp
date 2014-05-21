@@ -278,7 +278,7 @@ GtkGui::error(const std::string& msg)
     GtkWidget* popup = gtk_dialog_new_with_buttons("Gnash Error",
             GTK_WINDOW(_window),
             static_cast<GtkDialogFlags>(GTK_DIALOG_DESTROY_WITH_PARENT),
-            GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
+            GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, nullptr);
 
     g_signal_connect_swapped(popup, "response", G_CALLBACK(gtk_widget_destroy),
             popup);
@@ -402,7 +402,7 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
             cursortype = GDK_LAST_CURSOR;
     }
   
-    GdkCursor* gdkcursor = NULL; 
+    GdkCursor* gdkcursor = nullptr;
   
     if (cursortype != GDK_LAST_CURSOR) {
          gdkcursor = gdk_cursor_new(cursortype);
@@ -441,7 +441,7 @@ GtkGui::showMouse(bool show)
         GdkColor *color;
 
         color = g_new0(GdkColor, 1);
-        pixmap = gdk_pixmap_new(NULL, 1, 1, 1);
+        pixmap = gdk_pixmap_new(nullptr, 1, 1, 1);
         GdkCursor* cursor = gdk_cursor_new_from_pixmap(pixmap, pixmap,
                                                     color, color, 0, 0);
 
@@ -565,7 +565,7 @@ GtkGui::setupEvents()
                    G_CALLBACK(visibilityNotifyEvent), this);
   
     g_signal_connect_after(_canvas, "realize",
-                         G_CALLBACK (realizeEvent), NULL);
+                         G_CALLBACK (realizeEvent), nullptr);
 
     // connect_after because we are going to cause a rendering and the canvas
     // widget should have had a chance to update the size of the render area
@@ -599,7 +599,7 @@ GtkGui::startAdvanceTimer()
     stopAdvanceTimer();
     
     _advanceSourceTimer = g_timeout_add_full(G_PRIORITY_LOW, _interval,
-            (GSourceFunc)advance_movie, this, NULL);
+            (GSourceFunc)advance_movie, this, nullptr);
 
     log_debug(_("Advance interval timer set to %d ms (~ %d FPS)"),
             _interval, _interval ? 1000/_interval : 1000);
@@ -818,7 +818,7 @@ GtkGui::makeTreeModel(const std::unique_ptr<movie_root::InfoTree>& treepointer)
         }
 
         //Read in data from present node
-        if (depth == 0) gtk_tree_store_append(model, &child_iter, NULL);
+        if (depth == 0) gtk_tree_store_append(model, &child_iter, nullptr);
         else gtk_tree_store_append(model, &child_iter, &iter);
 
         gtk_tree_store_set(model, &child_iter,
@@ -1237,7 +1237,7 @@ PreferencesDialog::PreferencesDialog(GtkWidget* window)
                     // The buttons and their response codes:
                     GTK_STOCK_OK, GTK_RESPONSE_OK,
                     GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-                    NULL);
+                    nullptr);
     // Add Gnash icon
     addGnashIcon(GTK_WINDOW(_prefsDialog));
 
@@ -1705,7 +1705,7 @@ GtkGui::showPropertiesDialog()
                         GTK_DIALOG_DESTROY_WITH_PARENT),
                         // Just a 'close' button
                         GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-                        NULL);
+                        nullptr);
 
     // Not too small... But I'd rather not have to specify
     // a size in pixels.
@@ -1720,7 +1720,7 @@ GtkGui::showPropertiesDialog()
 
     // Destroy the window when a button is clicked.
     g_signal_connect (propsDialog, "response",
-               G_CALLBACK(gtk_widget_destroy), NULL);
+               G_CALLBACK(gtk_widget_destroy), nullptr);
 
     GtkWidget *propsvbox = gtk_vbox_new (FALSE, 1);
     gtk_container_add(GTK_CONTAINER(
@@ -1770,19 +1770,19 @@ GtkGui::showPropertiesDialog()
             -1, _("Variable"),
             renderer, "text",
             STRING1_COLUMN,
-            NULL);
+            nullptr);
 
     // 'Value' column:
     // Set to be 'editable' so that the data can be selected and
     // copied; it can't actually be edited, though.
     renderer = gtk_cell_renderer_text_new ();
-    g_object_set (renderer, "xalign", 0.0, "editable", TRUE, NULL);
+    g_object_set (renderer, "xalign", 0.0, "editable", TRUE, nullptr);
     gtk_tree_view_insert_column_with_attributes(
             GTK_TREE_VIEW(treeview),
             -1, _("Value"),
             renderer, "text",
             STRING2_COLUMN,
-            NULL);
+            nullptr);
 
     //Add tree to scrollwindow.
     gtk_container_add(GTK_CONTAINER(scrollwindow1), treeview);
@@ -1801,12 +1801,12 @@ GtkGui::showAboutDialog()
         "Rob Savoye", 
         "Sandro Santilli",
         "Ann Barcomb",
-        NULL 
+        nullptr
     };
 
     const gchar *artists[] = { 
         "Jason Savoye",
-        NULL
+        nullptr
     };
 
     const gchar *authors[] = { 
@@ -1828,7 +1828,7 @@ GtkGui::showAboutDialog()
         "Bob Naugle",
         "Si Liu",
         "Sharad Desai",
-        NULL
+        nullptr
     };
 
 	const std::string license = 
@@ -2237,7 +2237,7 @@ GtkGui::yesno(const std::string& question)
 /// Anonymous namespace for callbacks, local functions, event handlers etc.
 namespace {
 
-static GList *pixmaps_directories = NULL;
+static GList *pixmaps_directories = nullptr;
 
 // Adds the Gnash icon to a window.
 void
@@ -2254,19 +2254,19 @@ addGnashIcon(GtkWindow* window)
 GdkPixbuf*
 createPixbuf (const gchar *filename)
 {
-    gchar *pathname = NULL;
+    gchar *pathname = nullptr;
     GdkPixbuf *pixbuf;
-    GError *error = NULL;
+    GError *error = nullptr;
 
     if (!filename || !filename[0])
-       return NULL;
+       return nullptr;
 
     pathname = findPixmapFile (filename);
 
     if (!pathname) {
         log_error (_("Couldn't find pixmap file: %s"), filename);
         g_warning(_("Couldn't find pixmap file: %s"), filename);
-        return NULL;
+        return nullptr;
     }
 
     pixbuf = gdk_pixbuf_new_from_file (pathname, &error);
@@ -2396,7 +2396,7 @@ findPixmapFile(const gchar* filename)
         g_free (pathname);
         elem = elem->next;
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -2598,11 +2598,11 @@ menuOpenFile(GtkMenuItem* /*menuitem*/, gpointer data)
 
 #if GTK_CHECK_VERSION(2,4,0)
     dialog = gtk_file_chooser_dialog_new (_("Open file"),
-                                          NULL,
+                                          nullptr,
                                           GTK_FILE_CHOOSER_ACTION_OPEN,
                                           GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                           GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-                                          NULL);
+                                          nullptr);
     
     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT) {
         openFile(dialog, gui);
@@ -2663,7 +2663,7 @@ popupHandler(GtkWidget *widget, GdkEvent *event)
             GdkEventButton* event_button =
                             reinterpret_cast<GdkEventButton*>(event);
             if (event_button->button == 3) {
-                gtk_menu_popup(menu, NULL, NULL, NULL, NULL,
+                gtk_menu_popup(menu, nullptr, nullptr, nullptr, nullptr,
                                event_button->button, event_button->time);
                 return TRUE;
             } 
@@ -2685,7 +2685,7 @@ popupHandlerAlt(GtkWidget *widget, GdkEvent *event)
             GdkEventButton* event_button =
                             reinterpret_cast<GdkEventButton*>(event);
             if (event_button->button == 3) {
-                gtk_menu_popup(menu, NULL, NULL, NULL, NULL,
+                gtk_menu_popup(menu, nullptr, nullptr, nullptr, nullptr,
                                event_button->button, event_button->time);
                 return TRUE;
             } 

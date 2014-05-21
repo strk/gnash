@@ -155,7 +155,7 @@ URL::URL(const std::string& absolute_url)
         const size_t maxSize = 4096; 
         
         std::unique_ptr<char[]> buf; 
-        char* dir = 0;
+        char* dir = nullptr;
         size_t bufSize = 0;
         
         // This just assumes a failure in getcwd is a name-length error,

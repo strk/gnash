@@ -39,8 +39,8 @@ namespace gnash
 {
 
 GtkAggGlue::GtkAggGlue()
-:   _offscreenbuf(NULL),
-    _agg_renderer(NULL)
+:   _offscreenbuf(nullptr),
+    _agg_renderer(nullptr)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -108,7 +108,7 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 
     assert(width > 0);
     assert(height > 0);
-    assert(_agg_renderer != NULL);
+    assert(_agg_renderer != nullptr);
     
     if (_offscreenbuf && _offscreenbuf->width == width &&
         _offscreenbuf->height == height) {

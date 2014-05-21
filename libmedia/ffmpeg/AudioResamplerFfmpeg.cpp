@@ -30,7 +30,7 @@ namespace media {
 namespace ffmpeg {
 
 AudioResamplerFfmpeg::AudioResamplerFfmpeg()
-	:_context(NULL)
+	:_context(nullptr)
 {
 }
 AudioResamplerFfmpeg::~AudioResamplerFfmpeg() {

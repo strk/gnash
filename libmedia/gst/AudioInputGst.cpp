@@ -42,24 +42,24 @@ namespace media {
 namespace gst {
 
 GnashAudio::GnashAudio() {
-    _element = NULL;
-    _devLocation = NULL;
-    _gstreamerSrc = NULL;
-    _productName = NULL;
+    _element = nullptr;
+    _devLocation = nullptr;
+    _gstreamerSrc = nullptr;
+    _productName = nullptr;
 }
 
 GnashAudioPrivate::GnashAudioPrivate() {
-    audioSource = NULL;
-    audioEnc = NULL;
-    _audioDevice = NULL;
-    _deviceName = NULL;
-    _pipeline = NULL;
-    _audioMainBin = NULL;
-    _audioPlaybackBin = NULL;
-    _audioSourceBin = NULL;
-    _audioSaveBin = NULL;
+    audioSource = nullptr;
+    audioEnc = nullptr;
+    _audioDevice = nullptr;
+    _deviceName = nullptr;
+    _pipeline = nullptr;
+    _audioMainBin = nullptr;
+    _audioPlaybackBin = nullptr;
+    _audioSourceBin = nullptr;
+    _audioSaveBin = nullptr;
     _pipelineIsPlaying = false;
-    _mux = NULL;
+    _mux = nullptr;
 }
 
 AudioInputGst::AudioInputGst() 
@@ -73,7 +73,7 @@ AudioInputGst::AudioInputGst()
     _silenceTimeout(2000), 
     _useEchoSuppression(false)
 {
-    gst_init(NULL,NULL);
+    gst_init(nullptr,nullptr);
     
     findAudioDevs();
     
@@ -98,7 +98,7 @@ AudioInputGst::findAudioDevs()
     GstElement *element;
     element = gst_element_factory_make ("audiotestsrc", "audtestsrc");
     
-    if (element == NULL) {
+    if (element == nullptr) {
         log_error(_("%s: Could not create audio test source"), __FUNCTION__);
 	return;
     } else {
@@ -112,7 +112,7 @@ AudioInputGst::findAudioDevs()
     //detect pulse audio sources
     GstPropertyProbe *probe;
     GValueArray *devarr;
-    element = NULL;
+    element = nullptr;
 
     element = gst_element_factory_make ("pulsesrc", "pulsesrc");
     if ( ! element ) {
@@ -126,9 +126,9 @@ AudioInputGst::findAudioDevs()
         return;
     }
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-    for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+    for (size_t i = 0; devarr != nullptr && i < devarr->n_values; ++i) {
         GValue *val;
-        gchar *dev_name = NULL;
+        gchar *dev_name = nullptr;
         
         val = g_value_array_get_nth (devarr, i);
         g_object_set (element, "device", g_value_get_string (val), NULL);
@@ -136,7 +136,7 @@ AudioInputGst::findAudioDevs()
         g_object_get (element, "device-name", &dev_name, NULL);
         gst_element_set_state (element, GST_STATE_NULL);
         if ((strcmp(dev_name, "null") == 0) ||
-                (std::strstr(dev_name, "Monitor") != NULL)) {
+                (std::strstr(dev_name, "Monitor") != nullptr)) {
             log_debug("No pulse audio input devices.");
         }
         else { 
@@ -195,7 +195,7 @@ AudioInputGst::getSelectedCaps(int devselect)
 
     GstElement *pipeline;
     gchar *command;
-    GError *error = NULL;
+    GError *error = nullptr;
     GstStateChangeReturn return_val;
     GstBus *bus;
     GstMessage *message;
@@ -206,11 +206,11 @@ AudioInputGst::getSelectedCaps(int devselect)
     command = g_strdup_printf ("%s name=src device=%s ! fakesink",
         data_struct->getGstreamerSrc(), data_struct->getDevLocation());
     pipeline = gst_parse_launch(command, &error);
-    if ((pipeline != NULL) && (error == NULL)) {
+    if ((pipeline != nullptr) && (error == nullptr)) {
         //Wait at most 5 seconds for the pipeline to start playing
         gst_element_set_state (pipeline, GST_STATE_PLAYING);
         return_val = 
-            gst_element_get_state (pipeline, NULL, NULL, 5 * GST_SECOND);
+            gst_element_get_state (pipeline, nullptr, nullptr, 5 * GST_SECOND);
         
         //errors on bus?
         bus = gst_element_get_bus (pipeline);
@@ -223,7 +223,7 @@ AudioInputGst::getSelectedCaps(int devselect)
                 __FUNCTION__);
         }
         //if everything above worked properly, begin probing for values
-        if ((return_val == GST_STATE_CHANGE_SUCCESS) && (message == NULL)) {
+        if ((return_val == GST_STATE_CHANGE_SUCCESS) && (message == nullptr)) {
             GstElement *src;
             GstPad *pad;
             GstCaps *caps;
@@ -273,7 +273,7 @@ AudioInputGst::transferToPrivate(int devselect) {
         exit (EXIT_FAILURE);
     }
     GnashAudioPrivate *audio = new GnashAudioPrivate;
-    if (audio != NULL) {
+    if (audio != nullptr) {
         audio->setAudioDevice(_audioVect[devselect]);
         audio->setDeviceName(_audioVect[devselect]->getProductName());
         _globalAudio = audio;
@@ -286,8 +286,8 @@ AudioInputGst::transferToPrivate(int devselect) {
 gboolean
 AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio)
 {
-    GError *error = NULL;
-    gchar *command = NULL;
+    GError *error = nullptr;
+    gchar *command = nullptr;
     
     if (audio->_pipelineIsPlaying == true) {
         audioStop(audio);
@@ -295,10 +295,10 @@ AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio)
     
     //delete the old source bin if necessary (please don't delete the == NULL
     //here as it breaks things.)
-    if (!(GST_ELEMENT_PARENT(audio->_audioSourceBin) == NULL)) {
+    if (!(GST_ELEMENT_PARENT(audio->_audioSourceBin) == nullptr)) {
         gst_bin_remove(GST_BIN(audio->_audioMainBin),
                 audio->_audioSourceBin);
-        audio->_audioSourceBin = NULL;
+        audio->_audioSourceBin = nullptr;
     }
     
     if (strcmp(audio->_deviceName, "audiotest") == 0) {
@@ -322,7 +322,7 @@ AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio)
     
     audio->_audioSourceBin = gst_parse_bin_from_description(command, TRUE,
                                 &error);
-    if (audio->_audioSourceBin == NULL) {
+    if (audio->_audioSourceBin == nullptr) {
         log_error(_("%s: Creation of the audioSourceBin failed"),
             __FUNCTION__);
         log_error(_("the error was %s"), error->message);
@@ -356,8 +356,8 @@ AudioInputGst::audioChangeSourceBin(GnashAudioPrivate *audio)
 gboolean
 AudioInputGst::audioCreateSourceBin(GnashAudioPrivate *audio) 
 {
-    GError *error = NULL;
-    gchar *command = NULL;
+    GError *error = nullptr;
+    gchar *command = nullptr;
     if(strcmp(audio->_deviceName, "audiotest") == 0) {
         log_debug("%s: You don't have any mics chosen, using audiotestsrc",
             __FUNCTION__);
@@ -378,7 +378,7 @@ AudioInputGst::audioCreateSourceBin(GnashAudioPrivate *audio)
     
     audio->_audioSourceBin = gst_parse_bin_from_description(command, TRUE,
                                 &error);
-    if (audio->_audioSourceBin == NULL) {
+    if (audio->_audioSourceBin == nullptr) {
         log_error(_("%s: Creation of the audioSourceBin failed"),
             __FUNCTION__);
         log_error(_("the error was %s"), error->message);
@@ -408,16 +408,16 @@ AudioInputGst::audioCreateMainBin(GnashAudioPrivate *audio)
         log_error(_("%s: audioCreateSourceBin failed!"), __FUNCTION__);
         return false;
     }
-    if ((tee = gst_element_factory_make ("tee", "tee")) == NULL) {
+    if ((tee = gst_element_factory_make ("tee", "tee")) == nullptr) {
         log_error(_("%s: problem creating tee element"), __FUNCTION__);
         return false;
     }
-    if ((saveQueue = gst_element_factory_make("queue", "saveQueue")) == NULL) {
+    if ((saveQueue = gst_element_factory_make("queue", "saveQueue")) == nullptr) {
         log_error(_("%s: problem creating save_queue element"), __FUNCTION__);
         return false;
     }
     if ((audioPlaybackQueue = 
-        gst_element_factory_make("queue", "audioPlaybackQueue")) == NULL) {
+        gst_element_factory_make("queue", "audioPlaybackQueue")) == nullptr) {
         log_error(_("%s: problem creating audioPlaybackQueue element"), __FUNCTION__);
         return false;
     }
@@ -443,7 +443,7 @@ AudioInputGst::audioCreateMainBin(GnashAudioPrivate *audio)
    
     //add ghostpad to saveQueue (allows connections between bins)
     pad = gst_element_get_pad (saveQueue, "src");
-    if (pad == NULL) {
+    if (pad == nullptr) {
         log_error(_("%s: couldn't get saveQueueSrcPad"), __FUNCTION__);
         return false;
     }
@@ -453,7 +453,7 @@ AudioInputGst::audioCreateMainBin(GnashAudioPrivate *audio)
     
     //add ghostpad to video_display_queue
     pad = gst_element_get_pad (audioPlaybackQueue, "src");
-    if (pad == NULL) {
+    if (pad == nullptr) {
         log_error(_("%s: couldn't get audioPlaybackQueue"), __FUNCTION__);
         return false;
     }
@@ -479,7 +479,7 @@ AudioInputGst::audioCreatePlaybackBin(GnashAudioPrivate *audio)
     
     audio->_audioPlaybackBin = gst_bin_new("playbackBin");
     
-    if ((autosink = gst_element_factory_make ("autoaudiosink", "audiosink")) == NULL) {
+    if ((autosink = gst_element_factory_make ("autoaudiosink", "audiosink")) == nullptr) {
         log_error(_("%s: There was a problem making the audiosink!"), __FUNCTION__);
          return false;
     }
@@ -498,7 +498,7 @@ AudioInputGst::audioCreatePlaybackBin(GnashAudioPrivate *audio)
 gboolean
 AudioInputGst::makeAudioSourcePlaybackLink(GnashAudioPrivate *audio) 
 {
-    if (gst_bin_get_by_name(GST_BIN(audio->_pipeline), "playbackBin") == NULL) {
+    if (gst_bin_get_by_name(GST_BIN(audio->_pipeline), "playbackBin") == nullptr) {
         gst_object_ref(audio->_audioPlaybackBin);
         gst_bin_add(GST_BIN(audio->_pipeline), audio->_audioPlaybackBin);
     }
@@ -597,19 +597,19 @@ AudioInputGst::audioCreateSaveBin(GnashAudioPrivate* audio)
     
     audio->_audioSaveBin = gst_bin_new ("audioSaveBin");
     
-    if ((audioConvert = gst_element_factory_make("audioconvert", "audio_convert")) == NULL) {
+    if ((audioConvert = gst_element_factory_make("audioconvert", "audio_convert")) == nullptr) {
         log_error(_("%s: Couldn't make audioconvert element"), __FUNCTION__);
         return false;
     }
-    if ((audioEnc = gst_element_factory_make("vorbisenc", "audio_enc")) == NULL){
+    if ((audioEnc = gst_element_factory_make("vorbisenc", "audio_enc")) == nullptr){
         log_error(_("%s: Couldn't make vorbisenc element"), __FUNCTION__);
         return false;
     }
-    if ((audio->_mux = gst_element_factory_make("oggmux", "mux")) == NULL) {
+    if ((audio->_mux = gst_element_factory_make("oggmux", "mux")) == nullptr) {
         log_error(_("%s: Couldn't make oggmux element"), __FUNCTION__);
         return false;
     }
-    if ((filesink = gst_element_factory_make("filesink", "filesink")) == NULL) {
+    if ((filesink = gst_element_factory_make("filesink", "filesink")) == nullptr) {
         log_error(_("%s: Couldn't make filesink element"), __FUNCTION__);
         return false;
     } else {
@@ -639,7 +639,7 @@ AudioInputGst::audioCreateSaveBin(GnashAudioPrivate* audio)
 gboolean
 AudioInputGst::makeAudioSourceSaveLink (GnashAudioPrivate* audio) 
 {
-    if (gst_bin_get_by_name(GST_BIN(audio->_pipeline), "audioSaveBin") == NULL) {
+    if (gst_bin_get_by_name(GST_BIN(audio->_pipeline), "audioSaveBin") == nullptr) {
         gst_object_ref(audio->_audioSaveBin);
         gst_bin_add(GST_BIN(audio->_pipeline), audio->_audioSaveBin);
     }

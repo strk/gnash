@@ -91,7 +91,7 @@ StartSoundTag::executeActions(MovieClip* m, DisplayList& /* dlist */) const
         else {
 
             const sound::SoundEnvelopes* env = 
-                _soundInfo.envelopes.empty() ? 0 : &_soundInfo.envelopes;
+                _soundInfo.envelopes.empty() ? nullptr : &_soundInfo.envelopes;
 
             handler->startSound(m_handler_id,
                     _soundInfo.loopCount,

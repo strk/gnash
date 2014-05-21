@@ -52,7 +52,7 @@ namespace {
 void
 loadvars_class_init(as_object& where, const ObjectURI& uri)
 {
-    registerBuiltinClass(where, loadvars_ctor, attachLoadVarsInterface, 0, uri);
+    registerBuiltinClass(where, loadvars_ctor, attachLoadVarsInterface, nullptr, uri);
 }
 
 namespace {

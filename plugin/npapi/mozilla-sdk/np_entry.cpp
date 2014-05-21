@@ -43,7 +43,7 @@ NP_Shutdown()
 NPError
 fillPluginFunctionTable(NPPluginFuncs* aNPPFuncs)
 {
-    if(aNPPFuncs == NULL) {
+    if(aNPPFuncs == nullptr) {
         return NPERR_INVALID_FUNCTABLE_ERROR;
     }
     
@@ -93,7 +93,7 @@ fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
 {
     int i = 0, n;
     
-    if(aNPNFuncs == NULL) {
+    if(aNPNFuncs == nullptr) {
         return NPERR_INVALID_FUNCTABLE_ERROR;
     }
     

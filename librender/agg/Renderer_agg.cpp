@@ -333,7 +333,7 @@ public:
 
     AlphaMask(int width, int height)
         :
-        _rbuf(0, width, height, width),
+        _rbuf(nullptr, width, height, width),
         _pixf(_rbuf),
         _rbase(_pixf),
         _amask(_rbuf),
@@ -2065,7 +2065,7 @@ bool is_little_endian_host() {
 DSOEXPORT Renderer_agg_base*  create_Renderer_agg(const char *pixelformat)
 {
 
-  if (!pixelformat) return NULL;
+  if (!pixelformat) return nullptr;
 
   if (is_little_endian_host())
     log_debug("Framebuffer pixel format is %s (little-endian host)", pixelformat);
@@ -2115,11 +2115,11 @@ DSOEXPORT Renderer_agg_base*  create_Renderer_agg(const char *pixelformat)
 #endif
   {
       log_error(_("Unknown pixelformat: %s\n"), pixelformat);
-    return NULL;
+    return nullptr;
     //abort();
   }
   
-  return NULL; // avoid compiler warning
+  return nullptr; // avoid compiler warning
 }
 
 
@@ -2200,7 +2200,7 @@ DSOEXPORT const char *agg_detect_pixel_format(unsigned int rofs,
    
   }
   
-  return NULL; // unknown format
+  return nullptr; // unknown format
   
 }
 

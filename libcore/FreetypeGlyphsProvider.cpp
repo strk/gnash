@@ -93,7 +93,7 @@ public:
         :
         _shape(sh),
         _scale(scale),
-        _currPath(0),
+        _currPath(nullptr),
         _x(0),
         _y(0)
     {
@@ -240,7 +240,7 @@ private:
 };
 
 // statics
-FT_Library FreetypeGlyphsProvider::m_lib = 0;
+FT_Library FreetypeGlyphsProvider::m_lib = nullptr;
 boost::mutex FreetypeGlyphsProvider::m_lib_mutex;
 
 // static private
@@ -303,7 +303,7 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
     
     FcPattern* pat = FcNameParse((const FcChar8*)name.c_str());
     
-    FcConfigSubstitute (0, pat, FcMatchPattern);
+    FcConfigSubstitute (nullptr, pat, FcMatchPattern);
 
     if (italic) {
         FcPatternAddInteger (pat, FC_SLANT, FC_SLANT_ITALIC);
@@ -316,10 +316,10 @@ FreetypeGlyphsProvider::getFontFilename(const std::string &name,
     FcDefaultSubstitute (pat);
 
     FcPattern   *match;
-    match = FcFontMatch (0, pat, &result);
+    match = FcFontMatch (nullptr, pat, &result);
     FcPatternDestroy (pat);
 
-    FcFontSet* fs = NULL;
+    FcFontSet* fs = nullptr;
     if (match) {
         fs = FcFontSetCreate ();
         FcFontSetAdd (fs, match);
@@ -422,10 +422,10 @@ FreetypeGlyphsProvider::ascent() const
 FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name,
         bool bold, bool italic)
     :
-    _face(NULL)
+    _face(nullptr)
 {
 
-    if (m_lib == NULL)
+    if (m_lib == nullptr)
     {
         init();
     }

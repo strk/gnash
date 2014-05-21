@@ -53,13 +53,13 @@ class tree_node_ { // size: 5*4=20 bytes (on 32 bit arch), can be reduced by 8.
 
 template<class T>
 tree_node_<T>::tree_node_()
-	: parent(0), first_child(0), last_child(0), prev_sibling(0), next_sibling(0)
+	: parent(nullptr), first_child(nullptr), last_child(nullptr), prev_sibling(nullptr), next_sibling(nullptr)
 	{
 	}
 
 template<class T>
 tree_node_<T>::tree_node_(const T& val)
-	: parent(0), first_child(0), last_child(0), prev_sibling(0), next_sibling(0), data(val)
+	: parent(nullptr), first_child(nullptr), last_child(nullptr), prev_sibling(nullptr), next_sibling(nullptr), data(val)
 	{
 	}
 
@@ -507,22 +507,22 @@ tree<T, tree_node_allocator>::~tree()
 template <class T, class tree_node_allocator>
 void tree<T, tree_node_allocator>::head_initialise_() 
    { 
-   head = alloc_.allocate(1,0); // MSVC does not have default second argument 
-	feet = alloc_.allocate(1,0);
+   head = alloc_.allocate(1,nullptr); // MSVC does not have default second argument
+	feet = alloc_.allocate(1,nullptr);
 	alloc_.construct(head, tree_node_<T>());
 	alloc_.construct(feet, tree_node_<T>());
 
-   head->parent=0;
-   head->first_child=0;
-   head->last_child=0;
-   head->prev_sibling=0; //head;
+   head->parent=nullptr;
+   head->first_child=nullptr;
+   head->last_child=nullptr;
+   head->prev_sibling=nullptr; //head;
    head->next_sibling=feet; //head;
 
-	feet->parent=0;
-	feet->first_child=0;
-	feet->last_child=0;
+	feet->parent=nullptr;
+	feet->first_child=nullptr;
+	feet->last_child=nullptr;
 	feet->prev_sibling=head;
-	feet->next_sibling=0;
+	feet->next_sibling=nullptr;
    }
 
 template <class T, class tree_node_allocator>
@@ -573,12 +573,12 @@ template<class T, class tree_node_allocator>
 void tree<T, tree_node_allocator>::erase_children(const iterator_base& it)
 	{
 //	std::cout << "erase_children " << it.node << std::endl;
-	if(it.node==0) return;
+	if(it.node==nullptr) return;
 
 	tree_node *cur=it.node->first_child;
-	tree_node *prev=0;
+	tree_node *prev=nullptr;
 
-	while(cur!=0) {
+	while(cur!=nullptr) {
 		prev=cur;
 		cur=cur->next_sibling;
 		erase_children(pre_order_iterator(prev));
@@ -586,8 +586,8 @@ void tree<T, tree_node_allocator>::erase_children(const iterator_base& it)
 		alloc_.destroy(prev);
 		alloc_.deallocate(prev,1);
 		}
-	it.node->first_child=0;
-	it.node->last_child=0;
+	it.node->first_child=nullptr;
+	it.node->last_child=nullptr;
 //	std::cout << "exit" << std::endl;
 	}
 
@@ -601,13 +601,13 @@ iter tree<T, tree_node_allocator>::erase(iter it)
 	ret.skip_children();
 	++ret;
 	erase_children(it);
-	if(cur->prev_sibling==0) {
+	if(cur->prev_sibling==nullptr) {
 		cur->parent->first_child=cur->next_sibling;
 		}
 	else {
 		cur->prev_sibling->next_sibling=cur->next_sibling;
 		}
-	if(cur->next_sibling==0) {
+	if(cur->next_sibling==nullptr) {
 		cur->parent->last_child=cur->prev_sibling;
 		}
 	else {
@@ -713,8 +713,8 @@ typename tree<T, tree_node_allocator>::fixed_depth_iterator tree<T, tree_node_al
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_allocator>::begin(const iterator_base& pos) const
 	{
-	assert(pos.node!=0);
-	if(pos.node->first_child==0) {
+	assert(pos.node!=nullptr);
+	if(pos.node->first_child==nullptr) {
 		return end(pos);
 		}
 	return pos.node->first_child;
@@ -723,7 +723,7 @@ typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_alloca
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_allocator>::end(const iterator_base& pos) const
 	{
-	sibling_iterator ret(0);
+	sibling_iterator ret(nullptr);
 	ret.parent_=pos.node;
 	return ret;
 	}
@@ -764,7 +764,7 @@ template <class T, class tree_node_allocator>
 template <typename iter>
 iter tree<T, tree_node_allocator>::parent(iter position) 
 	{
-	assert(position.node!=0);
+	assert(position.node!=nullptr);
 	return iter(position.node->parent);
 	}
 
@@ -899,14 +899,14 @@ iter tree<T, tree_node_allocator>::append_child(iter position, const T& x)
 	assert(position.node!=feet);
 	assert(position.node);
 
-	tree_node* tmp = alloc_.allocate(1,0);
+	tree_node* tmp = alloc_.allocate(1,nullptr);
 	alloc_.construct(tmp, x);
 //	kp::constructor(&tmp->data, x);
-	tmp->first_child=0;
-	tmp->last_child=0;
+	tmp->first_child=nullptr;
+	tmp->last_child=nullptr;
 
 	tmp->parent=position.node;
-	if(position.node->last_child!=0) {
+	if(position.node->last_child!=nullptr) {
 		position.node->last_child->next_sibling=tmp;
 		}
 	else {
@@ -914,7 +914,7 @@ iter tree<T, tree_node_allocator>::append_child(iter position, const T& x)
 		}
 	tmp->prev_sibling=position.node->last_child;
 	position.node->last_child=tmp;
-	tmp->next_sibling=0;
+	tmp->next_sibling=nullptr;
 	return tmp;
 	}
 
@@ -1014,22 +1014,22 @@ template <class T, class tree_node_allocator>
 template <class iter>
 iter tree<T, tree_node_allocator>::insert(iter position, const T& x)
 	{
-	if(position.node==0) {
+	if(position.node==nullptr) {
 		position.node=feet; // Backward compatibility: when calling insert on a null node,
 		                    // insert before the feet.
 		}
-	tree_node* tmp = alloc_.allocate(1,0);
+	tree_node* tmp = alloc_.allocate(1,nullptr);
 	alloc_.construct(tmp, x);
 //	kp::constructor(&tmp->data, x);
-	tmp->first_child=0;
-	tmp->last_child=0;
+	tmp->first_child=nullptr;
+	tmp->last_child=nullptr;
 
 	tmp->parent=position.node->parent;
 	tmp->next_sibling=position.node;
 	tmp->prev_sibling=position.node->prev_sibling;
 	position.node->prev_sibling=tmp;
 
-	if(tmp->prev_sibling==0) {
+	if(tmp->prev_sibling==nullptr) {
 		if(tmp->parent) // when inserting nodes at the head, there is no parent
 			tmp->parent->first_child=tmp;
 		}
@@ -1148,21 +1148,21 @@ iter tree<T, tree_node_allocator>::replace(iter position, const iterator_base& f
 //	std::cout << "warning!" << position.node << std::endl;
 	erase_children(position);	
 //	std::cout << "no warning!" << std::endl;
-	tree_node* tmp = alloc_.allocate(1,0);
+	tree_node* tmp = alloc_.allocate(1,nullptr);
 	alloc_.construct(tmp, (*from));
 //	kp::constructor(&tmp->data, (*from));
-	tmp->first_child=0;
-	tmp->last_child=0;
-	if(current_to->prev_sibling==0) {
-		if(current_to->parent!=0)
+	tmp->first_child=nullptr;
+	tmp->last_child=nullptr;
+	if(current_to->prev_sibling==nullptr) {
+		if(current_to->parent!=nullptr)
 			current_to->parent->first_child=tmp;
 		}
 	else {
 		current_to->prev_sibling->next_sibling=tmp;
 		}
 	tmp->prev_sibling=current_to->prev_sibling;
-	if(current_to->next_sibling==0) {
-		if(current_to->parent!=0)
+	if(current_to->next_sibling==nullptr) {
+		if(current_to->parent!=nullptr)
 			current_to->parent->last_child=tmp;
 		}
 	else {
@@ -1181,16 +1181,16 @@ iter tree<T, tree_node_allocator>::replace(iter position, const iterator_base& f
 	pre_order_iterator toit=tmp;
 	// copy all children
 	do {
-		assert(current_from!=0);
-		if(current_from->first_child != 0) {
+		assert(current_from!=nullptr);
+		if(current_from->first_child != nullptr) {
 			current_from=current_from->first_child;
 			toit=append_child(toit, current_from->data);
 			}
 		else {
-			while(current_from->next_sibling==0 && current_from!=start_from) {
+			while(current_from->next_sibling==nullptr && current_from!=start_from) {
 				current_from=current_from->parent;
 				toit=parent(toit);
-				assert(current_from!=0);
+				assert(current_from!=nullptr);
 				}
 			current_from=current_from->next_sibling;
 			if(current_from!=last) {
@@ -1530,8 +1530,8 @@ void tree<T, tree_node_allocator>::sort(sibling_iterator from, sibling_iterator 
 	tree_node *prev=from.node->prev_sibling;
 	tree_node *next=it2.node->next_sibling;
 	typename std::multiset<tree_node *, compare_nodes<StrictWeakOrdering> >::iterator nit=nodes.begin(), eit=nodes.end();
-	if(prev==0) {
-		if((*nit)->parent!=0) // to catch "sorting the head" situations, when there is no parent
+	if(prev==nullptr) {
+		if((*nit)->parent!=nullptr) // to catch "sorting the head" situations, when there is no parent
 			(*nit)->parent->first_child=(*nit);
 		}
 	else prev->next_sibling=(*nit);
@@ -1551,8 +1551,8 @@ void tree<T, tree_node_allocator>::sort(sibling_iterator from, sibling_iterator 
 	// eit points to the last node in the sorted range.
 	(*eit)->next_sibling=next;
    (*eit)->prev_sibling=prev; // missed in the loop above
-	if(next==0) {
-		if((*eit)->parent!=0) // to catch "sorting the head" situations, when there is no parent
+	if(next==nullptr) {
+		if((*eit)->parent!=nullptr) // to catch "sorting the head" situations, when there is no parent
 			(*eit)->parent->last_child=(*eit);
 		}
 	else next->prev_sibling=(*eit);
@@ -2038,7 +2038,7 @@ bool tree<T, tree_node_allocator>::leaf_iterator::operator==(const leaf_iterator
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_allocator>::iterator_base::begin() const
 	{
-	if(node->first_child==0) 
+	if(node->first_child==nullptr)
 		return end();
 
 	sibling_iterator ret(node->first_child);
@@ -2049,7 +2049,7 @@ typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_alloca
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_allocator>::iterator_base::end() const
 	{
-	sibling_iterator ret(0);
+	sibling_iterator ret(nullptr);
 	ret.parent_=node;
 	return ret;
 	}
@@ -2086,7 +2086,7 @@ unsigned int tree<T, tree_node_allocator>::iterator_base::number_of_children() c
 
 template <class T, class tree_node_allocator>
 tree<T, tree_node_allocator>::pre_order_iterator::pre_order_iterator() 
-	: iterator_base(0)
+	: iterator_base(nullptr)
 	{
 	}
 
@@ -2119,15 +2119,15 @@ tree<T, tree_node_allocator>::pre_order_iterator::pre_order_iterator(const sibli
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::pre_order_iterator& tree<T, tree_node_allocator>::pre_order_iterator::operator++()
 	{
-	assert(this->node!=0);
-	if(!this->skip_current_children_ && this->node->first_child != 0) {
+	assert(this->node!=nullptr);
+	if(!this->skip_current_children_ && this->node->first_child != nullptr) {
 		this->node=this->node->first_child;
 		}
 	else {
 		this->skip_current_children_=false;
-		while(this->node->next_sibling==0) {
+		while(this->node->next_sibling==nullptr) {
 			this->node=this->node->parent;
-			if(this->node==0)
+			if(this->node==nullptr)
 				return *this;
 			}
 		this->node=this->node->next_sibling;
@@ -2599,9 +2599,9 @@ tree<T, tree_node_allocator>::sibling_iterator::sibling_iterator(const sibling_i
 template <class T, class tree_node_allocator>
 void tree<T, tree_node_allocator>::sibling_iterator::set_parent_()
 	{
-	parent_=0;
-	if(this->node==0) return;
-	if(this->node->parent!=0)
+	parent_=nullptr;
+	if(this->node==nullptr) return;
+	if(this->node->parent!=nullptr)
 		parent_=this->node->parent;
 	}
 

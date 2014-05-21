@@ -732,7 +732,7 @@ RTMP::sendPacket(RTMPPacket& packet)
             if (_socket.write(header, chunk) != chunk) {
                 return false;
             }
-            header = NULL;
+            header = nullptr;
             hSize = 0;
         }
       
@@ -1146,7 +1146,7 @@ decodeInt24(const std::uint8_t *c)
 std::uint8_t*
 encodeInt24(std::uint8_t *output, std::uint8_t *outend, int nVal)
 {
-    if (output + 3 > outend) return NULL;
+    if (output + 3 > outend) return nullptr;
 
     output[2] = nVal & 0xff;
     output[1] = nVal >> 8;

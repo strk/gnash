@@ -68,7 +68,7 @@ filereference_class_init(as_object& where, const ObjectURI& uri)
   
 	AsBroadcaster::initialize(*proto);
 
-    as_object* null = 0;
+    as_object* null = nullptr;
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, proto, null, 3);
 
 	where.init_member(uri, cl, as_object::DefaultFlags); 

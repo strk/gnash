@@ -384,7 +384,7 @@ Button::topmostMouseEntity(std::int32_t x, std::int32_t y)
 {
     if (!visible() || !isEnabled())
     {
-        return 0;
+        return nullptr;
     }
 
     //-------------------------------------------------
@@ -417,7 +417,7 @@ Button::topmostMouseEntity(std::int32_t x, std::int32_t y)
     //-------------------------------------------------
 
     // Find hit DisplayObjects
-    if ( _hitCharacters.empty() ) return 0;
+    if ( _hitCharacters.empty() ) return nullptr;
 
     // point is in p's space,
     // we need to convert it in world space
@@ -437,7 +437,7 @@ Button::topmostMouseEntity(std::int32_t x, std::int32_t y)
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -529,7 +529,7 @@ Button::mouseEvent(const event_id& event)
             const SWF::SoundInfoRecord& sinfo = bs.soundInfo;
 
             const sound::SoundEnvelopes* env = 
-                sinfo.envelopes.empty() ? 0 : &sinfo.envelopes;
+                sinfo.envelopes.empty() ? nullptr : &sinfo.envelopes;
 
             s->startSound(bs.sample->m_sound_handler_id,
                     bs.soundInfo.loopCount,
@@ -662,8 +662,8 @@ Button::set_current_state(MouseState new_state)
             if ( oldch && oldch->unloaded() ) {
                 removeInstanceProperty(*this, oldch);
                 if ( ! oldch->isDestroyed() ) oldch->destroy();
-                _stateCharacters[i] = NULL;
-                oldch = NULL;
+                _stateCharacters[i] = nullptr;
+                oldch = nullptr;
             }
 
             if ( oldch ) // the one we have should not be there... unload!
@@ -675,7 +675,7 @@ Button::set_current_state(MouseState new_state)
                     // No onUnload handler: destroy and clear slot
                     removeInstanceProperty(*this, oldch);
                     if (!oldch->isDestroyed()) oldch->destroy();
-                    _stateCharacters[i] = NULL;
+                    _stateCharacters[i] = nullptr;
                 }
                 else
                 {
@@ -697,8 +697,8 @@ Button::set_current_state(MouseState new_state)
             {
                 removeInstanceProperty(*this, oldch);
                 if ( ! oldch->isDestroyed() ) oldch->destroy();
-                _stateCharacters[i] = NULL;
-                oldch = NULL;
+                _stateCharacters[i] = nullptr;
+                oldch = nullptr;
             }
 
             if (!oldch) {

@@ -113,10 +113,10 @@ struct GnashDevice
     // These are only used for the Framebuffer
 
     /// Get the memory from the real framebuffer
-    virtual std::uint8_t *getFBMemory() { return 0; };
+    virtual std::uint8_t *getFBMemory() { return nullptr; };
     
     /// Get the memory from an offscreen buffer to support Double Buffering
-    virtual std::uint8_t *getOffscreenBuffer() { return 0; };
+    virtual std::uint8_t *getOffscreenBuffer() { return nullptr; };
 
     virtual size_t getFBMemSize() { return 0; };
 

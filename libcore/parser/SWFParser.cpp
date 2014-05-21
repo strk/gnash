@@ -83,7 +83,7 @@ SWFParser::read(std::streamsize bytes)
                 return false;
             }
 
-            SWF::TagLoadersTable::TagLoader lf = 0;
+            SWF::TagLoadersTable::TagLoader lf = nullptr;
 
             if (_tag == SWF::SHOWFRAME) {
                 // show frame tag -- advance to the next frame.

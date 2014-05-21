@@ -94,7 +94,7 @@ SWFMovieLoader::started() const
 {
     boost::mutex::scoped_lock lock(_mutex);
 
-    return _thread.get() != NULL;
+    return _thread.get() != nullptr;
 }
 
 bool
@@ -202,7 +202,7 @@ SWFMovieDefinition::get_font(int font_id) const
 {
 
     FontMap::const_iterator it = m_fonts.find(font_id);
-    if ( it == m_fonts.end() ) return NULL;
+    if ( it == m_fonts.end() ) return nullptr;
     boost::intrusive_ptr<Font> f = it->second;
     assert(f->get_ref_count() > 1);
     return f.get();
@@ -218,14 +218,14 @@ SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic)
        Font* f = it->second.get();
        if ( f->matches(name, bold, italic) ) return f;
     }
-    return 0;
+    return nullptr;
 }
 
 CachedBitmap*
 SWFMovieDefinition::getBitmap(int id) const
 {
     const Bitmaps::const_iterator it = _bitmaps.find(id);
-    if (it == _bitmaps.end()) return 0;
+    if (it == _bitmaps.end()) return nullptr;
     return it->second.get();
 }
 
@@ -240,7 +240,7 @@ sound_sample*
 SWFMovieDefinition::get_sound_sample(int id) const
 {
     SoundSampleMap::const_iterator it = m_sound_samples.find(id);
-    if (it == m_sound_samples.end()) return 0;
+    if (it == m_sound_samples.end()) return nullptr;
 
     boost::intrusive_ptr<sound_sample> ch = it->second;
 

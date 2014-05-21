@@ -140,9 +140,9 @@ public:
 	/// SWFMovieDefinition is one such example, future examples
 	/// should include jpeg_movie_def and similar..
 	///
-	virtual Movie* createMovie(Global_as& /*gl*/, DisplayObject* /*parent*/=0)
+	virtual Movie* createMovie(Global_as& /*gl*/, DisplayObject* /*parent*/=nullptr)
 	{
-		return NULL;
+		return nullptr;
 	}
 
     virtual void incrementLoadedFrames() {}
@@ -158,7 +158,7 @@ public:
 	///
 	virtual const PlayList* getPlaylist(size_t /*frame_number*/) const
 	{
-		return 0;
+		return nullptr;
 	}
 
 
@@ -195,7 +195,7 @@ public:
 	///         (this is the default)
 	virtual DefinitionTag* getDefinitionTag(std::uint16_t /*id*/) const
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	/// Get 0-based index of the frame with given label.
@@ -252,14 +252,14 @@ public:
 	///
 	virtual Font* get_font(int /*id*/) const
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	/// Find a font from the movie (not shared) lib
 	virtual Font* get_font(const std::string& /*name*/,
             bool /*bold*/, bool /*italic*/) const
 	{
-		return 0;
+		return nullptr;
 	}
 
 	/// Add an ControlTag to this movie_definition's playlist
@@ -310,7 +310,7 @@ public:
 	///
 	virtual image::JpegInput* get_jpeg_loader() const
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	/// \brief
@@ -328,7 +328,7 @@ public:
 	///
 	virtual CachedBitmap* getBitmap(int /*DisplayObject_id*/) const
 	{
-		return 0;
+		return nullptr;
 	}
 
 	/// \brief
@@ -350,7 +350,7 @@ public:
 	///
 	virtual sound_sample* get_sound_sample(int /*DisplayObject_id*/) const
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	/// \brief

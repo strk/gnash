@@ -73,7 +73,7 @@ struct _GnashView {
 
 G_DEFINE_TYPE(GnashView, gnash_view, GTK_TYPE_BIN)
 
-static GObjectClass *parent_class = NULL;
+static GObjectClass *parent_class = nullptr;
 
 static void gnash_view_class_init(GnashViewClass *gnash_view_class);
 static void gnash_view_init(GnashView *view);
@@ -97,7 +97,7 @@ static void gnash_view_load_movie(GnashView *view, const gchar *path);
 GtkWidget *
 gnash_view_new (void)
 {
-    return GTK_WIDGET(g_object_new (GNASH_TYPE_VIEW, NULL));
+    return GTK_WIDGET(g_object_new (GNASH_TYPE_VIEW, nullptr));
 }
 
 const gchar *
@@ -109,7 +109,7 @@ gnash_view_call (GnashView *view, const gchar *func_name, const gchar *input_dat
     gnash::as_value func = getMember(*getObject(view->movie), getURI(vm, func_name));
 
     if( !func.is_function() ) {
-        return NULL;
+        return nullptr;
     }
 
     gnash::as_value result;
@@ -120,7 +120,7 @@ gnash_view_call (GnashView *view, const gchar *func_name, const gchar *input_dat
         result = callMethod(getObject(view->movie), getURI(vm, func_name));
     }
     if( !result.is_string() ) {
-        return NULL;
+        return nullptr;
     }
 
     return result.to_string().c_str();
@@ -147,7 +147,7 @@ gnash_view_class_init(GnashViewClass *gnash_view_class)
 					 g_param_spec_string ("uri",
 							      "URI to movie",
 							      "URI to the SWF movie to display",
-							      NULL,
+							      nullptr,
 							      (GParamFlags)G_PARAM_READWRITE));
 }
 
@@ -162,7 +162,7 @@ gnash_view_set_property (GObject      *object,
     switch (prop_id)
     {
     case PROP_URI:
-        if(view->movie_definition.get() != NULL) {
+        if(view->movie_definition.get() != nullptr) {
             g_warning("Cannot change the movie URI once the view has been initialized.");
             return;
         }
@@ -196,7 +196,7 @@ gnash_view_init(GnashView *view)
 {
     GNASH_REPORT_FUNCTION;
 
-    view->uri = NULL;
+    view->uri = nullptr;
     view->advance_timer = 0;
 
 	g_signal_connect (GTK_WIDGET(view), "realize",
@@ -225,7 +225,7 @@ gnash_view_init(GnashView *view)
 
     view->canvas = GNASH_CANVAS(gnash_canvas_new());
     std::string nullstr;
-    gnash_canvas_setup(view->canvas, nullstr, nullstr, 0, NULL);
+    gnash_canvas_setup(view->canvas, nullstr, nullstr, 0, nullptr);
     gtk_container_add (GTK_CONTAINER (view), GTK_WIDGET(view->canvas));
     gtk_widget_show (GTK_WIDGET(view->canvas));
 
@@ -254,7 +254,7 @@ gnash_view_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
     widget->allocation = *allocation;
     gtk_widget_size_allocate (GTK_BIN(widget)->child, allocation);
 
-    if( view->stage.get() != NULL) {
+    if( view->stage.get() != nullptr) {
     	view->stage->setDimensions(allocation->width, allocation->height);
 
         std::shared_ptr<gnash::Renderer> renderer = gnash_canvas_get_renderer(view->canvas);
@@ -268,7 +268,7 @@ static void
 gnash_view_size_request (GtkWidget *widget, GtkRequisition *requisition)
 {
     GnashView *view = GNASH_VIEW(widget);
-    if( view->movie_definition.get() == NULL ) {
+    if( view->movie_definition.get() == nullptr ) {
         requisition->width = 0;
         requisition->height = 0;
     } else {
@@ -284,7 +284,7 @@ gnash_view_realize_cb(GtkWidget *widget, gpointer /*user_data*/)
     GnashView *view = GNASH_VIEW(widget);
 
     // Some initializations need to happen after the widget has been realized.
-    if(view->movie_definition.get() == NULL) {
+    if(view->movie_definition.get() == nullptr) {
         gtk_widget_realize(GTK_WIDGET(view->canvas));
         gnash_view_load_movie(view, view->uri);
     }
@@ -295,7 +295,7 @@ key_press_event_cb(GtkWidget */*widget*/, GdkEventKey *event, gpointer data)
 {
     GNASH_REPORT_FUNCTION;
     GnashView *view = GNASH_VIEW(data);
-    if (view->stage.get() == NULL)
+    if (view->stage.get() == nullptr)
         return FALSE;
 
     gnash::key::code c = gdk_to_gnash_key(event->keyval);
@@ -314,7 +314,7 @@ key_release_event_cb(GtkWidget */*widget*/, GdkEventKey *event, gpointer data)
 {
     GNASH_REPORT_FUNCTION;
     GnashView *view = GNASH_VIEW(data);
-    if (view->stage.get() == NULL)
+    if (view->stage.get() == nullptr)
         return FALSE;
 
     gnash::key::code c = gdk_to_gnash_key(event->keyval);
@@ -333,7 +333,7 @@ button_press_event_cb(GtkWidget */*widget*/, GdkEventButton *event, gpointer dat
 {
     GNASH_REPORT_FUNCTION;
     GnashView *view = GNASH_VIEW(data);
-    if (view->stage.get() == NULL)
+    if (view->stage.get() == nullptr)
         return FALSE;
 
     /// Double- and triple-clicks should not send an extra event!
@@ -353,7 +353,7 @@ button_release_event_cb(GtkWidget* /*widget*/, GdkEventButton* /*event*/,
 {
     GNASH_REPORT_FUNCTION;
     GnashView *view = GNASH_VIEW(data);
-    if (view->stage.get() == NULL)
+    if (view->stage.get() == nullptr)
         return FALSE;
 
     view->stage->mouseClick(false);
@@ -390,23 +390,23 @@ motion_notify_event_cb(GtkWidget */*widget*/, GdkEventMotion *event, gpointer da
 		if ( activeEntity->isSelectableTextField() )
 		{
 		    GdkCursor *gdkcursor = gdk_cursor_new(GDK_XTERM);
-		    gdk_window_set_cursor (widget->window, NULL);
+		    gdk_window_set_cursor (widget->window, nullptr);
             gdk_cursor_unref(gdkcursor);
 		}
 		else if ( activeEntity->allowHandCursor() )
 		{
 		    GdkCursor *gdkcursor = gdk_cursor_new(GDK_HAND2);
-		    gdk_window_set_cursor (widget->window, NULL);
+		    gdk_window_set_cursor (widget->window, nullptr);
             gdk_cursor_unref(gdkcursor);
 		}
 		else
 		{
-		    gdk_window_set_cursor (widget->window, NULL);
+		    gdk_window_set_cursor (widget->window, nullptr);
 		}
 	}
 	else
 	{
-	    gdk_window_set_cursor (widget->window, NULL);
+	    gdk_window_set_cursor (widget->window, nullptr);
 	}
 
     return TRUE;
@@ -445,7 +445,7 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     view->movie_definition = gnash::MovieFactory::makeMovie(url,
             *view->run_info, url.str().c_str(), false);
 
-    g_return_if_fail(view->movie_definition.get() != NULL);
+    g_return_if_fail(view->movie_definition.get() != nullptr);
 
     // NOTE: it's important that _systemClock is constructed
     //       before and destroyed after _virtualClock !
@@ -456,7 +456,7 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     view->movie_definition->completeLoad();
 
     view->advance_timer = g_timeout_add_full(G_PRIORITY_LOW, 10,
-            (GSourceFunc)gnash_view_advance_movie, view, NULL);
+            (GSourceFunc)gnash_view_advance_movie, view, nullptr);
 
     gtk_widget_queue_resize (GTK_WIDGET(view));
 
@@ -499,7 +499,7 @@ gnash_view_display(GnashView *view)
 
     std::shared_ptr<gnash::Renderer> renderer = gnash_canvas_get_renderer(view->canvas);
     renderer->set_invalidated_regions(changed_ranges);
-    gdk_window_invalidate_rect(GTK_WIDGET(view->canvas)->window, NULL, false);
+    gdk_window_invalidate_rect(GTK_WIDGET(view->canvas)->window, nullptr, false);
 
     gnash_canvas_before_rendering(view->canvas, view->stage.get());
 	view->stage->display();

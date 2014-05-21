@@ -36,9 +36,9 @@ namespace ffmpeg {
     
 AudioDecoderFfmpeg::AudioDecoderFfmpeg(const AudioInfo& info)
     :
-    _audioCodec(NULL),
-    _audioCodecCtx(NULL),
-    _parser(NULL),
+    _audioCodec(nullptr),
+    _audioCodecCtx(nullptr),
+    _parser(nullptr),
     _needsParsing(false)
 {
     setup(info);
@@ -56,9 +56,9 @@ AudioDecoderFfmpeg::AudioDecoderFfmpeg(const AudioInfo& info)
 
 AudioDecoderFfmpeg::AudioDecoderFfmpeg(SoundInfo& info)
     :
-    _audioCodec(NULL),
-    _audioCodecCtx(NULL),
-    _parser(NULL)
+    _audioCodec(nullptr),
+    _audioCodecCtx(nullptr),
+    _parser(nullptr)
 {
     setup(info);
 
@@ -137,13 +137,13 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
     }
 
 #if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(53,8,0)
-    int ret = avcodec_open2(_audioCodecCtx, _audioCodec, NULL);
+    int ret = avcodec_open2(_audioCodecCtx, _audioCodec, nullptr);
 #else
     int ret = avcodec_open(_audioCodecCtx, _audioCodec);
 #endif
     if (ret < 0) {
         av_free(_audioCodecCtx);
-        _audioCodecCtx=0;
+        _audioCodecCtx=nullptr;
         boost::format err = boost::format(
             _("AudioDecoderFfmpeg: avcodec_open failed to initialize "
             "FFmpeg codec %s (%d)")) % _audioCodec->name % (int)codec_id;
@@ -258,7 +258,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
     }
 
     _parser = av_parser_init(codec_id);
-    _needsParsing = (_parser != NULL);
+    _needsParsing = (_parser != nullptr);
 
     // Create an audioCodecCtx from the ffmpeg parser if exists/possible
 #if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(53,8,0)
@@ -317,14 +317,14 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
     log_debug("  Opening codec");
 #endif // GNASH_DEBUG_AUDIO_DECODING
 #if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(53,8,0)
-    int ret = avcodec_open2(_audioCodecCtx, _audioCodec, NULL);
+    int ret = avcodec_open2(_audioCodecCtx, _audioCodec, nullptr);
 #else
     int ret = avcodec_open(_audioCodecCtx, _audioCodec);
 #endif
     if (ret < 0) {
         //avcodec_close(_audioCodecCtx);
         av_free(_audioCodecCtx);
-        _audioCodecCtx = 0;
+        _audioCodecCtx = nullptr;
 
         boost::format err = boost::format(
             _("AudioDecoderFfmpeg: avcodec_open failed to initialize "
@@ -352,7 +352,7 @@ AudioDecoderFfmpeg::decode(const std::uint8_t* input,
     decodedBytes = 0; // nothing decoded yet
     while (decodedBytes < inputSize)
     {
-        const std::uint8_t* frame=0; // parsed frame (pointer into input)
+        const std::uint8_t* frame=nullptr; // parsed frame (pointer into input)
         int framesize; // parsed frame size
 
         int consumed = parseInput(input+decodedBytes,
@@ -482,7 +482,7 @@ AudioDecoderFfmpeg::decodeFrame(const std::uint8_t* input,
     if (!output.get()) {
         log_error(_("failed to allocate audio buffer."));
         outputSize = 0;
-        return NULL;
+        return nullptr;
     }
 
     std::int16_t* outPtr = output.get();
@@ -503,7 +503,7 @@ AudioDecoderFfmpeg::decodeFrame(const std::uint8_t* input,
     std::unique_ptr<AVFrame, decltype(av_free)*> frm ( FRAMEALLOC(), av_free );
     if (!frm.get()) {
         log_error(_("failed to allocate frame."));
-        return NULL;
+        return nullptr;
     }
     int tmp = avcodec_decode_audio4(_audioCodecCtx, frm.get(), &got_frm, &pkt);
 
@@ -522,7 +522,7 @@ AudioDecoderFfmpeg::decodeFrame(const std::uint8_t* input,
         if (static_cast<int>(outSize) < data_size) {
             log_error(_("output buffer size is too small for the current frame "
                 "(%d < %d)"), outSize, data_size);
-            return NULL;
+            return nullptr;
         }
 
         memcpy(outPtr, frm->extended_data[0], plane_size);
@@ -552,7 +552,7 @@ AudioDecoderFfmpeg::decodeFrame(const std::uint8_t* input,
                 "data."), outputSize, inputSize);
         log_error(_("Upgrading ffmpeg/libavcodec might fix this issue."));
         outputSize = 0;
-        return NULL;
+        return nullptr;
     }
 
     // Resampling is needed.

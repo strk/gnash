@@ -48,7 +48,7 @@ BitmapMovieDefinition::BitmapMovieDefinition(
 	_framerate(12),
 	_url(url),
 	_bytesTotal(image->size()),
-	_bitmap(renderer ? renderer->createCachedBitmap(std::move(image)) : 0)
+	_bitmap(renderer ? renderer->createCachedBitmap(std::move(image)) : nullptr)
 {
 }
 
@@ -57,7 +57,7 @@ BitmapMovieDefinition::createDisplayObject(Global_as& /*gl*/,
         DisplayObject* /*parent*/) const
 {
     std::abort();
-    return 0;
+    return nullptr;
 }
 
 } // namespace gnash

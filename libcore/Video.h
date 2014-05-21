@@ -64,7 +64,7 @@ public:
 	virtual SWFRect getBounds() const;
 
 	/// Register this video instance as a live DisplayObject
-	virtual void construct(as_object* init = 0);
+	virtual void construct(as_object* init = nullptr);
 
 	virtual void display(Renderer& renderer, const Transform& xform);
 

@@ -156,7 +156,7 @@ sound_handler::delete_sound(int handle)
     
     stopEmbedSoundInstances(*def);
     delete def;
-    _sounds[handle] = 0;
+    _sounds[handle] = nullptr;
 
 }
 
@@ -204,7 +204,7 @@ sound_handler::get_sound_info(int handle) const
     if (validHandle(_streamingSounds, handle)) {
         return &_streamingSounds[handle]->soundinfo;
     } 
-    return 0;
+    return nullptr;
 }
 
 void
@@ -644,7 +644,7 @@ sound_handler::fetchSamples(std::int16_t* to, unsigned int nSamples)
 void
 sound_handler::setAudioDump(const std::string& wavefile)
 {
-    bool wasDumping = (_wavWriter.get() != 0);
+    bool wasDumping = (_wavWriter.get() != nullptr);
 
     if (!wavefile.empty()) {
         _wavWriter.reset(new WAVWriter(wavefile));

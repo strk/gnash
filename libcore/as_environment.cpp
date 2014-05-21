@@ -88,7 +88,7 @@ namespace {
     as_value getVariableRaw(const as_environment& env,
         const std::string& varname,
         const as_environment::ScopeStack& scope,
-        as_object** retTarget = 0);
+        as_object** retTarget = nullptr);
 
     void setVariableRaw(const as_environment& env, const std::string& varname,
         const as_value& val, const as_environment::ScopeStack& scope);
@@ -107,8 +107,8 @@ as_environment::as_environment(VM& vm)
     :
     _vm(vm),
     _stack(_vm.getStack()),
-    _target(0),
-    _original_target(0)
+    _target(nullptr),
+    _original_target(nullptr)
 {
 }
 
@@ -135,13 +135,13 @@ findObject(const as_environment& ctx, const std::string& path,
     // Check if it's an absolute path
     if (*p == '/') {
 
-        MovieClip* root = 0;
+        MovieClip* root = nullptr;
         if (ctx.target()) root = ctx.target()->getAsRoot();
         else {
             if (ctx.get_original_target()) {
                 root = ctx.get_original_target()->getAsRoot();
             }
-            return 0;
+            return nullptr;
         }
 
         // If the path is just "/" return the root.
@@ -182,7 +182,7 @@ findObject(const as_environment& ctx, const std::string& path,
                 log_aserror(_("invalid path '%s' (p=next_slash=%s)"),
                 path, next_slash);
             );
-            return 0;
+            return nullptr;
         }
 
         if (next_slash) {
@@ -193,7 +193,7 @@ findObject(const as_environment& ctx, const std::string& path,
                         log_aserror(_("invalid path '%s' (dot not allowed "
                                 "after having seen a slash)"), path);
                     );
-                    return 0;
+                    return nullptr;
                 }
                 // No dot allowed after a double-dot.
                 if (next_slash[1] == '.') dot_allowed = false;
@@ -214,7 +214,7 @@ findObject(const as_environment& ctx, const std::string& path,
         const ObjectURI subpartURI(getURI(vm, subpart));
 
         if (!firstElementParsed) {
-            as_object* element(0);
+            as_object* element(nullptr);
 
             do {
                 // Try scope stack
@@ -252,7 +252,7 @@ findObject(const as_environment& ctx, const std::string& path,
 
             } while (0);
 
-            if (!element) return 0;
+            if (!element) return nullptr;
 
             env = element;
             firstElementParsed = true;
@@ -261,7 +261,7 @@ findObject(const as_environment& ctx, const std::string& path,
 
             assert(env);
             as_object* element = getElement(env, subpartURI);
-            if (!element) return 0;
+            if (!element) return nullptr;
             env = element;
         }
 
@@ -317,7 +317,7 @@ getVariable(const as_environment& env, const std::string& varname,
         if (target) {
             // ... but only if it resolves to a sprite
             DisplayObject* d = target->displayObject();
-            MovieClip* m = d ? d->to_movie() : 0;
+            MovieClip* m = d ? d->to_movie() : nullptr;
             if (m) return as_value(getObject(m));
         }
     }
@@ -539,7 +539,7 @@ getVariableRaw(const as_environment& env, const std::string& varname,
     // Looking for "this" 
     if (eq(key, NSV::PROP_THIS)) {
         val.set_as_object(getObject(env.get_original_target()));
-        if (retTarget) *retTarget = NULL; 
+        if (retTarget) *retTarget = nullptr;
         return val;
     }
 
@@ -549,7 +549,7 @@ getVariableRaw(const as_environment& env, const std::string& varname,
         log_debug("Took %s as _global, returning _global", varname);
 #endif
         // The "_global" ref was added in SWF6
-        if (retTarget) *retTarget = NULL; // correct ??
+        if (retTarget) *retTarget = nullptr; // correct ??
         return as_value(global);
     }
 
@@ -623,7 +623,7 @@ next_slash_or_dot(const char* word)
             return p;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 } // unnamed namespace 

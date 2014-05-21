@@ -99,7 +99,7 @@ const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
 LcShm::LcShm() 
     :
     SharedMem(64528),
-    _baseaddr(0)
+    _baseaddr(nullptr)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -136,7 +136,7 @@ LcShm::~LcShm()
 /// \brief Construct a block of Listeners.
 ///     This constructs an uninitialized Listener block.
 Listener::Listener()
-    : _baseaddr(0)
+    : _baseaddr(nullptr)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -208,7 +208,7 @@ Listener::addListener(const string &name)
     }
     
     // Add ourselves to the list
-    if (memcpy(item, name.c_str(), name.size()) == 0) {
+    if (memcpy(item, name.c_str(), name.size()) == nullptr) {
         return false;
     }
 
@@ -303,7 +303,7 @@ Listener::listListeners()
 {
 //    GNASH_REPORT_FUNCTION;    
     std::unique_ptr< vector<string> > listeners ( new vector<string> );
-    if (_baseaddr != 0) {
+    if (_baseaddr != nullptr) {
         std::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
         
         const char *item = reinterpret_cast<const char *>(addr);
@@ -367,9 +367,9 @@ LcShm::parseHeader(std::uint8_t *data, std::uint8_t* tooFar)
 //    GNASH_REPORT_FUNCTION;
     std::uint8_t *ptr = data;
 
-    if (data == 0) {
+    if (data == nullptr) {
         log_debug(_("No data pointer to parse!"));
-        return 0;
+        return nullptr;
     }
 
 #ifndef GNASH_TRUST_AMF
@@ -386,14 +386,14 @@ LcShm::parseHeader(std::uint8_t *data, std::uint8_t* tooFar)
     
     AMF amf;
     std::shared_ptr<Element> el = amf.extractAMF(ptr, tooFar);
-    if (el == 0) {
+    if (el == nullptr) {
         log_debug(_("Didn't extract an element from the byte stream!"));
-        return 0;
+        return nullptr;
     }
     _object.connection_name = el->to_string();
     
     el = amf.extractAMF(ptr, tooFar);
-    if (ptr != 0) {
+    if (ptr != nullptr) {
         _object.hostname = el->to_string();
     }
     
@@ -515,7 +515,7 @@ LcShm::connect(const string& names)
         return false;
     }
 
-    if (SharedMem::begin() <= static_cast<unsigned char *>(0)) {
+    if (SharedMem::begin() <= static_cast<unsigned char *>(nullptr)) {
         log_error(_("Failed to open shared memory segment: \"%s\""), names.c_str());
         return false; 
     }
@@ -556,7 +556,7 @@ LcShm::connect(key_t key)
         return false;
     }
 
-    if (SharedMem::begin() <= static_cast<unsigned char *>(0)) {
+    if (SharedMem::begin() <= static_cast<unsigned char *>(nullptr)) {
         log_error(_("Failed to open shared memory segment: 0x%x"), key);
         return false; 
     }

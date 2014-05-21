@@ -45,7 +45,7 @@ void
 contextmenu_class_init(as_object& where, const ObjectURI& uri)
 {
     registerBuiltinClass(where, contextmenu_ctor, attachContextMenuInterface,
-            0, uri);
+            nullptr, uri);
 }
 
 

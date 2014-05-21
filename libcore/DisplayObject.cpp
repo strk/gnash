@@ -101,8 +101,8 @@ DisplayObject::DisplayObject(movie_root& mr, as_object* object,
     _volume(100),
     _ratio(0),
     m_clip_depth(noClipDepthValue),
-    _mask(0),
-    _maskee(0),
+    _mask(nullptr),
+    _maskee(nullptr),
     _blendMode(BLENDMODE_NORMAL),
     _visible(true),
     _scriptTransformed(false),
@@ -161,7 +161,7 @@ as_object*
 DisplayObject::pathElement(const ObjectURI& uri)
 {
     as_object* obj = getObject(this);
-    if (!obj) return 0;
+    if (!obj) return nullptr;
 
     string_table::key key = getName(uri);
 
@@ -177,7 +177,7 @@ DisplayObject::pathElement(const ObjectURI& uri)
             (uri, ObjectURI(NSV::PROP_THIS))) {
         return obj;
     }
-    return 0;
+    return nullptr;
 }
 
 void 
@@ -331,7 +331,7 @@ DisplayObject::set_visible(bool visible)
         assert(_object);
         movie_root& mr = stage();
         if (mr.getFocus() == this) {
-            mr.setFocus(0);
+            mr.setFocus(nullptr);
         }
     }
     _visible = visible;      
@@ -453,8 +453,8 @@ DisplayObject::unload()
     const bool unloadHandler = unloadChildren();
 
     // Unregister this DisplayObject as mask and/or maskee.
-    if (_maskee) _maskee->setMask(0);
-    if (_mask) _mask->setMaskee(0);
+    if (_maskee) _maskee->setMask(nullptr);
+    if (_mask) _mask->setMaskee(nullptr);
 
     _unloaded = true;
 
@@ -577,7 +577,7 @@ DisplayObject::getTargetPath() const
     Path path;
 
     // Build parents stack
-    const DisplayObject* topLevel = 0;
+    const DisplayObject* topLevel = nullptr;
     const DisplayObject* ch = this;
 
     string_table& st = getStringTable(*getObject(this));
@@ -742,18 +742,18 @@ DisplayObject::setMask(DisplayObject* mask)
         // on any previously registered maskee
         // so we make sure to set our _mask to 
         // NULL before getting called again
-        _mask->setMaskee(0);
+        _mask->setMaskee(nullptr);
     }
 
     // if we had a maskee, notify it to stop using
     // us as a mask
-    if (prevMaskee) prevMaskee->setMask(0);
+    if (prevMaskee) prevMaskee->setMask(nullptr);
 
     // TODO: should we reset any original clip depth
     //       specified by PlaceObject tag ?
     set_clip_depth(noClipDepthValue); 
     _mask = mask;
-    _maskee = 0;
+    _maskee = nullptr;
 
     if (_mask) {
         /// Register as as masked by the mask
@@ -769,7 +769,7 @@ DisplayObject::setMaskee(DisplayObject* maskee)
     if (_maskee) {
         // We don't want the maskee to call setMaskee(null)
         // on us again
-        _maskee->_mask = 0;
+        _maskee->_mask = nullptr;
     }
 
     _maskee = maskee;
@@ -972,7 +972,7 @@ DisplayObject::MaskRenderer::MaskRenderer(Renderer& r, const DisplayObject& o)
     :
     _renderer(r),
     _mask(o.visible() && o.getMask() && !o.getMask()->unloaded() ? o.getMask()
-                                                                 : 0)
+                                                                 : nullptr)
 {
     if (!_mask) return;
 
@@ -1472,7 +1472,7 @@ getGetterSetterByURI(const ObjectURI& uri, string_table& st)
     const GetterSetters::const_iterator it = gs.find(uri);
 
     if (it == gs.end()) {
-        static const GetterSetter none(0, 0);
+        static const GetterSetter none(nullptr, nullptr);
         return none;
     }
 
@@ -1483,7 +1483,7 @@ getGetterSetterByURI(const ObjectURI& uri, string_table& st)
 const GetterSetter&
 getGetterSetterByIndex(size_t index)
 {
-    const Setter n = 0;
+    const Setter n = nullptr;
 
     static const GetterSetter props[] = {
         GetterSetter(&getX, &setX),
@@ -1517,7 +1517,7 @@ getGetterSetterByIndex(size_t index)
     };
 
     if (index >= arraySize(props)) {
-        const Getter ng = 0;
+        const Getter ng = nullptr;
         static const GetterSetter none(ng, n);
         return none;
     }
@@ -1618,7 +1618,7 @@ template<typename Map>
 const Map
 getURIMap(const typename Map::key_compare& cmp)
 {
-    const Setter n = 0;
+    const Setter n = nullptr;
 
     Map ret(cmp);
     ret.insert(std::make_pair(NSV::PROP_uX, GetterSetter(&getX, &setX)));

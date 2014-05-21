@@ -132,7 +132,7 @@ RTMPClient::encodeConnect(const char *uri,
             port = RTMP_PORT;
         }
     } else {
-        port = strtol(portstr.c_str(), NULL, 0) & 0xffff;
+        port = strtol(portstr.c_str(), nullptr, 0) & 0xffff;
     }
 
 
@@ -191,7 +191,7 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     appnode->makeString("app", app);
     obj->addProperty(appnode);
 
-    const char *version = 0;
+    const char *version = nullptr;
     if (rcfile.getFlashVersionString().size() > 0) {
         version = rcfile.getFlashVersionString().c_str();
     } else {
@@ -268,7 +268,7 @@ RTMPClient::connectToServer(const std::string &url)
     // If we're currently not connected, build and send the
     // initial handshake packet.
     if (connected() == false) {
-	short port = strtol(uri.port().c_str(), NULL, 0) & 0xffff;
+	short port = strtol(uri.port().c_str(), nullptr, 0) & 0xffff;
 	if (!createClient(uri.hostname(), port)) {
 	    return false;
 	}

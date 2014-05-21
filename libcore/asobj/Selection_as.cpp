@@ -59,7 +59,7 @@ selection_class_init(as_object& where, const ObjectURI& uri)
 
     // All properties are protected using ASSetPropFlags.
     Global_as& gl = getGlobal(where);
-    as_object* null = 0;
+    as_object* null = nullptr;
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, o, null, 7);
 }
 
@@ -198,7 +198,7 @@ selection_setFocus(const fn_call& fn)
 
     /// These should remove focus.
     if (focus.is_null() || focus.is_undefined()) {
-        mr.setFocus(0);
+        mr.setFocus(nullptr);
         return as_value(true);
     }
 

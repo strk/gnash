@@ -129,7 +129,7 @@ RcInitFile::RcInitFile()
 #ifdef __OS2__x
     _urlOpenerFormat = PrfQueryProfileString(HINI_USER, (PSZ)
             "WPURLDEFAULTSETTINGS",
-            (PSZ) "DefaultBrowserExe", NULL,
+            (PSZ) "DefaultBrowserExe", nullptr,
             (PVOID) browserExe, (LONG)sizeof(browserExe));
     _urlOpenerFormat += " -remote 'openurl(%u)'";
 #endif
@@ -323,7 +323,7 @@ RcInitFile::expandPath (std::string& path)
             else user = path.substr(1);
 
             // find user using pwd
-            const char *userhome = NULL;
+            const char *userhome = nullptr;
             struct passwd *password = getpwnam(user.c_str());
             if (password) {
                 userhome = password->pw_dir;
@@ -691,7 +691,7 @@ RcInitFile::updateFile()
         }
     } else {
         // Check the users home directory
-        const char *home = NULL;
+        const char *home = nullptr;
 #if defined(__amigaos4__)
         //on AmigaOS we have a GNASH: assign that point to program dir
         home = "/gnash";

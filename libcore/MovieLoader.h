@@ -73,7 +73,7 @@ public:
     ///                 
     void loadMovie(const std::string& url, const std::string& target,
             const std::string& data, MovieClip::VariablesMethod method,
-            as_object* handler=0);
+            as_object* handler=nullptr);
 
     /// Drop all requests and kill the thread
     void clear();
@@ -97,7 +97,7 @@ private:
                 _target(t),
                 _url(u),
                 _usePost(false),
-                _mdef(0),
+                _mdef(nullptr),
                 _mutex(),
                 _handler(handler),
                 _completed(false)

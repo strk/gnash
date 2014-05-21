@@ -62,7 +62,7 @@ public:
     ///    would not be accessible after destruction of this 
     ///    instance.
     ///
-    NoSeekFile(int fd, const char* filename=NULL);
+    NoSeekFile(int fd, const char* filename=nullptr);
 
     ~NoSeekFile();
 
@@ -367,7 +367,7 @@ make_stream(int fd, const char* cachefilename)
     std::cerr << boost::format("making NoSeekFile stream for fd %d") % fd << std::endl;
 #endif
 
-    NoSeekFile* stream = NULL;
+    NoSeekFile* stream = nullptr;
 
     try {
         stream = new NoSeekFile(fd, cachefilename);
@@ -375,7 +375,7 @@ make_stream(int fd, const char* cachefilename)
     catch (const std::exception& ex) {
         std::cerr << boost::format("NoSeekFile stream: %s") % ex.what() << std::endl;
         delete stream;
-        return NULL;
+        return nullptr;
     }
 
     return stream;

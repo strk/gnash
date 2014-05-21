@@ -163,19 +163,19 @@ main(int argc, char *argv[])
         } else {
             dirname = rcfile.getSOLSafeDir().c_str();
         }
-        DIR *library_dir = NULL;
+        DIR *library_dir = nullptr;
         library_dir = opendir (dirname);
-        if (library_dir != NULL) {
+        if (library_dir != nullptr) {
             // By convention, the first two entries in each directory are
             // for . and .. (``dot'' and ``dot dot''), so we ignore those. The
             // next directory read will get a real file, if any exists.
             entry = readdir(library_dir);
             entry = readdir(library_dir);
         }
-        if (library_dir != NULL) {
+        if (library_dir != nullptr) {
             for (i=0; entry>static_cast<struct dirent *>(0); i++) {
                 entry = readdir(library_dir);
-                if (entry != NULL) {
+                if (entry != nullptr) {
                     //string::size_type pos;
                     if (strstr(entry->d_name, ".sol")) {
                         cout << "Found SOL: " << entry->d_name << endl;

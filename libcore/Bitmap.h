@@ -75,7 +75,7 @@ public:
     virtual bool pointInShape(std::int32_t x, std::int32_t y) const;
 
     /// Called when the object is placed on stage.
-    virtual void construct(as_object* init = 0);
+    virtual void construct(as_object* init = nullptr);
 
 protected:
 

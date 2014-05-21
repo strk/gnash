@@ -165,7 +165,7 @@ NPN_Status(NPP instance, const char *message)
 const char *
 NPN_UserAgent(NPP instance)
 {
-    const char * rv = NULL;
+    const char * rv = nullptr;
     rv = NPNFuncs.uagent(instance);
     return rv;
 }
@@ -173,7 +173,7 @@ NPN_UserAgent(NPP instance)
 void *
 NPN_MemAlloc(uint32_t size)
 {
-    void * rv = NULL;
+    void * rv = nullptr;
     rv = NPNFuncs.memalloc(size);
     return rv;
 }

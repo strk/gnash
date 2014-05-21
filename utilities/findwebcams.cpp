@@ -45,8 +45,8 @@ class data {
 };
 
 data::data() {
-    deviceName = NULL;
-    deviceType = NULL;
+    deviceName = nullptr;
+    deviceType = nullptr;
     deviceNumber = -1;
     duplicate = false;
 };
@@ -60,8 +60,8 @@ size_t findVidDevs(std::vector<data*>& vidVect) {
     GstElement *element;
     element = gst_element_factory_make ("videotestsrc", "vidtestsrc");
     
-    if (element == NULL) {
-        vidVect.push_back(NULL);
+    if (element == nullptr) {
+        vidVect.push_back(nullptr);
         numdevs += 1;
     } else {
         vidVect.push_back(new data);
@@ -74,14 +74,14 @@ size_t findVidDevs(std::vector<data*>& vidVect) {
     //video4linux source
     GstPropertyProbe *probe;
     GValueArray *devarr;
-    element = NULL;
+    element = nullptr;
     
     element = gst_element_factory_make ("v4lsrc", "v4lvidsrc");
     probe = GST_PROPERTY_PROBE (element);
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-    for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+    for (size_t i = 0; devarr != nullptr && i < devarr->n_values; ++i) {
         GValue *val;
-        gchar *dev_name = NULL;
+        gchar *dev_name = nullptr;
         
         val = g_value_array_get_nth (devarr, i);
         g_object_set (element, "device", g_value_get_string (val), NULL);
@@ -105,16 +105,16 @@ size_t findVidDevs(std::vector<data*>& vidVect) {
     
     
     //video4linux2 source
-    probe = NULL;
-    element = NULL;
-    devarr = NULL;
+    probe = nullptr;
+    element = nullptr;
+    devarr = nullptr;
     
     element = gst_element_factory_make ("v4l2src", "v4l2vidsrc");
     probe = GST_PROPERTY_PROBE (element);
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-    for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+    for (size_t i = 0; devarr != nullptr && i < devarr->n_values; ++i) {
         GValue *val;
-        gchar *dev_name = NULL;
+        gchar *dev_name = nullptr;
         
         val = g_value_array_get_nth (devarr, i);
         g_object_set (element, "device", g_value_get_string (val), NULL);
@@ -149,7 +149,7 @@ size_t findVidDevs(std::vector<data*>& vidVect) {
 
 int main () {
     //initialize gstreamer to probe for devs
-    gst_init(NULL, NULL);
+    gst_init(nullptr, nullptr);
     size_t numdevs = 0;
     std::vector<data*> vidVector;
     
@@ -177,11 +177,11 @@ int main () {
         gint counter = 0;
         for (size_t i = 0; i < numdevs; ++i)
         {
-            if (i == 0 && (vidVector[i] != 0)) {
+            if (i == 0 && (vidVector[i] != nullptr)) {
                 std::cout << "    " << i
                      << ". Video Test Source (videotestsrc)" << std::endl;
                 counter++;
-            } else if (i == 0 && (vidVector[i] == 0)) {
+            } else if (i == 0 && (vidVector[i] == nullptr)) {
                 std::cout << "no test video device available";
             } else {
                 if (vidVector[i]->duplicate != true) {

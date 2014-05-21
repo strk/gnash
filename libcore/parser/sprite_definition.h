@@ -250,7 +250,7 @@ private:
 		//assert(frame_number < m_loading_frame);
 
 		PlayListMap::const_iterator it = m_playlist.find(frame_number);
-		if ( it == m_playlist.end() ) return NULL;
+		if ( it == m_playlist.end() ) return nullptr;
 		else return &(it->second);
 	}
 

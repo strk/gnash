@@ -81,7 +81,7 @@ void terminate_signal(int /*signo*/)
 DumpGui::DumpGui(unsigned long xid, float scale, bool loop, RunResources& r)
     :
     Gui(xid, scale, loop, r),
-    _agg_renderer(0),
+    _agg_renderer(nullptr),
     _offscreenbuf_size(-1),
     _timeout(0),
     _framecount(0),

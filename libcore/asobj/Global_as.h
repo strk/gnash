@@ -170,8 +170,8 @@ registerBuiltinClass(as_object& where, Global_as::ASFunction ctor,
 /// The call will fail harmlessly if the as_value is not callable.
 inline DSOEXPORT as_value
 invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
-        fn_call::Args& args, as_object* super = 0,
-        const movie_definition* callerDef = 0)
+        fn_call::Args& args, as_object* super = nullptr,
+        const movie_definition* callerDef = nullptr)
 {
 
 	as_value val;

@@ -106,7 +106,7 @@ public:
 	}
 	
 	/// Create a playable Movie from this def.
-	virtual Movie* createMovie(Global_as& gl, DisplayObject* parent = 0);
+	virtual Movie* createMovie(Global_as& gl, DisplayObject* parent = nullptr);
 
 	virtual const std::string& get_url() const {
 		return _url;

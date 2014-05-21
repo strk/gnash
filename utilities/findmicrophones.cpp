@@ -48,8 +48,8 @@ class data {
 };
 
 data::data() {
-    deviceName = NULL;
-    deviceType = NULL;
+    deviceName = nullptr;
+    deviceType = nullptr;
 };
 
 gint findAudioDevs(std::vector<data*>& audioVect) {
@@ -59,8 +59,8 @@ gint findAudioDevs(std::vector<data*>& audioVect) {
     GstElement *element;
     element = gst_element_factory_make ("audiotestsrc", "audiotestsrc");
     
-    if (element == NULL) {
-        audioVect.push_back(NULL);
+    if (element == nullptr) {
+        audioVect.push_back(nullptr);
         numdevs += 1;
     } else {
         audioVect.push_back(new data);
@@ -72,14 +72,14 @@ gint findAudioDevs(std::vector<data*>& audioVect) {
     //pulseaudio src
     GstPropertyProbe *probe;
     GValueArray *devarr;
-    element = NULL;
+    element = nullptr;
     
     element = gst_element_factory_make ("pulsesrc", "pulsesrc");
     probe = GST_PROPERTY_PROBE (element);
     devarr = gst_property_probe_probe_and_get_values_name (probe, "device");
-    for (size_t i = 0; devarr != NULL && i < devarr->n_values; ++i) {
+    for (size_t i = 0; devarr != nullptr && i < devarr->n_values; ++i) {
         GValue *val;
-        gchar *dev_name = NULL;
+        gchar *dev_name = nullptr;
         
         val = g_value_array_get_nth (devarr, i);
         g_object_set (element, "device", g_value_get_string (val), NULL);
@@ -89,7 +89,7 @@ gint findAudioDevs(std::vector<data*>& audioVect) {
         if (strcmp(dev_name, "null") == 0) {
             g_print("no pulse audio sources found\n");
         }
-        else if ((strstr(dev_name, "Monitor") != NULL)) {
+        else if ((strstr(dev_name, "Monitor") != nullptr)) {
             g_print("ignoring monitor (audio output)");
         }
         else { 
@@ -107,7 +107,7 @@ gint findAudioDevs(std::vector<data*>& audioVect) {
 
 int main () {
     //initialize gstreamer to probe for devs
-    gst_init(NULL, NULL);
+    gst_init(nullptr, nullptr);
     gint numdevs = 0;
     std::vector<data*> audioVector;
     gint i;
@@ -120,9 +120,9 @@ int main () {
         g_print("\nFound %d audio input devices: \n\n", numdevs);
         for (i = 0; i < numdevs; ++i)
         {
-            if (i == 0 && (audioVector[i] != 0)) {
+            if (i == 0 && (audioVector[i] != nullptr)) {
                 g_print("%d. device[%d] = Audio Test Source (audiotestsrc)\n", i, i);
-            } else if (i == 0 && (audioVector[i] == 0)) {
+            } else if (i == 0 && (audioVector[i] == nullptr)) {
                 g_print("no test audio device available\n");
             } else {
                 g_print("%d. device[%d] = %s (%s)\n", i, i, audioVector[i]->deviceName,

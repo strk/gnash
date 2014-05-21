@@ -151,14 +151,14 @@ public:
 	/// Return a value from the constant pool
 	const char* dictionary_get(size_t n) const
 	{
-        if ( _pools.empty() ) return 0;
+        if ( _pools.empty() ) return nullptr;
 
         // We'll query the last inserted one for now (highest PC)
         const ConstantPool& pool = _pools.rbegin()->second;
 
         if ( n < pool.size() ) return pool[n];
 
-        else return 0;
+        else return nullptr;
 	}
 
 	/// Read an SWF::ACTION_CONSTANTPOOL opcode and return as a dictionary

@@ -271,7 +271,7 @@ as_value::to_primitive(AsType hint) const
     // TODO: implement as_object::DefaultValue (ECMA-262 - 8.6.2.6)
 
     as_value method;
-    as_object* obj(0);
+    as_object* obj(nullptr);
 
     if (hint == NUMBER) {
         assert(_type == OBJECT);
@@ -472,24 +472,24 @@ as_value::to_object(VM& vm) const
 
         default:
             // Invalid to convert exceptions.
-            return NULL;
+            return nullptr;
     }
 }
 
 MovieClip*
 as_value::toMovieClip(bool allowUnloaded) const
 {
-    if (_type != DISPLAYOBJECT) return 0;
+    if (_type != DISPLAYOBJECT) return nullptr;
 
     DisplayObject *ch = getCharacter(allowUnloaded);
-    if (!ch) return 0;
+    if (!ch) return nullptr;
     return ch->to_movie();
 }
 
 DisplayObject*
 as_value::toDisplayObject(bool allowUnloaded) const
 {
-    if (_type != DISPLAYOBJECT) return 0;
+    if (_type != DISPLAYOBJECT) return nullptr;
     return getCharacter(allowUnloaded);
 }
 
@@ -502,7 +502,7 @@ as_value::to_function() const
         return getObj()->to_function();
     }
 
-    return 0;
+    return nullptr;
 }
 
 as_object*
@@ -512,7 +512,7 @@ as_value::get_object() const
         return getObj();
     }
 
-    return 0;
+    return nullptr;
 }
 
 void
@@ -642,7 +642,7 @@ as_value::typeOf() const
         default:
             if (is_exception()) return "exception";
             std::abort();
-            return 0;
+            return nullptr;
     }
 }
 

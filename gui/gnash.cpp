@@ -204,7 +204,7 @@ void
 setupFDs(gnash::Player& p, const std::string& fds)
 {
     int hostfd = 0, controlfd = 0;
-    hostfd = std::strtol(fds.substr(0, fds.find(":")).c_str(), NULL, 0);
+    hostfd = std::strtol(fds.substr(0, fds.find(":")).c_str(), nullptr, 0);
     std::string csub = fds.substr(fds.find(":")+1, fds.size());
     controlfd = strtol(csub.c_str(), 0, 0);
     // gnash::log_debug("Host FD #%d, Control FD #%d\n", hostfd, controlfd);

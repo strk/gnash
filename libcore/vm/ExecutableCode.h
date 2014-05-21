@@ -121,7 +121,7 @@ public:
             // still might be also guarded by unloaded()
             if (target()->isDestroyed()) break;
 
-            PoolGuard guard(getVM(target()->get_environment()), 0);
+            PoolGuard guard(getVM(target()->get_environment()), nullptr);
             ActionExec exec(*(*it), target()->get_environment(), false);
             exec();
         }

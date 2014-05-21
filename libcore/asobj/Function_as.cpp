@@ -119,7 +119,7 @@ function_apply(const fn_call& fn)
         // detrimental effect on memory usage!
         // Normal supers will be created when needed in the function
         // call.
-        new_fn_call.super = 0;
+        new_fn_call.super = nullptr;
 
 		// Check for second argument ('arguments' array)
 		if (fn.nargs > 1) {
@@ -161,7 +161,7 @@ function_call(const fn_call& fn)
     else tp = toObject(fn.arg(0), getVM(fn));
 
     new_fn_call.this_ptr = tp;
-    new_fn_call.super = 0;
+    new_fn_call.super = nullptr;
     if (fn.nargs) new_fn_call.drop_bottom();
 
 	// Call the function 

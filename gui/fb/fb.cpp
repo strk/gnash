@@ -535,7 +535,7 @@ FBGui::find_accessible_tty(int no)
         if (fn) return fn;
     }
     
-    return NULL;
+    return nullptr;
 }
 
 char *
@@ -549,7 +549,7 @@ FBGui::find_accessible_tty(const char* format, int no)
         return fname;
     }
     
-    return NULL; 
+    return nullptr;
 }
 
 bool

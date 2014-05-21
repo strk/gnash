@@ -39,7 +39,7 @@ public:
 
     sound_handler* _mixer;
 
-    NullSoundHandler(media::MediaHandler* m, sound_handler* mixer=0)
+    NullSoundHandler(media::MediaHandler* m, sound_handler* mixer=nullptr)
         :
         sound_handler(m),
         _mixer(mixer)

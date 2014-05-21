@@ -266,7 +266,7 @@ struct StyleHandler : boost::static_visitor<cairo_pattern_t*>
             }
         }
         // We should never get here.
-        return 0;
+        return nullptr;
     }
 
     cairo_pattern_t* operator()(const SolidFill& f) const {
@@ -344,7 +344,7 @@ public:
   : PathParser(paths, FillStyles.size()),
     _renderer(renderer),
     _cr(context),
-    _pattern(0),
+    _pattern(nullptr),
     _FillStyles(FillStyles)
   {
   }
@@ -371,7 +371,7 @@ public:
     // Surfaces are owned by const bitmap_info_cairo
     if (cairo_pattern_get_type(_pattern) != CAIRO_PATTERN_TYPE_SURFACE) {
       cairo_pattern_destroy(_pattern);
-      _pattern = 0;
+      _pattern = nullptr;
     }
   }
 
@@ -450,7 +450,7 @@ Renderer_cairo::Renderer_cairo()
     : _video_bufsize(0),
       _drawing_mask(false)
 {    
-    _cr = cairo_create(NULL);
+    _cr = cairo_create(nullptr);
     cairo_matrix_init_scale(&_stage_mat, 1/20.0f, 1/20.0f);
 }
   

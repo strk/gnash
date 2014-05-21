@@ -259,7 +259,7 @@ AMF::encodeDate(const std::uint8_t *date)
 //    GNASH_REPORT_FUNCTION;
 //    std::shared_ptr<Buffer> buf;
     std::shared_ptr<Buffer> buf;
-    if (date != 0) {
+    if (date != nullptr) {
 	buf.reset(new Buffer(AMF0_NUMBER_SIZE+1));
 	*buf = Element::DATE_AMF0;
 	double num = *(reinterpret_cast<const double*>(date));
@@ -908,7 +908,7 @@ AMF::extractAMF(std::uint8_t *in, std::uint8_t* tooFar)
     std::uint16_t length;
     std::shared_ptr<cygnal::Element> el(new Element);
 
-    if (in == 0) {
+    if (in == nullptr) {
         gnash::log_error(_("AMF body input data is NULL"));
         return el;
     }
@@ -1003,7 +1003,7 @@ AMF::extractAMF(std::uint8_t *in, std::uint8_t* tooFar)
                 }
                 std::shared_ptr<cygnal::Element> child =
                     amf_obj.extractProperty(tmpptr, tooFar); 
-                if (child == 0) {
+                if (child == nullptr) {
                     // skip past zero length string (2 bytes), null
                     // (1 byte) and end object (1 byte)
                     //tmpptr += 3;
@@ -1051,7 +1051,7 @@ AMF::extractAMF(std::uint8_t *in, std::uint8_t* tooFar)
                 }
                 std::shared_ptr<cygnal::Element> child =
                     amf_obj.extractProperty(tmpptr, tooFar); 
-                if (child == 0) {
+                if (child == nullptr) {
                     // skip past zero length string (2 bytes),
                     // null (1 byte) and end object (1 byte)
                     //tmpptr += 3;
@@ -1096,7 +1096,7 @@ AMF::extractAMF(std::uint8_t *in, std::uint8_t* tooFar)
             while (items) {
                 std::shared_ptr<cygnal::Element> child =
                     amf_obj.extractAMF(tmpptr, tooFar); 
-                if (child == 0) {
+                if (child == nullptr) {
                     break;
                 } else {
                 //child->dump();
@@ -1153,7 +1153,7 @@ AMF::extractAMF(std::uint8_t *in, std::uint8_t* tooFar)
                 }
                 std::shared_ptr<cygnal::Element> child =
                     amf_obj.extractProperty(tmpptr, tooFar); 
-                if (child == 0) {
+                if (child == nullptr) {
                     break;
                 }
                 el->addProperty(child);

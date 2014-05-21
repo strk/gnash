@@ -131,7 +131,7 @@ Proc::startCGI(const string &filespec, bool outflag, std::uint16_t port)
     strcpy(cmd_line[1], "-n");
     cmd_line[2] = new char[4];
     strcpy(cmd_line[2], "-vv");
-    cmd_line[3] = 0;
+    cmd_line[3] = nullptr;
 //     }
     
     // When running multiple cgis, we prefer to specify the port it's using.
@@ -140,7 +140,7 @@ Proc::startCGI(const string &filespec, bool outflag, std::uint16_t port)
         strcpy(cmd_line[3], "-p");
         cmd_line[4] = new char[10];
         sprintf(cmd_line[4], "%d", port);
-        cmd_line[5] = 0;
+        cmd_line[5] = nullptr;
     }
 
 

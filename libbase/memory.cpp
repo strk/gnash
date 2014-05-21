@@ -46,7 +46,7 @@ const int DATALOG_SIZE = 1024;
 
 Memory::Memory() 
     : _collecting(false),
-      _info(0),
+      _info(nullptr),
       _size(DATALOG_SIZE),
       _index(0)
     , _checkpoint()
@@ -92,7 +92,7 @@ Memory::startStats()
 {
 //    GNASH_REPORT_FUNCTION;
     _collecting = true;
-    if (_info == 0) {
+    if (_info == nullptr) {
         log_debug(_("Allocating buffer for %d data samples"), _size);
         _info = new struct small_mallinfo[_size];
         reset();

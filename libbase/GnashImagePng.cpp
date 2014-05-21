@@ -93,8 +93,8 @@ public:
     PngInput(std::shared_ptr<IOChannel> in)
         :
         Input(in),
-        _pngPtr(0),
-        _infoPtr(0),
+        _pngPtr(nullptr),
+        _infoPtr(nullptr),
         _currentRow(0)
     {
         init();
@@ -174,7 +174,7 @@ private:
 
 PngInput::~PngInput()
 {
-    png_destroy_read_struct(&_pngPtr, &_infoPtr, 0);
+    png_destroy_read_struct(&_pngPtr, &_infoPtr, nullptr);
 }
 
 size_t
@@ -216,7 +216,7 @@ void
 PngInput::init()
 {
     // Initialize png library.
-    _pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, &error,
+    _pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, &error,
             &warning);
 
     if (!_pngPtr) return;
@@ -224,7 +224,7 @@ PngInput::init()
     _infoPtr = png_create_info_struct(_pngPtr);
 
     if (!_infoPtr) {
-        png_destroy_read_struct(&_pngPtr, 0, 0);
+        png_destroy_read_struct(&_pngPtr, nullptr, nullptr);
         return;
     }
 }
@@ -319,8 +319,8 @@ PngOutput::PngOutput(std::shared_ptr<IOChannel> out, size_t width,
         size_t height, int /*quality*/)
     :
     Output(out, width, height),
-    _pngPtr(0),
-    _infoPtr(0)
+    _pngPtr(nullptr),
+    _infoPtr(nullptr)
 {
     init();
 }
@@ -337,13 +337,13 @@ PngOutput::init()
 {
     // Initialize png library.
     _pngPtr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-                                        NULL, &error, &warning);
+                                        nullptr, &error, &warning);
     if (!_pngPtr) return;
 
     _infoPtr = png_create_info_struct(_pngPtr);
 
     if (!_infoPtr) {
-        png_destroy_write_struct(&_pngPtr, static_cast<png_infopp>(NULL));
+        png_destroy_write_struct(&_pngPtr, static_cast<png_infopp>(nullptr));
         return;
     }
 }
@@ -369,7 +369,7 @@ PngOutput::writeImageRGBA(const unsigned char* rgbaData)
        8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE,
        PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
-    png_write_png(_pngPtr, _infoPtr, PNG_TRANSFORM_IDENTITY, NULL);
+    png_write_png(_pngPtr, _infoPtr, PNG_TRANSFORM_IDENTITY, nullptr);
 }
 
 
@@ -394,7 +394,7 @@ PngOutput::writeImageRGB(const unsigned char* rgbData)
        8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
        PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
-    png_write_png(_pngPtr, _infoPtr, PNG_TRANSFORM_IDENTITY, NULL);
+    png_write_png(_pngPtr, _infoPtr, PNG_TRANSFORM_IDENTITY, nullptr);
 }
 
 } // unnamed namespace

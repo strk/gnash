@@ -89,7 +89,7 @@ registerBitmapClass(as_object& where, Global_as::ASFunction ctor,
         VM& vm = getVM(where);
         proto = constructInstance(*constructor, as_environment(vm), args);
     }
-    else proto = 0;
+    else proto = nullptr;
 
     as_object* cl = gl.createClass(ctor, createObject(gl));
     if (proto) p(*proto);

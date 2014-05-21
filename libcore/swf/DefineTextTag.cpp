@@ -59,7 +59,7 @@ DisplayObject*
 DefineTextTag::createDisplayObject(Global_as& gl, DisplayObject* parent)
     const
 {
-    return new StaticText(getRoot(gl), 0, this, parent);
+    return new StaticText(getRoot(gl), nullptr, this, parent);
 }
 
 bool

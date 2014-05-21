@@ -69,7 +69,7 @@ ActionExec::ActionExec(const Function& func, as_environment& newEnv,
     _func(&func),
     _this_ptr(this_ptr),
     _initialStackSize(0),
-    _originalTarget(0),
+    _originalTarget(nullptr),
     _origExecSWFVersion(0),
     _tryList(),
     _returning(false),
@@ -106,13 +106,13 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
     :
     code(abuf),
     env(newEnv),
-    retval(0),
+    retval(nullptr),
     _withStack(),
     _scopeStack(),
-    _func(0),
-    _this_ptr(0),
+    _func(nullptr),
+    _this_ptr(nullptr),
     _initialStackSize(0),
-    _originalTarget(0),
+    _originalTarget(nullptr),
     _origExecSWFVersion(0),
     _tryList(),
     _returning(false),
@@ -146,7 +146,7 @@ ActionExec::operator()()
     IF_VERBOSE_ACTION (
             log_action(_("at ActionExec operator() start, pc=%d"
                    ", stop_pc=%d, code.size=%d, func=%d, codeVersion=%d"),
-                pc, stop_pc, code.size(), _func ? _func : 0, codeVersion);
+                pc, stop_pc, code.size(), _func ? _func : nullptr, codeVersion);
         std::stringstream ss;
         getVM(env).dumpState(ss, STACK_DUMP_LIMIT);
 	    log_action(_("%s"), ss.str());
@@ -531,7 +531,7 @@ ActionExec::cleanupAfterRun()
     VM& vm = getVM(env);
 
     env.set_target(_originalTarget);
-    _originalTarget = NULL;
+    _originalTarget = nullptr;
 
     vm.setSWFVersion(_origExecSWFVersion);
 

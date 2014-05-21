@@ -48,7 +48,7 @@ Function2::call(const fn_call& fn)
     // Extract caller before pushing ourself on the call stack
     VM& vm = getVM(fn); 
 
-    as_object* caller = vm.calling() ? &vm.currentCall().function() : 0;
+    as_object* caller = vm.calling() ? &vm.currentCall().function() : nullptr;
 
 	// Set up local stack frame, for parameters and locals.
 	FrameGuard guard(getVM(fn), *this);
@@ -147,7 +147,7 @@ Function2::call(const fn_call& fn)
         // Put 'super' in a register (SWF6+ only).
         // TOCHECK: should we still set it if not available ?
         as_object* super = fn.super ? fn.super :
-            fn.this_ptr ? fn.this_ptr->get_super() : 0;
+            fn.this_ptr ? fn.this_ptr->get_super() : nullptr;
 
         if (super && (_function2Flags & PRELOAD_SUPER)) {
             cf.setLocalRegister(current_reg, super);

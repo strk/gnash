@@ -252,13 +252,13 @@ CurlSession::~CurlSession()
 		  curl_share_strerror(code));
         gnashSleep(1000000);
     }
-    _shandle = 0;
+    _shandle = nullptr;
     curl_global_cleanup();
 }
 
 CurlSession::CurlSession()
     :
-    _shandle(0),
+    _shandle(nullptr),
     _shareMutex(),
     _cookieMutex(),
     _dnscacheMutex()
@@ -788,7 +788,7 @@ CurlStreamFile::processMessages()
 void
 CurlStreamFile::init(const std::string& url, const std::string& cachefile)
 {
-    _customHeaders = 0;
+    _customHeaders = nullptr;
 
     _url = url;
     _running = 1;

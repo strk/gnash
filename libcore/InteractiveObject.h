@@ -78,7 +78,7 @@ public:
     /// DisplayObject.
     virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&,
             size_t&) {
-        return 0;
+        return nullptr;
     }
 
     /// Returns local, untransformed bounds of this DisplayObject in TWIPS

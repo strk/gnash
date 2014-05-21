@@ -63,7 +63,7 @@ clocktime::getTicks()
 
     struct timeval tv;
     
-    gettimeofday(&tv, 0);
+    gettimeofday(&tv, nullptr);
 
     std::uint64_t result = static_cast<std::uint64_t>(tv.tv_sec) * 1000000L;
 

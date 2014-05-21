@@ -40,7 +40,7 @@ namespace gnash {
 class GtkGlue : public DeviceGlue
 {
   public:
-    GtkGlue() : _drawing_area(0), _needs_area(false) { }
+    GtkGlue() : _drawing_area(nullptr), _needs_area(false) { }
     virtual ~GtkGlue() { }
     virtual bool init(int argc, char **argv[]) = 0;
 

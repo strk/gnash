@@ -112,7 +112,7 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
         }
 
         
-        std::int16_t* conv_data = 0;
+        std::int16_t* conv_data = nullptr;
 
 #ifdef RESAMPLING_SPEEX
 		spx_uint32_t conv_size = 0;

@@ -50,7 +50,7 @@ public:
 		ButtonSound()
 			:
 			soundID(0),
-			sample(0)
+			sample(nullptr)
 		{}
 
 	};

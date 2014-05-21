@@ -348,7 +348,7 @@ SOL::readFile(const std::string &filespec)
 
 	try {
 
-        std::uint8_t *ptr = 0;
+        std::uint8_t *ptr = nullptr;
 
 	    std::ifstream ifs(filespec.c_str(), std::ios::binary);
 
@@ -420,7 +420,7 @@ SOL::readFile(const std::string &filespec)
 	    while ( ptr < tooFar) {
             if (ptr) {
                 el = amf_obj.extractProperty(ptr, tooFar);
-                if (el != 0) {
+                if (el != nullptr) {
                     ptr += amf_obj.totalsize() + 1;
                     _amfobjs.push_back(el);
                 }

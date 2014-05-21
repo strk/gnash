@@ -42,7 +42,7 @@ namespace noseek_fd_adapter {
 /// Specify a cachefilename if you want to be able to access
 /// the full cache after deletion of the returned IOChannel.
 ///
-DSOEXPORT IOChannel* make_stream(int fd, const char* cachefilename = 0);
+DSOEXPORT IOChannel* make_stream(int fd, const char* cachefilename = nullptr);
 
 } // namespace gnash::noseek_fd_adapter
 } // namespace gnash

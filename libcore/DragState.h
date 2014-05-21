@@ -96,7 +96,7 @@ public:
 
     /// Reset drag state to its initial condition
     void reset() {
-        _displayObject = 0;
+        _displayObject = nullptr;
         _bounds.reset();
         _lock_centered = false;
     }

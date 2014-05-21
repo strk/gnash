@@ -88,13 +88,13 @@ inline std::uint8_t*
 AudioDecoder::decode(const std::uint8_t*, std::uint32_t, std::uint32_t&,
         std::uint32_t&)
 {
-    return 0;
+    return nullptr;
 }
 
 inline std::uint8_t*
 AudioDecoder::decode(const EncodedAudioFrame&, std::uint32_t&)
 {
-    return 0;
+    return nullptr;
 }
 	
 } // gnash.media namespace 

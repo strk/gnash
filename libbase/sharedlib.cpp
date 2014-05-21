@@ -59,7 +59,7 @@ namespace gnash {
 
 SharedLib::SharedLib(const std::string& filespec)
 #ifdef HAVE_LTDL
-  : _dlhandle(NULL)
+  : _dlhandle(nullptr)
 #endif
 {
     _filespec = filespec;
@@ -103,7 +103,7 @@ SharedLib::openLib (const std::string& filespec)
 #ifdef HAVE_LTDL
     _dlhandle = lt_dlopenext (filespec.c_str());
     
-    if (_dlhandle == NULL) {
+    if (_dlhandle == nullptr) {
         log_error("lt_dlopenext(\"%s\") failed: %s", filespec.c_str(), lt_dlerror());
         return false;
     }
@@ -123,16 +123,16 @@ SharedLib::initentry *
 SharedLib::getInitEntry (const std::string& symbol)
 {
     // GNASH_REPORT_FUNCTION;
-    lt_ptr run = NULL;
+    lt_ptr run = nullptr;
     
     scoped_lock lock(_libMutex);
 
 #ifdef HAVE_LTDL
     run  = lt_dlsym (_dlhandle, symbol.c_str());
     
-    if (run == NULL) {
+    if (run == nullptr) {
         log_error(_("Couldn't find symbol: %s"), symbol);
-        return NULL;
+        return nullptr;
     } else {
         log_debug(_("Found symbol %s @ %p"), symbol, (void *)run);
     }
@@ -148,7 +148,7 @@ SharedLib::getDllSymbol(const std::string& symbol)
 {
     GNASH_REPORT_FUNCTION;
     
-    lt_ptr run = NULL;
+    lt_ptr run = nullptr;
     
     scoped_lock lock(_libMutex);
 
@@ -160,9 +160,9 @@ SharedLib::getDllSymbol(const std::string& symbol)
     Realistically, we should never get a valid pointer with a value of 0
     Markus: 'Id est NULL.'
     */
-    if (run == NULL) {
+    if (run == nullptr) {
         log_error("Couldn't find symbol: %s", symbol);
-        return NULL;
+        return nullptr;
     } else {
         log_debug("Found symbol %s @ %p", symbol, (void *)run);
     }

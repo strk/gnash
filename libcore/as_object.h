@@ -199,7 +199,7 @@ public:
     ///                 an inherited property.
     /// @returns        A property if found and visible, NULL if not found or
     ///                 not visible in current VM version
-    Property* findProperty(const ObjectURI& uri, as_object** owner = 0);
+    Property* findProperty(const ObjectURI& uri, as_object** owner = nullptr);
 
     /// Return a reference to this as_object's global object.
     VM& vm() const {
@@ -468,7 +468,7 @@ public:
     void set_member_flags(const ObjectURI& uri, int setTrue, int setFalse = 0);
 
     /// Cast to a as_function, or return NULL
-    virtual as_function* to_function() { return 0; }
+    virtual as_function* to_function() { return nullptr; }
 
     /// Return true if this is a 'super' object
     virtual bool isSuper() const { return false; }
@@ -841,7 +841,7 @@ template<typename T>
 T*
 get(as_object* o)
 {
-    if (!o) return 0;
+    if (!o) return nullptr;
     return dynamic_cast<T*>(o->displayObject());
 }
 

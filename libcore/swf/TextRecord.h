@@ -64,7 +64,7 @@ public:
         _hasYOffset(false),
         _xOffset(0.0f),
         _yOffset(0.0f),
-        _font(0),
+        _font(nullptr),
         _underline(false)
     {}
           

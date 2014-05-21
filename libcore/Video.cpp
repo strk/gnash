@@ -43,7 +43,7 @@ Video::Video(as_object* object,
 	:
 	DisplayObject(getRoot(*object), object, parent),
 	m_def(def),
-	_ns(0),
+	_ns(nullptr),
 	_embeddedStream(m_def),
 	_lastDecodedVideoFrameNum(-1),
 	_lastDecodedVideoFrame(),

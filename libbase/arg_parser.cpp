@@ -137,7 +137,7 @@ Arg_parser::Arg_parser( const int argc, const char * const argv[],
         
         if( ch1 == '-' && ch2 )	{	// we found an option
             const char * const opt = argv[argind];
-            const char * const arg = (argind + 1 < argc) ? argv[argind+1] : 0;
+            const char * const arg = (argind + 1 < argc) ? argv[argind+1] : nullptr;
             if( ch2 == '-' ) {
                 if( !argv[argind][2] ) { ++argind; break; }	// we found "--"
                 else if( !parse_long_option( opt, arg, options, argind ) ) break;

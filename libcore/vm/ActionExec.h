@@ -159,7 +159,7 @@ public:
 	as_value* retval;
 
 	/// Is this execution thread a function call ?
-	bool isFunction() const { return _func != 0; }
+	bool isFunction() const { return _func != nullptr; }
 
 	/// Get the current 'this' pointer, for use in function calls
 	as_object* getThisPointer();
@@ -205,7 +205,7 @@ public:
 	///	                containing any found variable. If you aren't interested,
     ///                 pass null (default). If the variable does not belong
     ///                 to an object, target will be set to null.
-	as_value getVariable(const std::string& name, as_object** target = 0);
+	as_value getVariable(const std::string& name, as_object** target = nullptr);
 
 	/// Get current target.
 	//

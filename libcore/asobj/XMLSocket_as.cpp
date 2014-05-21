@@ -279,7 +279,7 @@ void
 xmlsocket_class_init(as_object& where, const ObjectURI& uri)
 {
     registerBuiltinClass(where, xmlsocket_new, attachXMLSocketInterface,
-            0, uri);
+            nullptr, uri);
 }
 
 void

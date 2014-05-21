@@ -243,8 +243,8 @@ createSWFMovie(std::unique_ptr<IOChannel> in, const std::string& url,
 
     const std::string& absURL = URL(url).str();
 
-    if (!m->readHeader(std::move(in), absURL)) return 0;
-    if (startLoaderThread && !m->completeLoad()) return 0;
+    if (!m->readHeader(std::move(in), absURL)) return nullptr;
+    if (startLoaderThread && !m->completeLoad()) return nullptr;
 
     return m;
 }

@@ -93,8 +93,8 @@ public:
         CursoredBuffer()
             :
             m_size(0),
-            m_data(NULL),
-            m_ptr(NULL)
+            m_data(nullptr),
+            m_ptr(nullptr)
         {}
 
         ~CursoredBuffer()

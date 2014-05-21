@@ -86,7 +86,7 @@ public:
     /// @return         The DefinitionTag of the requested character or 0
     ///                 if the character has not yet been exported.
     virtual SWF::DefinitionTag* exportedCharacter(const std::string& /*s*/) {
-        return 0;
+        return nullptr;
     }
 
     /// Add a character to the list of known characters

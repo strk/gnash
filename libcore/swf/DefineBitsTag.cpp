@@ -574,10 +574,10 @@ inflateWrapper(SWFStream& in, void* buffer, size_t buffer_bytes)
 
     z_stream d_stream;
 
-    d_stream.zalloc = 0;
-    d_stream.zfree = 0;
-    d_stream.opaque = 0;
-    d_stream.next_in  = 0;
+    d_stream.zalloc = nullptr;
+    d_stream.zfree = nullptr;
+    d_stream.opaque = nullptr;
+    d_stream.next_in  = nullptr;
     d_stream.avail_in = 0;
 
     d_stream.next_out = static_cast<Byte*>(buffer);

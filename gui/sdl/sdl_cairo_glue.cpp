@@ -27,12 +27,12 @@ namespace gnash
 {
 
 SdlCairoGlue::SdlCairoGlue()
-: _cairo_surface(NULL)
-  , _cairo_handle(NULL)
-  , _sdl_surface(NULL)
-  , _render_image(NULL)
-  , _screen(NULL)
-  , _renderer(NULL)
+: _cairo_surface(nullptr)
+  , _cairo_handle(nullptr)
+  , _sdl_surface(nullptr)
+  , _render_image(nullptr)
+  , _screen(nullptr)
+  , _renderer(nullptr)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -116,7 +116,7 @@ SdlCairoGlue::render()
     /*Fill the background in purple so we can see the alpha blend */
     //SDL_FillRect (_screen, NULL, SDL_MapRGB(_screen->format,255,0,255));
 
-    SDL_BlitSurface(_sdl_surface, NULL, _screen, NULL);
+    SDL_BlitSurface(_sdl_surface, nullptr, _screen, nullptr);
 
     //cairo_surface_write_to_png (_cairo_surface, "/tmp/gnash.png");
 

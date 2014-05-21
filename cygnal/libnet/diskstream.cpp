@@ -86,7 +86,7 @@ DiskStream::DiskStream()
     : _state(DiskStream::NO_STATE),
       _filefd(0),
       _netfd(0),
-      _dataptr(0),
+      _dataptr(nullptr),
       _max_memload(0),
       _filesize(0),
       _pagesize(0),
@@ -126,7 +126,7 @@ DiskStream::DiskStream(const string &str)
     : _state(DiskStream::NO_STATE),
       _filefd(0),
       _netfd(0),
-      _dataptr(0),
+      _dataptr(nullptr),
       _max_memload(0),
       _filesize(0),
       _pagesize(0),
@@ -167,7 +167,7 @@ DiskStream::DiskStream(const string &str, std::uint8_t *data, size_t size)
     : _state(DiskStream::NO_STATE),
       _filefd(0),
       _netfd(0),
-      _dataptr(0),
+      _dataptr(nullptr),
       _max_memload(0),
       _pagesize(0),
       _offset(0)
@@ -215,7 +215,7 @@ DiskStream::DiskStream(const string &str, cygnal::Buffer &buf)
     : _state(DiskStream::NO_STATE),
       _filefd(0),
       _netfd(0),
-      _dataptr(0),
+      _dataptr(nullptr),
       _max_memload(0),
       _pagesize(0),
       _offset(0)
@@ -262,8 +262,8 @@ DiskStream::DiskStream(const string &str, cygnal::Buffer &buf)
 DiskStream::DiskStream(const string &str, int netfd)
     : _state(DiskStream::NO_STATE),
       _filefd(0),
-      _filespec(0),
-      _dataptr(0),
+      _filespec(nullptr),
+      _dataptr(nullptr),
       _max_memload(0),
       _filesize(0),
       _pagesize(0),
@@ -336,7 +336,7 @@ DiskStream::fullyPopulated()
 {
     // GNASH_REPORT_FUNCTION;
     
-    if ((_filesize < _max_memload) && (_dataptr != 0)) {
+    if ((_filesize < _max_memload) && (_dataptr != nullptr)) {
 	return true;
     }
     return false;
@@ -443,13 +443,13 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	return _dataptr + offset;
     }
     
-    std::uint8_t *dataptr = 0;
+    std::uint8_t *dataptr = nullptr;
     
     if (_filefd) {
 	/// If the data pointer is legit, then we need to unmap that page
 	/// to mmap() a new one. If we're still in the current mapped
 	/// page, then just return the existing data pointer.
-	if (dataptr != 0) {
+	if (dataptr != nullptr) {
 #ifdef _WIN32
 	    UnmapViewOfFile(_dataptr);
 #elif defined(__amigaos4__)
@@ -485,19 +485,19 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 #elif defined(__amigaos4__)
 	dataptr = static_cast<std::uint8_t *>(malloc(loadsize));
 #else
-	dataptr = static_cast<std::uint8_t *>(mmap(0, loadsize,
+	dataptr = static_cast<std::uint8_t *>(mmap(nullptr, loadsize,
 						     PROT_READ, MAP_SHARED,
 						     _filefd, page));
 #endif
     } else {
 	log_error(_("Couldn't load file %s"), _filespec);
-	return 0;
+	return nullptr;
     }
     
     if (dataptr == MAP_FAILED) {
 	log_error(_("Couldn't map file %s into memory: %s"),
 		   _filespec, strerror(errno));
-	return 0;
+	return nullptr;
     } else {
 	log_debug(_("File %s a offset %d mapped to: %p"), _filespec, offset, (void *)dataptr);
 	clock_gettime (CLOCK_REALTIME, &_last_access);
@@ -1048,42 +1048,42 @@ DiskStream::determineFileType( std::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
 
-  if (data == 0) {
+  if (data == nullptr) {
     return FILETYPE_NONE;
   }
  
   // JPEG, offset 6 bytes, read the string JFIF
-  if (memcpy(data + 6, "JFIF", 4) == 0) {
+  if (memcpy(data + 6, "JFIF", 4) == nullptr) {
     return FILETYPE_NONE;
   }
   // SWF, offset 0, read the string FWS
-  if (memcpy(data, "SWF", 3) == 0) {
+  if (memcpy(data, "SWF", 3) == nullptr) {
     return FILETYPE_SWF;
   }
   // compressed SWF, offset 0, read the string CWS
   // FLV, offset 0, read the string FLV
   // PNG, offset 0, read the string PNG
-  if (memcpy(data, "PNG", 3) == 0) {
+  if (memcpy(data, "PNG", 3) == nullptr) {
     return FILETYPE_PNG;
   }
   // Ogg, offset 0, read the string OggS
-  if (memcpy(data, "OggS", 4) == 0) {
+  if (memcpy(data, "OggS", 4) == nullptr) {
     return FILETYPE_OGG;
   }
   // Theora, offset 28, read string theora
-  if (memcpy(data + 28, "theora", 6) == 0) {
+  if (memcpy(data + 28, "theora", 6) == nullptr) {
     return FILETYPE_THEORA;
   }
   // FLAC, offset 28, read string FLAC
-  if (memcpy(data + 28, "FLAC", 4) == 0) {
+  if (memcpy(data + 28, "FLAC", 4) == nullptr) {
     return FILETYPE_FLAC;
   }
   // Vorbis, offset 28, read string vorbis
-  if (memcpy(data + 28, "vorbis", 6) == 0) {
+  if (memcpy(data + 28, "vorbis", 6) == nullptr) {
     return FILETYPE_VORBIS;
   }
   // MP3, offset 0, read string ID3
-  if (memcpy(data, "ID3", 3) == 0) {
+  if (memcpy(data, "ID3", 3) == nullptr) {
     return FILETYPE_MP3;
   }
 
@@ -1092,12 +1092,12 @@ DiskStream::determineFileType( std::uint8_t *data)
   //   offset 0, read string "\<head"
   //   offset 0, read string "\<title"
   //   offset 0, read string "\<html"
-  if (memcpy(data, "ID3", 3) == 0) {
+  if (memcpy(data, "ID3", 3) == nullptr) {
     return FILETYPE_HTML;
   }
 
   // XML, offset 0, read string "\<?xml"
-  if (memcpy(data, "<?xml", 5) == 0) {
+  if (memcpy(data, "<?xml", 5) == nullptr) {
     return FILETYPE_XML;
   }
   

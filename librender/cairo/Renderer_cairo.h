@@ -59,7 +59,7 @@ public:
     void set_invalidated_regions(const InvalidatedRanges& ranges);
       
     virtual Renderer* startInternalRender(image::GnashImage& /*im*/) {
-        return 0;
+        return nullptr;
     }
 
     virtual void endInternalRender() {}

@@ -107,7 +107,7 @@ BitmapFill::BitmapFill(Type t, const CachedBitmap* bi, const SWFMatrix& m,
     _smoothingPolicy(pol),
     _matrix(m),
     _bitmapInfo(bi),
-    _md(0),
+    _md(nullptr),
     _id(0)
 {
 }
@@ -118,7 +118,7 @@ BitmapFill::BitmapFill(SWF::FillType t, movie_definition* md,
     _type(),
     _smoothingPolicy(),
     _matrix(m),
-    _bitmapInfo(0),
+    _bitmapInfo(nullptr),
     _md(md),
     _id(id)
 {
@@ -185,7 +185,7 @@ BitmapFill::bitmap() const
         return  _bitmapInfo.get();
     }
     if (!_md) {
-        return 0;
+        return nullptr;
     }
     _bitmapInfo = _md->getBitmap(_id);
 

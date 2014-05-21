@@ -34,7 +34,7 @@ private:
     
 public:
     
-    Renderer_agg_base() : _testBuffer(0) { }  
+    Renderer_agg_base() : _testBuffer(nullptr) { }
     
     // virtual classes should have virtual destructors
     virtual ~Renderer_agg_base() {
@@ -53,7 +53,7 @@ public:
         int size = width * height * getBytesPerPixel();
         
         unsigned char *tmp = static_cast<unsigned char *>(realloc(_testBuffer, size));
-        if (tmp == NULL) {
+        if (tmp == nullptr) {
             log_error(_("Memory reallocation error"));
             return false;
         } else {

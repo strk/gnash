@@ -84,7 +84,7 @@ public:
     /// Return the wanted property if it exists and satisfies the predicate.
     //
     /// This will abort if there is no current object.
-    Property* getProperty(as_object** owner = 0) const {
+    Property* getProperty(as_object** owner = nullptr) const {
 
         assert(_object);
         Property* prop = _object->_members.getProperty(_uri);
@@ -93,7 +93,7 @@ public:
             if (owner) *owner = _object;
             return prop;
         }
-        return 0;
+        return nullptr;
     }
 
 private:
@@ -112,7 +112,7 @@ getConstructor(as_object& o)
 {
 	as_value ctorVal;
 	if (!o.get_member(NSV::PROP_uuCONSTRUCTORuu, &ctorVal)) {
-		return 0;
+		return nullptr;
 	}
 	return ctorVal.to_function();
 }
@@ -181,11 +181,11 @@ protected:
 private:
 
     as_object* prototype() {
-        return _super ? _super->get_prototype() : 0;
+        return _super ? _super->get_prototype() : nullptr;
     }
 
     as_function* constructor() {
-        return _super ? getConstructor(*_super) : 0;
+        return _super ? getConstructor(*_super) : nullptr;
     }
 
     as_object* _super;
@@ -200,15 +200,15 @@ as_super::get_super(const ObjectURI& fname)
 
     // Our class prototype is __proto__.
     as_object* proto = get_prototype(); 
-    if (!proto) return new as_super(getGlobal(*this), 0);
+    if (!proto) return new as_super(getGlobal(*this), nullptr);
 
     if (fname.empty() || getSWFVersion(*this) <= 6) {
         return new as_super(getGlobal(*this), proto);
     }
 
-    as_object* owner = 0;
+    as_object* owner = nullptr;
     proto->findProperty(fname, &owner);
-    if (!owner) return 0;
+    if (!owner) return nullptr;
 
     if (owner == proto) return new as_super(getGlobal(*this), proto);
 
@@ -280,7 +280,7 @@ const int as_object::DefaultFlags;
 as_object::as_object(const Global_as& gl)
     :
     GcResource(getRoot(gl).gc()),
-    _displayObject(0),
+    _displayObject(nullptr),
     _array(false),
     _vm(getVM(gl)),
     _members(*this)
@@ -290,7 +290,7 @@ as_object::as_object(const Global_as& gl)
 as_object::as_object(VM& vm)
     :
     GcResource(vm.getRoot().gc()),
-    _displayObject(0),
+    _displayObject(nullptr),
     _array(false),
     _vm(vm),
     _members(*this)
@@ -452,7 +452,7 @@ as_object::get_super(const ObjectURI& fname)
     as_object* proto = get_prototype();
 
     if ( ! fname.empty() && getSWFVersion(*this) > 6) {
-        as_object* owner = 0;
+        as_object* owner = nullptr;
         findProperty(fname, &owner);
         // should be 0 if findProperty returned 0
         if (owner != this) proto = owner; 
@@ -487,7 +487,7 @@ as_object::findProperty(const ObjectURI& uri, as_object** owner)
     } while (pr());
 
     // No Property found
-    return 0;
+    return nullptr;
 }
 
 Property*
@@ -511,7 +511,7 @@ as_object::findUpdatableProperty(const ObjectURI& uri)
             }
         }
     }
-    return 0;
+    return nullptr;
 }
 
 void
@@ -614,7 +614,7 @@ as_object::set_member(const ObjectURI& uri, const as_value& val, bool ifFound)
                 if ((prop->isGetterSetter()) && visible(*prop, version)) {
                     break;
                 }
-                else prop = 0;
+                else prop = nullptr;
             }
         }
     }
@@ -934,8 +934,8 @@ as_object::get_prototype() const
     int swfVersion = getSWFVersion(*this);
     
     Property* prop = _members.getProperty(NSV::PROP_uuPROTOuu);
-    if (!prop) return 0;
-    if (!visible(*prop, swfVersion)) return 0;
+    if (!prop) return nullptr;
+    if (!visible(*prop, swfVersion)) return nullptr;
     
     const as_value& proto = prop->getValue(*this);
     
@@ -1089,8 +1089,8 @@ as_object*
 getPathElement(as_object& o, const ObjectURI& uri)
 {
     as_value tmp;
-    if (!o.get_member(uri, &tmp)) return 0;
-    if (!tmp.is_object()) return 0;
+    if (!o.get_member(uri, &tmp)) return nullptr;
+    if (!tmp.is_object()) return nullptr;
     return toObject(tmp, getVM(o));
 }
 
@@ -1110,7 +1110,7 @@ getObjectWithPrototype(Global_as& gl, const ObjectURI& c)
 {
     as_object* ctor = toObject(getMember(gl, c), getVM(gl));
     as_object* proto = ctor ? 
-        toObject(getMember(*ctor, NSV::PROP_PROTOTYPE), getVM(gl)) : 0;
+        toObject(getMember(*ctor, NSV::PROP_PROTOTYPE), getVM(gl)) : nullptr;
 
     as_object* o = createObject(gl);
     o->set_prototype(proto ? proto : as_value());

@@ -636,7 +636,7 @@ public:
     ///                 
     void loadMovie(const std::string& url, const std::string& target,
             const std::string& data, MovieClip::VariablesMethod method,
-            as_object* handler=0)
+            as_object* handler=nullptr)
     {
         _movieLoader.loadMovie(url, target, data, method, handler);
     }

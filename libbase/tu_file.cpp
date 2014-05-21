@@ -251,7 +251,7 @@ std::unique_ptr<IOChannel>
 makeFileChannel(const char* filepath, const char* mode)
 {
 	FILE* fp = fopen(filepath, mode);
-	if ( fp == 0 ) { return std::unique_ptr<IOChannel>(); }
+	if ( fp == nullptr ) { return std::unique_ptr<IOChannel>(); }
 
 	return makeFileChannel(fp, true);
 }

@@ -80,7 +80,7 @@ static bool check_extension(const char *name, const char *ext)
     const char *end;
     int name_len, n;
 
-    if (name == NULL || ext == NULL)
+    if (name == nullptr || ext == nullptr)
         return false;
 
     end = ext + strlen(ext);
@@ -158,7 +158,7 @@ bool GnashTexture::init()
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, internal_format() == GL_RGBA ? 4 : 1);
     glTexImage2D(GL_TEXTURE_2D, 0, internal_format(), _width, _height, 0,
-                 format(), GL_UNSIGNED_BYTE, NULL);
+                 format(), GL_UNSIGNED_BYTE, nullptr);
     release();
     return true;
 }

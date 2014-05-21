@@ -234,7 +234,7 @@ attachExternalInterfaceStaticInterface(as_object& o)
     // here, but it seems that the properties actually are visible in SWF6
     // and SWF7, at least for the flashplayer 9. So we just make sure they
     // are read-only.
-    as_object* null = 0;
+    as_object* null = nullptr;
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 7);
 }
 

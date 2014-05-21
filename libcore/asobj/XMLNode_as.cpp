@@ -79,10 +79,10 @@ namespace {
 XMLNode_as::XMLNode_as(Global_as& gl)
     :
     _global(gl),
-    _object(0),
-    _parent(0),
+    _object(nullptr),
+    _parent(nullptr),
     _attributes(new as_object(gl)),
-    _childNodes(0),
+    _childNodes(nullptr),
     _type(Element),
     _gcMarkInProgress(false)
 {
@@ -91,10 +91,10 @@ XMLNode_as::XMLNode_as(Global_as& gl)
 XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
     :
     _global(tpl._global),
-    _object(0),
-    _parent(0), 
+    _object(nullptr),
+    _parent(nullptr),
     _attributes(new as_object(_global)),
-    _childNodes(0),
+    _childNodes(nullptr),
     _name(tpl._name),
     _value(tpl._value),
     _type(tpl._type),
@@ -120,7 +120,7 @@ XMLNode_as::~XMLNode_as()
         //       (due to updateChildNodes)
         // See https://savannah.gnu.org/bugs/?40439
         _parent->_children.remove(this);
-        _parent = 0; 
+        _parent = nullptr;
     }
 
     clearChildren();
@@ -191,7 +191,7 @@ XMLNode_as::hasChildNodes() const
 XMLNode_as*
 XMLNode_as::firstChild() const
 {
-    if (_children.empty()) return 0;
+    if (_children.empty()) return nullptr;
     return _children.front();
 }
 
@@ -206,7 +206,7 @@ XMLNode_as*
 XMLNode_as::lastChild() const
 {
 	if (_children.empty()) {
-        return 0;
+        return nullptr;
 	}
 	return _children.back();
 }
@@ -214,7 +214,7 @@ XMLNode_as::lastChild() const
 void
 XMLNode_as::removeChild(XMLNode_as* node)
 {
-    node->setParent(0);
+    node->setParent(nullptr);
     _children.remove(node);
     updateChildNodes();
 }
@@ -257,10 +257,10 @@ XMLNode_as::insertBefore(XMLNode_as* newnode, XMLNode_as* pos)
 XMLNode_as*
 XMLNode_as::previousSibling() const
 {
-    if (!_parent) return 0;
- 	if (_parent->_children.size() <= 1) return 0;
+    if (!_parent) return nullptr;
+ 	if (_parent->_children.size() <= 1) return nullptr;
 
-    XMLNode_as *previous_node = 0;
+    XMLNode_as *previous_node = nullptr;
     for (Children::iterator itx = _parent->_children.begin();
             itx != _parent->_children.end(); ++itx) {
 
@@ -269,18 +269,18 @@ XMLNode_as::previousSibling() const
         previous_node = *itx;
     }
 
-    return 0;
+    return nullptr;
 }
 
 XMLNode_as*
 XMLNode_as::nextSibling() const
 {
 
-    if (!_parent) return 0;
+    if (!_parent) return nullptr;
 
-    if (_parent->_children.size() <= 1) return 0;
+    if (_parent->_children.size() <= 1) return nullptr;
 
-    XMLNode_as *previous_node = 0;
+    XMLNode_as *previous_node = nullptr;
     for (Children::reverse_iterator itx = _parent->_children.rbegin();
             itx != _parent->_children.rend(); ++itx) {
 
@@ -288,7 +288,7 @@ XMLNode_as::nextSibling() const
 		previous_node = *itx;
     }
 
-    return 0;
+    return nullptr;
 }
 
 void
@@ -395,7 +395,7 @@ XMLNode_as::clearChildren()
             it != e; ++it) {
         XMLNode_as* node = *it;
 
-        node->setParent(0);
+        node->setParent(nullptr);
         if (!node->_object) {
             // The node is not GC'd because it has no associated object. 
             // See XMLNode_as class docs.
@@ -405,7 +405,7 @@ XMLNode_as::clearChildren()
     _children.clear();
 
     // Reset so that it is reinitialized on next access.
-    _childNodes = 0;
+    _childNodes = nullptr;
 }
 
 void

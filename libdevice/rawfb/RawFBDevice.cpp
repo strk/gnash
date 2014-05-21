@@ -44,7 +44,7 @@ static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 RawFBDevice::RawFBDevice()
     : _fd(0),
-      _fbmem(0)
+      _fbmem(nullptr)
 {
     // GNASH_REPORT_FUNCTION;
 
@@ -53,19 +53,19 @@ RawFBDevice::RawFBDevice()
 
 RawFBDevice::RawFBDevice(int /* vid */)
     : _fd(0),
-      _fbmem(0),
+      _fbmem(nullptr),
       _cmap()
 {
     // GNASH_REPORT_FUNCTION;
 
-    if (!initDevice(0, 0)) {
+    if (!initDevice(0, nullptr)) {
         log_error(_("Couldn't initialize RAWFB device!"));
     }
 }
 
 RawFBDevice::RawFBDevice(int /* argc */ , char ** /* argv */)
     : _fd(0),
-      _fbmem(0),
+      _fbmem(nullptr),
       _cmap()
 {
     // GNASH_REPORT_FUNCTION;
@@ -91,7 +91,7 @@ RawFBDevice::~RawFBDevice()
     if (_fbmem) {
         munmap(_fbmem, 0);
         log_debug(_("Freeing framebuffer memory"));
-        _fbmem = 0;
+        _fbmem = nullptr;
     }
     
     if (_offscreen_buffer) {
@@ -110,7 +110,7 @@ RawFBDevice::initDevice(int /* argc */, char **/* argv[] */)
 {
     GNASH_REPORT_FUNCTION;
     
-    const char *devname = 0;
+    const char *devname = nullptr;
     // Open the framebuffer device
 #ifdef ENABLE_FAKE_FRAMEBUFFER
     _fd = open(FAKEFB, O_RDWR);
@@ -179,7 +179,7 @@ RawFBDevice::setGrayscaleLUT8()
     _cmap.red = (__u16*)malloc(CMAP_SIZE);
     _cmap.green = (__u16*)malloc(CMAP_SIZE);
     _cmap.blue = (__u16*)malloc(CMAP_SIZE);
-    _cmap.transp = NULL;
+    _cmap.transp = nullptr;
 
     for (i=0; i<256; i++) {
         int r = i;
@@ -217,7 +217,7 @@ RawFBDevice::attachWindow(GnashDevice::native_window_t window)
     // of the opened device. EGL wants the descriptor here too, so
     // this way we work in a similar manner.
     if (window) {
-        _fbmem = reinterpret_cast<std::uint8_t *>(mmap(0, _fixinfo.smem_len,
+        _fbmem = reinterpret_cast<std::uint8_t *>(mmap(nullptr, _fixinfo.smem_len,
                                         PROT_READ|PROT_WRITE, MAP_SHARED,
                                         window, 0));
     }
@@ -260,7 +260,7 @@ RawFBDevice::swapBuffers()
 const char *
 RawFBDevice::getErrorString(int /* error */)
 {
-    return 0;
+    return nullptr;
 }
 
 // Create an RAWFB window to render in. This is only used by testing

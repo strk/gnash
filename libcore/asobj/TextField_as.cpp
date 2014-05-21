@@ -90,7 +90,7 @@ createTextFieldObject(Global_as& gl)
 {
     as_value tf(getMember(gl, NSV::CLASS_TEXT_FIELD));
     as_function* ctor = tf.to_function();
-    if (!ctor) return 0;
+    if (!ctor) return nullptr;
     fn_call::Args args;
     as_environment env(getVM(gl));
     return constructInstance(*ctor, env, args);
@@ -115,7 +115,7 @@ textfield_class_init(as_object& where, const ObjectURI& uri)
     where.init_member(uri, cl, as_object::DefaultFlags);
 
     // ASSetPropFlags is called on the TextField class.
-    as_object* null = 0;
+    as_object* null = nullptr;
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, cl, null, 131);
 }
 
@@ -1082,7 +1082,7 @@ textfield_ctor(const fn_call& fn)
     // It's not clear why this happens. Attaching a relay would have the
     // same effect as both following statements.
     obj->setArray(false);
-    obj->setRelay(0);
+    obj->setRelay(nullptr);
 
     as_object* proto = obj->get_prototype();
 
@@ -1122,7 +1122,7 @@ attachTextFieldInterface(as_object& o)
 
     // Finally ASSetPropFlags is called on the prototype.
     Global_as& gl = getGlobal(o);
-    as_object* null = 0;
+    as_object* null = nullptr;
     callMethod(&gl, NSV::PROP_AS_SET_PROP_FLAGS, &o, null, 131);
 }
 
