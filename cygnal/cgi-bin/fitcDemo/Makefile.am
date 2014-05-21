@@ -31,7 +31,7 @@ GNASH_LIBS = \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
-INCLUDES = \
+AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libnet \

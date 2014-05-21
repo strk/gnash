@@ -44,8 +44,6 @@ sysconf_DATA = cygnalrc
 # this is where Cygnal plugins get installed
 pluginsdir = $(libdir)/cygnal/plugins
 
-AM_CPPFLAGS = 	-DPLUGINSDIR=\"$(pluginsdir)\"
-
 AM_LDFLAGS = \
 	libnet/libgnashnet.la \
 	libamf/libgnashamf.la \
@@ -68,7 +66,7 @@ endif
 
 localedir = $(datadir)/locale
 
-INCLUDES = -I.. \
+AM_CPPFLAGS = -I.. \
         -I$(srcdir)/libamf \
         -I$(srcdir)/libnet \
         -I$(top_srcdir)	\
@@ -83,6 +81,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libcore/parser \
         -I$(top_srcdir)/libcore/vm \
         -DLOCALEDIR=\"$(localedir)\" \
+        -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)

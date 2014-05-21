@@ -30,14 +30,13 @@ AM_LDFLAGS = \
 	$(DEJAGNU_CFLAGS) \
 	$(NULL)
 
-AM_CPPFLAGS = -DSRCDIR=\"$(srcdir)\"
-
-INCLUDES = \
+AM_CPPFLAGS = \
         -I$(top_srcdir)/cygnal/libamf \
         -I$(top_srcdir)/cygnal/libnet \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/testsuite \
+	-DSRCDIR=\"$(srcdir)\" \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(DEJAGNU_CFLAGS) \

@@ -27,7 +27,7 @@ plugins_LTLIBRARIES = fileio.la
 
 DEF_MAKESWF_FLAGS = -I $(top_builddir) -I $(top_srcdir)/testsuite/actionscript.all
 
-INCLUDES =  \
+AM_CPPFLAGS =  \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/libcore \
             -I$(top_srcdir)/libcore/abc \

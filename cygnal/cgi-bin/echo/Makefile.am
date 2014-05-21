@@ -31,7 +31,7 @@ GNASH_LIBS = \
 	$(BOOST_LIBS) \
 	$(NULL)
 
-INCLUDES = \
+AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libltdl \

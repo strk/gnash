@@ -21,8 +21,6 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-AM_CPPFLAGS = # -Wall
-
 AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/cygnal/libamf/libgnashamf.la \
@@ -35,7 +33,7 @@ AM_LDFLAGS = \
 
 localedir = $(datadir)/locale
 
-INCLUDES = \
+AM_CPPFLAGS = \
         -I$(top_srcdir)/testsuite \
         -I$(top_srcdir)/cygnal/libnet \
         -I$(top_srcdir)/cygnal/libamf \

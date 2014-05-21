@@ -23,7 +23,7 @@ pluginsdir = $(libdir)/gnash/plugins
 
 plugins_LTLIBRARIES = dejagnu.la
 
-INCLUDES =  \
+AM_CPPFLAGS =  \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libcore/abc \

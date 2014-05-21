@@ -21,8 +21,6 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-AM_CPPFLAGS = # -Wall
-
 AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
@@ -39,7 +37,7 @@ endif	# ANDROID
 
 localedir = $(datadir)/locale
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/testsuite \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \

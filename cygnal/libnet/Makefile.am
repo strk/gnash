@@ -39,7 +39,7 @@ libgnashnet_la_LDFLAGS =  -release $(VERSION) $(AM_LDFLAGS)
 
 localedir = $(datadir)/locale
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/cygnal/libamf \
 	-I$(top_srcdir)/cygnal/libnet \
         -I$(top_srcdir)/libbase \
