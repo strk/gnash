@@ -438,7 +438,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
     _childpid(0),
     _filefd(-1),
     _name(),
-    _scriptObject(0)
+    _scriptObject(nullptr)
 {
     // gnash::log_debug("%s: %x", __PRETTY_FUNCTION__, (void *)this);
 
@@ -739,7 +739,7 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
     gchar buffer[buf_size];
 
     do {
-        GError* error = 0;
+        GError* error = nullptr;
         gsize bytes_read = 0;
 
         GIOStatus status = g_io_channel_read_chars(iochan, buffer, buf_size,
@@ -1121,7 +1121,7 @@ nsPluginInstance::setupCookies(const std::string& pageurl)
 
     std::string ncookie;
  
-    char *cookie = 0;
+    char *cookie = nullptr;
     uint32_t length = 0;
 
     NPError rv = NPERR_GENERIC_ERROR;
@@ -1196,7 +1196,7 @@ nsPluginInstance::setupProxy(const std::string& url)
     if (!NPNFuncs.getvalueforurl) return;
 #endif
 
-    char *proxy = 0;
+    char *proxy = nullptr;
     uint32_t length = 0;
 #if NPAPI_VERSION != 190
     NPN_GetValueForURL(_instance, NPNURLVProxy, url.c_str(),
@@ -1404,7 +1404,7 @@ nsPluginInstance::startProc()
     
     std::transform(arg_vec.begin(), arg_vec.end(), std::back_inserter(args),
                    std::mem_fun_ref(&std::string::c_str));
-    args.push_back(0);
+    args.push_back(nullptr);
     
     // Argument List prepared, now fork(), close file descriptors and execv()
     

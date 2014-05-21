@@ -126,7 +126,7 @@ Extension::initModule(const std::string& module, as_object &where)
     
     SharedLib *sl = _plugins[module];
 
-    if (sl == 0) {
+    if (!sl) {
         sl = _plugins[module] = new SharedLib(_pluginsdir + "/" + module);
         if ( ! sl->openLib() ) return false;
     } 
@@ -155,7 +155,7 @@ Extension::initModuleWithFunc(const std::string& module,
 
     SharedLib *sl = _plugins[module];
 
-    if (sl == 0) {
+    if (!sl) {
         sl = _plugins[module] = new SharedLib(module);
         if ( ! sl->openLib() ) return false;
     } 

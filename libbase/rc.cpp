@@ -160,7 +160,7 @@ RcInitFile::loadFiles()
 #endif
     
     // Check the users home directory
-    const char *home = 0;
+    const char *home = nullptr;
 #if defined (__amigaos4__)
     //on AmigaOS we have a GNASH: assign that point to program dir
     home = "/gnash";
