@@ -71,10 +71,7 @@ namespace gnash
 {
 
 SWFMovieLoader::SWFMovieLoader(SWFMovieDefinition& md)
-    :
-    _movie_def(md),
-    _thread(),
-    _barrier(2) // us and the main thread..
+    : _movie_def(md)
 {
 }
 
@@ -118,7 +115,6 @@ SWFMovieLoader::isSelfThread() const
 void
 SWFMovieLoader::execute(SWFMovieLoader& ml, SWFMovieDefinition* md)
 {
-    ml._barrier.wait(); // let _thread assignment happen before going on
     md->read_all_swf();
 }
 
@@ -136,8 +132,6 @@ SWFMovieLoader::start()
 
     _thread.reset(new boost::thread(std::bind(
                     execute, std::ref(*this), &_movie_def)));
-
-    _barrier.wait(); // let execution start befor returning
 
     return true;
 }

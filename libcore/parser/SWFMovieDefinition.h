@@ -35,7 +35,6 @@
 #include <memory> 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
-#include <boost/thread/barrier.hpp>
 #include <memory>
 
 #include "movie_definition.h" // for inheritance
@@ -91,11 +90,6 @@ private:
 
     mutable boost::mutex _mutex;
     std::unique_ptr<boost::thread> _thread;
-
-    // Barrier to ensure that _thread
-    // is initialized before the loader thread
-    // continues execution
-    boost::barrier _barrier;
 
     /// Entry point for the actual thread
     static void execute(SWFMovieLoader& ml, SWFMovieDefinition* md);
