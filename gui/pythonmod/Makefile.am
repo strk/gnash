@@ -38,7 +38,7 @@ GNASH_INCLUDES = \
 	-I$(top_srcdir)/libdevice/vaapi \
 	-I$(top_srcdir)/libsound
 
-AM_CPPFLAGS = \
+INCLUDES = \
 	$(PYTHON_CFLAGS) \
 	$(PYGTK_CFLAGS) \
 	$(GTK2_CFLAGS) \
@@ -73,7 +73,7 @@ inst_HEADERS = gnash-view.h
 RENDERER_GLUE =
 if BUILD_OGL_RENDERER
 RENDERER_GLUE += $(top_srcdir)/gui/gtk/gtk_glue_gtkglext.cpp
-AM_CPPFLAGS += $(GLEXT_CFLAGS)
+INCLUDES += $(GLEXT_CFLAGS)
 gnash_la_LIBADD += $(GLEXT_LIBS)
 endif
 if BUILD_AGG_RENDERER
