@@ -40,7 +40,6 @@ MediaParser::MediaParser(std::unique_ptr<IOChannel> stream)
 	_bytesLoaded(0),
 	_stream(std::move(stream)),
 	_bufferTime(100), // 100 ms 
-	_parserThread(),
 	_parserThreadKillRequested(false),
 	_seekRequest(false)
 {
@@ -52,8 +51,8 @@ MediaParser::startParserThread()
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	log_debug("Starting MediaParser thread");
-	_parserThread.reset(new std::thread(
-                std::bind(parserLoopStarter, this)));
+	_parserThread = std::thread(
+                std::bind(parserLoopStarter, this));
 #endif
 }
 
@@ -272,11 +271,10 @@ MediaParser::peekNextAudioFrame() const
 void
 MediaParser::stopParserThread()
 {
-	if ( _parserThread.get() )
+	if ( _parserThread.joinable() )
 	{
 		requestParserThreadKill();
-		_parserThread->join();
-		_parserThread.reset();
+		_parserThread.join();
 	}
 }
 

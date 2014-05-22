@@ -87,10 +87,10 @@ public:
 	/// Start the load and parse thread
 	void process()
 	{
-		assert(!_thread.get());
+		assert(!_thread.joinable());
 		assert(_stream.get());
-		_thread.reset(new std::thread(
-                std::bind(LoadVariablesThread::execLoadingThread, this)));
+		_thread = std::thread(
+                    std::bind(LoadVariablesThread::execLoadingThread, this));
 	}
 
 	/// Cancel a download in progress
@@ -103,7 +103,7 @@ public:
 	bool inProgress()
 	{
 		// TODO: should we mutex-protect this ?
-		return ( _thread.get() != nullptr );
+		return _thread.joinable();
 	}
 
 	/// Mutex-protected inspector for thread completion
@@ -115,10 +115,9 @@ public:
 	bool completed()
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
-		if (  _completed && _thread.get() )
+		if (  _completed && _thread.joinable() )
 		{
-			_thread->join();
-			_thread.reset();
+			_thread.join();
 		}
 		return _completed;
 	}
@@ -198,7 +197,7 @@ private:
 
         std::unique_ptr<IOChannel> _stream;
 
-        std::unique_ptr<std::thread> _thread;
+        std::thread _thread;
 
 	ValuesMap _vals;
 

@@ -688,7 +688,7 @@ protected:
 	std::uint64_t _bufferTime;
 	mutable std::mutex _bufferTimeMutex;
 
-	std::unique_ptr<std::thread> _parserThread;
+	std::thread _parserThread;
 	mutable std::mutex _parserThreadKillRequestMutex;
 	bool _parserThreadKillRequested;
 	std::condition_variable _parserThreadWakeup;

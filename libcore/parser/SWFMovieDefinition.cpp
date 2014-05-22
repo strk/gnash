@@ -80,10 +80,10 @@ SWFMovieLoader::~SWFMovieLoader()
 {
     // we should assert _movie_def._loadingCanceled
     // but we're not friend yet (anyone introduce us ?)
-    if ( _thread.get() )
+    if ( _thread.joinable() )
     {
         //cout << "Joining thread.." << endl;
-        _thread->join();
+        _thread.join();
     }
 }
 
@@ -92,7 +92,7 @@ SWFMovieLoader::started() const
 {
     std::lock_guard<std::mutex> lock(_mutex);
 
-    return _thread.get() != nullptr;
+    return _thread.joinable();
 }
 
 bool
@@ -100,10 +100,10 @@ SWFMovieLoader::isSelfThread() const
 {
     std::lock_guard<std::mutex> lock(_mutex);
 
-    if (!_thread.get()) {
+    if (!_thread.joinable()) {
         return false;
     }
-    return std::this_thread::get_id() == _thread->get_id();
+    return std::this_thread::get_id() == _thread.get_id();
 }
 
 // static..
@@ -125,7 +125,7 @@ SWFMovieLoader::start()
     // Those tests do seem a bit redundant, though...
     std::lock_guard<std::mutex> lock(_mutex);
 
-    _thread.reset(new std::thread(std::bind(execute, &_movie_def)));
+    _thread = std::thread(std::bind(execute, &_movie_def));
 
     return true;
 }

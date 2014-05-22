@@ -203,7 +203,7 @@ private:
     /// needed for some facilities like find_character_by_target
     movie_root& _movieRoot;
 
-    std::unique_ptr<std::thread> _thread;
+    std::thread _thread;
 };
 
 } // namespace gnash

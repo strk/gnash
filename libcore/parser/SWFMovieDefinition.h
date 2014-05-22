@@ -89,7 +89,7 @@ private:
     SWFMovieDefinition& _movie_def;
 
     mutable std::mutex _mutex;
-    std::unique_ptr<std::thread> _thread;
+    std::thread _thread;
 
     /// Entry point for the actual thread
     static void execute(SWFMovieDefinition* md);

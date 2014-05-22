@@ -183,11 +183,10 @@ LoadVariablesThread::cancelRequested()
 
 LoadVariablesThread::~LoadVariablesThread()
 {
-	if ( _thread.get() )
+	if ( _thread.joinable() )
 	{
 		cancel();
-		_thread->join();
-		_thread.reset();
+		_thread.join();
 	}
 }
 

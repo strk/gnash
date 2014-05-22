@@ -151,7 +151,7 @@ MovieLoader::processRequest(Request& r)
 void
 MovieLoader::clear()
 {
-    if (_thread.get()) {
+    if (_thread.joinable()) {
 
 #ifdef GNASH_DEBUG_LOCKING
         log_debug("clear: lock on requests: trying");
@@ -190,9 +190,8 @@ MovieLoader::clear()
         requestsLock.unlock(); // allow the thread to die
 
         log_debug("MovieLoader notified, joining");
-        _thread->join();
+        _thread.join();
         log_debug("MovieLoader joined");
-        _thread.reset();
     }
 
     // no thread now, can clean w/out locking
@@ -449,12 +448,10 @@ MovieLoader::loadMovie(const std::string& urlstr,
     );
 
     // Start or wake up the loader thread 
-    if (!_thread.get()) {
+    if (!_thread.joinable()) {
         _killed=false;
-        _thread.reset(new std::thread(std::bind(
-                        &MovieLoader::processRequests, this)));
-    }
-    else {
+        _thread = std::thread(std::bind(&MovieLoader::processRequests, this));
+    } else {
         log_debug("loadMovie: waking up existing thread");
         _wakeup.notify_all();
     }
