@@ -22,7 +22,7 @@
 
 #include <boost/noncopyable.hpp>
 #include <cstdint>
-#include <boost/array.hpp>
+#include <array>
 #include <memory>
 
 namespace gnash {
@@ -77,7 +77,7 @@ struct ImgBuf : public boost::noncopyable
     size_t width; // in pixels
     size_t height; // in pixels
     
-    boost::array<size_t, 4> stride;
+    std::array<size_t, 4> stride;
     
     FreeFunc dealloc;
 };

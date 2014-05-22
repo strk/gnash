@@ -23,7 +23,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/array.hpp>
 #include <cstdint>
 #include <sstream>
 

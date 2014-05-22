@@ -20,7 +20,6 @@
 #define GNASH_SSH_CLIENT_H
 
 #include <string>
-#include <boost/array.hpp>
 #include <cstdint>
 #include <sstream>
 

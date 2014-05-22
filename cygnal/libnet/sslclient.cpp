@@ -23,7 +23,6 @@
 
 #include <mutex>
 #include <cstdint>
-#include <boost/array.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

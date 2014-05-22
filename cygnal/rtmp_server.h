@@ -21,7 +21,7 @@
 
 #include <vector>
 #include <cstdint>
-#include <boost/array.hpp>
+#include <array>
 #include <string>
 #include <map>
 
@@ -137,7 +137,7 @@ private:
 #ifdef CLIENT_ID_NUMERIC
     std::array<double>	_clientids;
 #else
-    boost::array<std::string, 1000>	_clientids;
+    std::array<std::string, 1000>	_clientids;
 #endif
     double		_streamid;
     /// \var _netconnect

@@ -20,7 +20,6 @@
 #define GNASH_SSH_SERVER_H
 
 #include <string>
-#include <boost/array.hpp>
 #include <cstdint>
 #include <sstream>
 

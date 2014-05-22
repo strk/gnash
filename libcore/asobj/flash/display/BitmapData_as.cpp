@@ -27,7 +27,7 @@
 #include <boost/random.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
-#include <boost/array.hpp>
+#include <array>
 #include <cmath>
 
 #include "MovieClip.h"
@@ -421,10 +421,10 @@ private:
     }
 
     // A random permutation table.
-    boost::array<size_t, Size * 2 + 2> permTable;
+    std::array<size_t, Size * 2 + 2> permTable;
 
     // The gradient stuff.
-    boost::array<boost::array<T, 2>, Size * 2 + 2> g2;
+    std::array<std::array<T, 2>, Size * 2 + 2> g2;
 };
 
 /// Store offsets.

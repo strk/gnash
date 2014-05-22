@@ -24,7 +24,6 @@
 #endif
 
 #include <string>
-#include <boost/array.hpp>
 #include <cstdint>
 #include <sstream>
 

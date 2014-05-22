@@ -74,7 +74,7 @@
 #include <list>
 #include <set>
 #include <bitset>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/any.hpp>
@@ -547,7 +547,7 @@ public:
     /// This is a ptr_deque because it needs no insertion in the middle but
     /// frequent push_back and pop_front. We also have to traverse it, so
     /// a queue is not usable.
-    typedef boost::array<boost::ptr_deque<ExecutableCode>, PRIORITY_SIZE>
+    typedef std::array<boost::ptr_deque<ExecutableCode>, PRIORITY_SIZE>
         ActionQueue;
 
     /// Push an executable code to the ActionQueue

@@ -26,7 +26,7 @@
 
 #include <map>
 #include <memory> 
-#include <boost/array.hpp>
+#include <array>
 #include <cstdint>
 #include <boost/random/mersenne_twister.hpp>  // for mt11213b
 #include <boost/noncopyable.hpp>
@@ -270,7 +270,7 @@ private:
 
 	SafeStack<as_value>	_stack;
 
-    typedef boost::array<as_value, 4> GlobalRegisters;
+    typedef std::array<as_value, 4> GlobalRegisters;
     GlobalRegisters _globalRegisters;
 
 	CallStack _callStack;
