@@ -703,6 +703,8 @@ public:
   Renderer_ogl()
     : _xscale(1.0),
       _yscale(1.0),
+      _width(0.0),
+      _height(0.0),
       _drawing_mask(false)
   {
   }
