@@ -150,7 +150,7 @@ public:
     
     /// Construct a primitive Boolean value
     template <typename T>
-    as_value(T val, typename std::enable_if<boost::is_same<bool, T>::value>::type*
+    as_value(T val, typename std::enable_if<std::is_same<bool, T>::value>::type*
              dummy = 0)
         :
         _type(BOOLEAN),
