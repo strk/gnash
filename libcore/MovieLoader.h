@@ -23,8 +23,7 @@
 #include <string>
 #include <boost/ptr_container/ptr_list.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/thread/condition.hpp>
+#include <condition_variable>
 
 #include "URL.h"
 #include "MovieClip.h" 
@@ -34,6 +33,9 @@ namespace gnash {
     class movie_root;
     class movie_definition;
     class as_object;
+}
+namespace std {
+    class thread;
 }
 
 namespace gnash {
@@ -131,7 +133,7 @@ private:
         ///
         bool getCompleted(boost::intrusive_ptr<movie_definition>& md) const
         {
-            boost::mutex::scoped_lock lock(_mutex);
+            std::lock_guard<std::mutex> lock(_mutex);
             md = _mdef;
             return _completed;
         }
@@ -139,14 +141,14 @@ private:
         /// Only check if request is completed
         bool pending() const
         {
-            boost::mutex::scoped_lock lock(_mutex);
+            std::lock_guard<std::mutex> lock(_mutex);
             return !_completed;
         }
 
         /// Only check if request is completed
         bool completed() const
         {
-            boost::mutex::scoped_lock lock(_mutex);
+            std::lock_guard<std::mutex> lock(_mutex);
             return _completed;
         }
 
@@ -159,7 +161,7 @@ private:
         ///
         void setCompleted(boost::intrusive_ptr<movie_definition> md)
         {
-            boost::mutex::scoped_lock lock(_mutex);
+            std::lock_guard<std::mutex> lock(_mutex);
             _mdef = md;
             _completed = true;
         }
@@ -170,7 +172,7 @@ private:
         bool _usePost;
         std::string _postData;
         boost::intrusive_ptr<movie_definition> _mdef;
-        mutable boost::mutex _mutex;
+        mutable std::mutex _mutex;
         as_object* _handler;
         bool _completed;
     };
@@ -179,7 +181,7 @@ private:
     typedef boost::ptr_list<Request> Requests;
     Requests _requests;
 
-	mutable boost::mutex _requestsMutex;
+    mutable std::mutex _requestsMutex;
 
     void processRequests();
     void processRequest(Request& r);
@@ -196,14 +198,14 @@ private:
 
     bool _killed;
 
-	boost::mutex _killMutex;
+    std::mutex _killMutex;
 
-    boost::condition _wakeup;
+    std::condition_variable _wakeup;
 
     /// needed for some facilities like find_character_by_target
     movie_root& _movieRoot;
 
-    std::unique_ptr<boost::thread> _thread;
+    std::unique_ptr<std::thread> _thread;
 };
 
 } // namespace gnash

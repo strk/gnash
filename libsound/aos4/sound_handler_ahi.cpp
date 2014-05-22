@@ -81,7 +81,7 @@ AOS4_sound_handler::AOS4_sound_handler(media::MediaHandler* m)
 
 AOS4_sound_handler::~AOS4_sound_handler()
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
 	// on class destruction we must kill the Audio thread
 	_closing = true;
@@ -178,7 +178,7 @@ AOS4_sound_handler::closeAudio()
 void
 AOS4_sound_handler::reset()
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::delete_all_sounds();
     sound_handler::stop_all_sounds();
 }
@@ -187,7 +187,7 @@ int
 AOS4_sound_handler::create_sound(std::unique_ptr<SimpleBuffer> data,
                                 std::unique_ptr<media::SoundInfo> sinfo)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::create_sound(data, sinfo);
 }
 
@@ -197,14 +197,14 @@ AOS4_sound_handler::addSoundBlock(unsigned char* data,
         int streamId)
 {
 
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::addSoundBlock(data, dataBytes, nSamples, streamId);
 }
 
 void
 AOS4_sound_handler::stop_sound(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::stop_sound(soundHandle);
 }
 
@@ -212,14 +212,14 @@ AOS4_sound_handler::stop_sound(int soundHandle)
 void
 AOS4_sound_handler::delete_sound(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::delete_sound(soundHandle);
 }
 
 void
 AOS4_sound_handler::stop_all_sounds()
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::stop_all_sounds();
 }
 
@@ -227,7 +227,7 @@ AOS4_sound_handler::stop_all_sounds()
 int
 AOS4_sound_handler::get_volume(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::get_volume(soundHandle);
 }
 
@@ -235,28 +235,28 @@ AOS4_sound_handler::get_volume(int soundHandle)
 void
 AOS4_sound_handler::set_volume(int soundHandle, int volume)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::set_volume(soundHandle, volume);
 }
 
 media::SoundInfo*
 AOS4_sound_handler::get_sound_info(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::get_sound_info(soundHandle);
 }
 
 unsigned int
 AOS4_sound_handler::get_duration(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::get_duration(soundHandle);
 }
 
 unsigned int
 AOS4_sound_handler::tell(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::tell(soundHandle);
 }
 
@@ -275,7 +275,7 @@ AOS4_sound_handler::fetchSamples(std::int16_t* to, unsigned int nSamples)
 		AHIRequest *req = AHIios[AHICurBuf];
 		UWORD AHIOtherBuf = AHICurBuf^1;
 
-	    boost::mutex::scoped_lock lock(_mutex);
+	    std::lock_guard<std::mutex> lock(_mutex);
     	if (!_closing) 
     	{
 	    		sound_handler::fetchSamples(to, nSamples);
@@ -395,7 +395,7 @@ AOS4_sound_handler::mix(std::int16_t* outSamples, std::int16_t* inSamples, unsig
 void
 AOS4_sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     sound_handler::plugInputStream(newStreamer);
 
@@ -412,21 +412,21 @@ AOS4_sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 void
 AOS4_sound_handler::mute()
 {
-    boost::mutex::scoped_lock lock(_mutedMutex);
+    std::lock_guard<std::mutex> lock(_mutedMutex);
     sound_handler::mute();
 }
 
 void
 AOS4_sound_handler::unmute()
 {
-    boost::mutex::scoped_lock lock(_mutedMutex);
+    std::lock_guard<std::mutex> lock(_mutedMutex);
     sound_handler::unmute();
 }
 
 bool
 AOS4_sound_handler::is_muted() const
 {
-    boost::mutex::scoped_lock lock(_mutedMutex);
+    std::lock_guard<std::mutex> lock(_mutedMutex);
     return sound_handler::is_muted();
 }
 

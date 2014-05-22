@@ -114,13 +114,13 @@ SDL_sound_handler::SDL_sound_handler(media::MediaHandler* m)
 void
 SDL_sound_handler::reset()
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::stop_all_sounds();
 }
 
 SDL_sound_handler::~SDL_sound_handler()
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
     log_debug("Pausing SDL Audio on destruction");
@@ -135,7 +135,7 @@ SDL_sound_handler::~SDL_sound_handler()
 int
 SDL_sound_handler::createStreamingSound(const media::SoundInfo& sinfo)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::createStreamingSound(sinfo);
 }
 
@@ -143,7 +143,7 @@ int
 SDL_sound_handler::create_sound(std::unique_ptr<SimpleBuffer> data,
                                 const media::SoundInfo& sinfo)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::create_sound(std::move(data), sinfo);
 }
 
@@ -152,7 +152,7 @@ SDL_sound_handler::addSoundBlock(std::unique_ptr<SimpleBuffer> buf,
         size_t sampleCount, int seekSamples, int handle)
 {
 
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::addSoundBlock(std::move(buf), sampleCount, seekSamples, handle);
 }
 
@@ -160,21 +160,21 @@ SDL_sound_handler::addSoundBlock(std::unique_ptr<SimpleBuffer> buf,
 void
 SDL_sound_handler::stopEventSound(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::stopEventSound(soundHandle);
 }
 
 void
 SDL_sound_handler::stopAllEventSounds()
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::stopAllEventSounds();
 }
 
 void
 SDL_sound_handler::stopStreamingSound(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::stopStreamingSound(soundHandle);
 }
 
@@ -182,14 +182,14 @@ SDL_sound_handler::stopStreamingSound(int soundHandle)
 void
 SDL_sound_handler::delete_sound(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::delete_sound(soundHandle);
 }
 
 void   
 SDL_sound_handler::stop_all_sounds()
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::stop_all_sounds();
 }
 
@@ -197,7 +197,7 @@ SDL_sound_handler::stop_all_sounds()
 int
 SDL_sound_handler::get_volume(int soundHandle) const
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::get_volume(soundHandle);
 }
 
@@ -205,28 +205,28 @@ SDL_sound_handler::get_volume(int soundHandle) const
 void   
 SDL_sound_handler::set_volume(int soundHandle, int volume)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::set_volume(soundHandle, volume);
 }
     
 media::SoundInfo*
 SDL_sound_handler::get_sound_info(int soundHandle) const
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::get_sound_info(soundHandle);
 }
 
 unsigned int
 SDL_sound_handler::get_duration(int soundHandle) const
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::get_duration(soundHandle);
 }
 
 unsigned int
 SDL_sound_handler::tell(int soundHandle) const
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::tell(soundHandle);
 }
 
@@ -239,7 +239,7 @@ create_sound_handler_sdl(media::MediaHandler* m)
 void
 SDL_sound_handler::fetchSamples(std::int16_t* to, unsigned int nSamples)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::fetchSamples(to, nSamples);
 
     // If nothing is left to play there is no reason to keep polling.
@@ -296,7 +296,7 @@ SDL_sound_handler::mix(std::int16_t* outSamples, std::int16_t* inSamples,
 void
 SDL_sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     sound_handler::plugInputStream(std::move(newStreamer));
 
@@ -314,21 +314,21 @@ SDL_sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 void
 SDL_sound_handler::mute()
 {
-    boost::mutex::scoped_lock lock(_mutedMutex);
+    std::lock_guard<std::mutex> lock(_mutedMutex);
     sound_handler::mute();
 }
 
 void
 SDL_sound_handler::unmute()
 {
-    boost::mutex::scoped_lock lock(_mutedMutex);
+    std::lock_guard<std::mutex> lock(_mutedMutex);
     sound_handler::unmute();
 }
 
 bool
 SDL_sound_handler::is_muted() const
 {
-    boost::mutex::scoped_lock lock(_mutedMutex);
+    std::lock_guard<std::mutex> lock(_mutedMutex);
     return sound_handler::is_muted();
 }
 
@@ -353,7 +353,7 @@ SDL_sound_handler::unpause()
 void
 SDL_sound_handler::unplugInputStream(InputStream* id)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     sound_handler::unplugInputStream(id);
 }

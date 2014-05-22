@@ -23,7 +23,7 @@
 #include "sound_handler.h" // for inheritance
 
 #include <set> // for composition (InputStreams)
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <memory>
 
 #include <SoundPlayer.h>
@@ -55,10 +55,10 @@ class Mkit_sound_handler : public sound_handler
     bool _audioopen;
 
     /// Mutex for making sure threads doesn't mess things up
-    boost::mutex _mutex;
+    std::mutex _mutex;
 
     /// Mutex protecting _muted (defined in base class)
-    mutable boost::mutex _mutedMutex;
+    mutable std::mutex _mutedMutex;
 
     // See dox in sound_handler.h
     void mix(std::int16_t* outSamples, std::int16_t* inSamples,

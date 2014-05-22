@@ -23,7 +23,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <string>
 #include "dsodefs.h" // DSOEXPORT
 
@@ -48,7 +48,7 @@ namespace gnash {
 /// TODO: document this class
 class SharedLib
 {
-    typedef boost::mutex::scoped_lock scoped_lock;
+    typedef std::lock_guard<std::mutex> scoped_lock;
 
 public:
     // Typedefs for function pointers to keep the code readable
@@ -72,7 +72,7 @@ private:
     lt_dlhandle _dlhandle;
 #endif
     std::string _filespec;
-    boost::mutex _libMutex;    
+    std::mutex _libMutex;
 };
 
 } // end of gnash namespace

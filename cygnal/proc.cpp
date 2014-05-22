@@ -147,7 +147,7 @@ Proc::startCGI(const string &filespec, bool outflag, std::uint16_t port)
     // fork ourselves silly
     childpid = fork();
     
-//    boost::mutex::scoped_lock lock(_mutex);
+//    std::lock_guard<std::mutex> lock(_mutex);
     
     // childpid is a positive integer, if we are the parent, and fork() worked
     if (childpid > 0) {
@@ -185,7 +185,7 @@ Proc::findCGI(const string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
     log_debug("Finding \"%s\"", filespec);
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     return _pids[filespec];
 }
@@ -195,7 +195,7 @@ Proc::stopCGI(void)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     return false;
 }
@@ -206,7 +206,7 @@ Proc::stopCGI(const string &filespec)
 //    GNASH_REPORT_FUNCTION;
     log_debug("Stopping \"%s\"", filespec);
 
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     pid_t pid = _pids[filespec];
     
     if (kill (pid, SIGQUIT) == -1) {
@@ -220,7 +220,7 @@ bool
 Proc::setOutput(const string &filespec, bool outflag)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     _output[filespec] = outflag;
     
     return (true);
@@ -230,7 +230,7 @@ bool
 Proc::getOutput(const string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     
     return _output[filespec];
 }

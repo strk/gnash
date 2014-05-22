@@ -29,6 +29,8 @@
 #include <fstream>
 #include <iomanip> 
 #include <string>
+#include <thread>
+#include <mutex>
 #include <boost/format.hpp>
 
 #include <unistd.h> // for getpid
@@ -38,11 +40,6 @@
 
 using std::cout;
 using std::endl;
-
-namespace {
-    // TODO: drop this and use boost::this_thread::id instead.
-    inline unsigned long int /* pthread_t */ get_thread_id();
-}
 
 namespace gnash {
 
@@ -91,13 +88,13 @@ namespace {
 
     struct Timestamp {
         std::uint64_t startTicks;
-        std::map<int, int> threadMap;
+        std::map<std::thread::id, int> threadMap;
         Timestamp() : startTicks(clocktime::getTicks()) {}
     };
 
     std::ostream& operator<< (std::ostream& o, Timestamp& t)
     {
-        int tid = get_thread_id();
+        std::thread::id tid = std::this_thread::get_id();
         int& htid = t.threadMap[tid];
         if (!htid) {
             htid = t.threadMap.size();
@@ -243,8 +240,7 @@ processLog_action(const boost::format& fmt)
 void
 LogFile::log(const std::string& msg)
 {
-
-    boost::mutex::scoped_lock lock(_ioMutex);
+    std::lock_guard<std::mutex> lock(_ioMutex);
 
     if ( !_verbose ) return; // nothing to do if not verbose
 
@@ -355,7 +351,8 @@ LogFile::openLog(const std::string& filespec)
 bool
 LogFile::closeLog()
 {
-    boost::mutex::scoped_lock lock(_ioMutex);
+    std::lock_guard<std::mutex> lock(_ioMutex);
+
     if (_state == OPEN) {
         _outstream.flush();
         _outstream.close();
@@ -380,48 +377,6 @@ LogFile::removeLog()
 }
 
 } // end of gnash namespace
-
-/// Used in logging.
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#else
-# ifdef _WIN32
-extern "C" unsigned long int /* DWORD WINAPI */ GetCurrentThreadId();
-# else
-#include <sys/types.h>
-#include <unistd.h>
-# endif
-#endif
-
-namespace {
-
-inline unsigned long int /* pthread_t */ get_thread_id(void)
-{
-#ifdef HAVE_PTHREADS
-# ifdef __APPLE_CC__
-    return reinterpret_cast<unsigned long int>(pthread_self());
-# else
-    // This isn't a proper style C++ cast, but FreeBSD has a problem with
-    // static_cast for this as pthread_self() returns a pointer. We can
-    // use that too, this ID is only used for the log file to keep output
-    // from seperare threads clear.
-# ifdef _WIN32
-    return GetCurrentThreadId();
-#else
-    return (unsigned long int)pthread_self();
-#endif
-# endif 
-#else
-# ifdef _WIN32
-    return GetCurrentThreadId();
-# else
-    return static_cast<unsigned long int>(getpid());
-# endif
-#endif
-
-}
-
-} // anonymous namespace
 
 // Local Variables:
 // mode: C++

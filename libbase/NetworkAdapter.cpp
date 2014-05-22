@@ -88,14 +88,10 @@ extern "C" {
 #include <cerrno>
 #include <cstdio> // cached data uses a *FILE
 #include <cstdlib> // std::getenv
+#include <mutex>
 
 #include <boost/version.hpp>
 #include <boost/assign/list_of.hpp>
-#include <boost/thread/mutex.hpp>
-
-#if BOOST_VERSION < 103500
-# include <boost/thread/detail/lock.hpp>
-#endif
 
 
 //#define GNASH_CURL_VERBOSE 1
@@ -109,25 +105,15 @@ namespace gnash {
 namespace {
 
 inline
-void lock(boost::mutex& mut)
+void lock(std::mutex& mut)
 {
-#if BOOST_VERSION < 103500
-    // see https://savannah.gnu.org/bugs/index.php?32579#comment7
-    boost::detail::thread::lock_ops<boost::mutex>::lock(mut);
-#else
     mut.lock();
-#endif
 }
 
 inline
-void unlock(boost::mutex& mut)
+void unlock(std::mutex& mut)
 {
-#if BOOST_VERSION < 103500
-    // see https://savannah.gnu.org/bugs/index.php?32579#comment7
-    boost::detail::thread::lock_ops<boost::mutex>::unlock(mut);
-#else
     mut.unlock();
-#endif
 }
 
 
@@ -173,13 +159,13 @@ private:
     CURLSH* _shandle;
 
     // mutex protecting share state
-    boost::mutex _shareMutex;
+    std::mutex _shareMutex;
 
     // mutex protecting shared cookies
-    boost::mutex _cookieMutex;
+    std::mutex _cookieMutex;
 
     // mutex protecting shared dns cache
-    boost::mutex _dnscacheMutex;
+    std::mutex _dnscacheMutex;
 
     /// Import cookies, if requested
     //

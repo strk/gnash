@@ -29,7 +29,7 @@
 #include <string>
 #include <boost/ptr_container/ptr_deque.hpp>
 #include <memory>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include "PlayHead.h" // for composition
 #include "Relay.h" // for ActiveRelay inheritance
@@ -131,7 +131,7 @@ public:
 
     /// The queue needs to be protected as sound_handler callback
     /// is invoked by a separate thread (dunno if it makes sense actually)
-    boost::mutex _audioQueueMutex;
+    std::mutex _audioQueueMutex;
 
     // Id of an attached audio streamer, 0 if none
     sound::InputStream* _auxStreamer;
@@ -509,7 +509,7 @@ private:
     std::uint32_t _bufferTime;
 
     // Mutex to insure we don't corrupt the image
-    boost::mutex image_mutex;
+    std::mutex image_mutex;
 
     // The image/videoframe which is given to the renderer
     std::unique_ptr<image::GnashImage> _imageframe;
@@ -530,7 +530,7 @@ private:
 
     // Mutex protecting _playback_state and _decoding_state
     // (not sure a single one is appropriate)
-    boost::mutex _state_mutex;
+    std::mutex _state_mutex;
     
     /// Video decoder
     std::unique_ptr<media::VideoDecoder> _videoDecoder;
@@ -570,7 +570,7 @@ private:
     StatusCode _statusCode;
 
     /// Mutex protecting _statusQueue
-    boost::mutex _statusMutex;
+    std::mutex _statusMutex;
 
 };
 

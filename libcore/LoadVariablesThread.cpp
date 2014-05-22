@@ -170,14 +170,14 @@ LoadVariablesThread::LoadVariablesThread(const StreamProvider& sp,
 void
 LoadVariablesThread::cancel()
 {
-	boost::mutex::scoped_lock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_canceled = true;
 }
 
 bool
 LoadVariablesThread::cancelRequested()
 {
-	boost::mutex::scoped_lock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	return _canceled;
 }
 

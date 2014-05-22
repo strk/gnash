@@ -27,7 +27,7 @@
 #include "dsodefs.h" // for DSOEXPORT
 
 #include <fstream>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <boost/format.hpp>
 
 // This is needed so we can print to the Android log file, which can
@@ -207,7 +207,7 @@ private:
     LogFile ();
 
     /// Mutex for locking I/O during logfile access.
-    boost::mutex _ioMutex;
+    std::mutex _ioMutex;
 
     /// Stream to write to stdout.
     std::ofstream _outstream;

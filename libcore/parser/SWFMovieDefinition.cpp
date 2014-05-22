@@ -26,7 +26,8 @@
 
 #include <functional>
 #include <boost/version.hpp>
-#include <boost/thread.hpp>
+#include <thread>
+#include <mutex>
 #include <iomanip>
 #include <memory>
 #include <string>
@@ -89,7 +90,7 @@ SWFMovieLoader::~SWFMovieLoader()
 bool
 SWFMovieLoader::started() const
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     return _thread.get() != nullptr;
 }
@@ -97,23 +98,17 @@ SWFMovieLoader::started() const
 bool
 SWFMovieLoader::isSelfThread() const
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     if (!_thread.get()) {
         return false;
     }
-#if BOOST_VERSION < 103500
-    boost::thread this_thread;
-    return this_thread == *_thread;
-#else
-    return boost::this_thread::get_id() == _thread->get_id();
-#endif
-
+    return std::this_thread::get_id() == _thread->get_id();
 }
 
 // static..
 void
-SWFMovieLoader::execute(SWFMovieLoader& ml, SWFMovieDefinition* md)
+SWFMovieLoader::execute(SWFMovieDefinition* md)
 {
     md->read_all_swf();
 }
@@ -125,13 +120,12 @@ SWFMovieLoader::start()
     std::abort();
 #endif
     // don't start SWFMovieLoader thread() which rely
-    // on boost::thread() returning before they are executed. Therefore,
+    // on std::thread() returning before they are executed. Therefore,
     // we must employ locking.
     // Those tests do seem a bit redundant, though...
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
-    _thread.reset(new boost::thread(std::bind(
-                    execute, std::ref(*this), &_movie_def)));
+    _thread.reset(new std::thread(std::bind(execute, &_movie_def)));
 
     return true;
 }
@@ -170,7 +164,7 @@ void
 SWFMovieDefinition::addDisplayObject(std::uint16_t id, SWF::DefinitionTag* c)
 {
     assert(c);
-    boost::mutex::scoped_lock lock(_dictionaryMutex);
+    std::lock_guard<std::mutex> lock(_dictionaryMutex);
     _dictionary.addDisplayObject(id, c);
     addControlTag(c);
 }
@@ -178,7 +172,7 @@ SWFMovieDefinition::addDisplayObject(std::uint16_t id, SWF::DefinitionTag* c)
 SWF::DefinitionTag*
 SWFMovieDefinition::getDefinitionTag(std::uint16_t id) const
 {
-    boost::mutex::scoped_lock lock(_dictionaryMutex);
+    std::lock_guard<std::mutex> lock(_dictionaryMutex);
     boost::intrusive_ptr<SWF::DefinitionTag> ch = 
         _dictionary.getDisplayObject(id);
     return ch.get(); 
@@ -372,7 +366,7 @@ SWFMovieDefinition::completeLoad()
 bool
 SWFMovieDefinition::ensure_frame_loaded(size_t framenum) const
 {
-    boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+    std::unique_lock<std::mutex> lock(_frames_loaded_mutex);
 
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
     return (framenum <= _frames_loaded);
@@ -505,7 +499,7 @@ SWFMovieDefinition::read_all_swf()
                 "SHOWFRAME tags found in stream. Pretending we loaded "
                 "all advertised frames"), m_frame_count, floaded);
         );
-        boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+        std::lock_guard<std::mutex> lock(_frames_loaded_mutex);
         _frames_loaded = m_frame_count;
         // Notify any thread waiting on frame reached condition
         _frame_reached_condition.notify_all();
@@ -515,14 +509,14 @@ SWFMovieDefinition::read_all_swf()
 size_t
 SWFMovieDefinition::get_loading_frame() const
 {
-    boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+    std::lock_guard<std::mutex> lock(_frames_loaded_mutex);
     return _frames_loaded;
 }
 
 void
 SWFMovieDefinition::incrementLoadedFrames()
 {
-    boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+    std::lock_guard<std::mutex> lock(_frames_loaded_mutex);
 
     ++_frames_loaded;
 
@@ -558,7 +552,7 @@ SWFMovieDefinition::registerExport(const std::string& symbol,
 {
     assert(id);
 
-    boost::mutex::scoped_lock lock(_exportedResourcesMutex);
+    std::lock_guard<std::mutex> lock(_exportedResourcesMutex);
 #ifdef DEBUG_EXPORTS
     log_debug("%s registering export %s, %s", get_url(), symbol, id);
 #endif
@@ -569,8 +563,8 @@ SWFMovieDefinition::registerExport(const std::string& symbol,
 void
 SWFMovieDefinition::add_frame_name(const std::string& n)
 {
-    boost::mutex::scoped_lock lock1(_namedFramesMutex);
-    boost::mutex::scoped_lock lock2(_frames_loaded_mutex);
+    std::lock_guard<std::mutex> lock1(_namedFramesMutex);
+    std::lock_guard<std::mutex> lock2(_frames_loaded_mutex);
 
     _namedFrames.insert(std::make_pair(n, _frames_loaded));
 }
@@ -579,7 +573,7 @@ bool
 SWFMovieDefinition::get_labeled_frame(const std::string& label,
         size_t& frame_number) const
 {
-    boost::mutex::scoped_lock lock(_namedFramesMutex);
+    std::lock_guard<std::mutex> lock(_namedFramesMutex);
     NamedFrameMap::const_iterator it = _namedFrames.find(label);
     if (it == _namedFrames.end()) return false;
     frame_number = it->second;
@@ -606,7 +600,7 @@ SWFMovieDefinition::set_jpeg_loader(std::unique_ptr<image::JpegInput> j_in)
 std::uint16_t
 SWFMovieDefinition::exportID(const std::string& symbol) const
 {
-    boost::mutex::scoped_lock lock(_exportedResourcesMutex);
+    std::lock_guard<std::mutex> lock(_exportedResourcesMutex);
     Exports::const_iterator it = _exportTable.find(symbol);
     return (it == _exportTable.end()) ? 0 : it->second;
 }

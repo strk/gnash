@@ -21,8 +21,8 @@
 
 #include <string>
 #include <cstdint>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
+#include <mutex>
+#include <condition_variable>
 #include <deque>
 
 #include "getclocktime.hpp"
@@ -84,19 +84,19 @@ public:
     const std::string &getName() { return _name; }
 private:
     // an optional name for the queue, only used for debugging messages to make them unique
-    std::string		_name;
+    std::string			_name;
     // The queue itself
-    que_t		_que;
+    que_t			_que;
 
     // A condition variable used to signal the other thread when the que has data
-    boost::condition	_cond;
+    std::condition_variable	_cond;
     // This is the mutex used by the condition variable. It needs to be separate from the
     // one used to lock access to the que.
-    boost::mutex	_cond_mutex;
+    std::mutex			_cond_mutex;
     // This is the mutex that controls access to the que.
-    boost::mutex	_mutex;
+    std::mutex			_mutex;
 #ifdef USE_STATS_QUEUE
-    que_stats_t		_stats;
+    que_stats_t			_stats;
 #endif
 };
     

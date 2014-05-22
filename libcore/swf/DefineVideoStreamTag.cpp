@@ -18,7 +18,7 @@
 
 #include "DefineVideoStreamTag.h"
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <memory> 
 #include <vector> 
@@ -107,7 +107,7 @@ void
 DefineVideoStreamTag::addVideoFrameTag(
         std::unique_ptr<media::EncodedVideoFrame> frame)
 {
-	boost::mutex::scoped_lock lock(_video_mutex);
+	std::lock_guard<std::mutex> lock(_video_mutex);
     _video_frames.push_back(frame.release());
 }
 

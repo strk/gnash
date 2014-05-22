@@ -28,9 +28,9 @@
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/identity.hpp>
 #include <boost/multi_index/member.hpp>
-#include <boost/thread.hpp>
 #include <string>
 #include <map>
+#include <mutex>
 #include "dsodefs.h"
 
 namespace gnash {
@@ -149,7 +149,7 @@ private:
 
 	table _table;
 	static const std::string _empty;
-	boost::mutex _lock;
+	std::mutex _lock;
 	std::size_t _highestKey;
 
     std::map<key, key> _caseTable;

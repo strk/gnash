@@ -20,7 +20,7 @@
 #define __CYGNAL_H__
 
 #include <cstdint>
-#include <boost/thread.hpp>
+#include <thread>
 #include <vector>
 #include <string>
 #include <map>
@@ -80,7 +80,7 @@ private:
     std::vector<std::shared_ptr<peer_t> > _peers;
     std::vector<std::shared_ptr<peer_t> > _active_peers;
     std::map<std::string, std::shared_ptr<Handler> > _handlers;
-    boost::mutex _mutex;
+    std::mutex _mutex;
 };
 
 /// \class cygnal::ThreadCounter of threads currently
@@ -91,13 +91,13 @@ class ThreadCounter
 public:
 
     ThreadCounter() : _tids(0) {};
-    void increment() { boost::mutex::scoped_lock lk(_tid_mutex); ++_tids; };
-    void decrement() { boost::mutex::scoped_lock lk(_tid_mutex); --_tids; };
+    void increment() { std::lock_guard<std::mutex> lk(_tid_mutex); ++_tids; };
+    void decrement() { std::lock_guard<std::mutex> lk(_tid_mutex); --_tids; };
     int num_of_tids() { return _tids; };
 private:
-    boost::mutex  _tid_mutex;
+    std::mutex  _tid_mutex;
     int           _tids;
-    boost::thread _tid_handle;
+    std::thread _tid_handle;
 };
   
 // End of gnash namespace 

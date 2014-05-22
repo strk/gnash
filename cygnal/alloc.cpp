@@ -19,15 +19,15 @@
 
 /// This defines thread safe new/delete operators
 #include <new>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
-static boost::mutex mem_mutex;
+static std::mutex mem_mutex;
 
 #if 0
 // Wrap new in a mutex, because it is not thread safe.
 void *
 operator new (std::size_t bytes) throw (std::bad_alloc) {
-    boost::mutex::scoped_lock lock(mem_mutex);
+    std::lock_guard<std::mutex> lock(mem_mutex);
     void *ptr = malloc (bytes);
     return ptr;
 }
@@ -35,7 +35,7 @@ operator new (std::size_t bytes) throw (std::bad_alloc) {
 // Wrap delete in a mutex, because it is not thread safe.
 void
 operator delete (void* vptr) throw () {
-    boost::mutex::scoped_lock lock(mem_mutex);
+    std::lock_guard<std::mutex> lock(mem_mutex);
     free (vptr);
 }
 #endif

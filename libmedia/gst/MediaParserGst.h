@@ -25,6 +25,7 @@
 #include <queue>
 #include <gst/gst.h>
 #include <boost/optional.hpp>
+#include <boost/utility.hpp> // noncopyable
 
 #include "MediaParser.h" // for inheritance
 #include "ClockTime.h"

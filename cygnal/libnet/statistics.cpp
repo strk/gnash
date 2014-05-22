@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <string>
 #include <list>
 #include <iostream>
@@ -27,7 +27,7 @@
 #include "netstats.h"
 #include "statistics.h"
 
-static boost::mutex io_mutex;
+static std::mutex io_mutex;
 
 // The string versions of the codec, used for debugging. If you add
 // another enum type to codec_e, you have to add the string
@@ -96,7 +96,7 @@ Statistics::addStats() {
     st->setBytes(getBytes());
     st->setFileType(getFileType());
     
-    boost::mutex::scoped_lock lock(io_mutex);
+    std::lock_guard<std::mutex> lock(io_mutex);
     _netstats.push_back(st);
     
     return _netstats.size();
@@ -104,7 +104,7 @@ Statistics::addStats() {
 
 void
 Statistics::dump() {   
-    boost::mutex::scoped_lock lock(io_mutex);
+    std::lock_guard<std::mutex> lock(io_mutex);
     std::list<NetStats *>::iterator it;
 
     for (it = _netstats.begin(); it != _netstats.end(); ++it) {

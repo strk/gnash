@@ -18,6 +18,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#include <string>
+#include <iosfwd>
 
 #include "FLVParser.h"
 #include "log.h"
@@ -27,8 +29,6 @@
 #include "SimpleBuffer.h"
 #include "GnashAlgorithm.h"
 
-#include <string>
-#include <iosfwd>
 
 // Define the following macro the have seek() operations printed
 //#define GNASH_DEBUG_SEEK 1
@@ -69,7 +69,7 @@ bool
 FLVParser::seek(std::uint32_t& time)
 {
 
-	boost::mutex::scoped_lock streamLock(_streamMutex);
+	std::lock_guard<std::mutex> streamLock(_streamMutex);
 	// we might obtain this lock while the parser is pushing the last
 	// encoded frame on the queue, or while it is waiting on the wakeup
 	// condition
@@ -295,7 +295,7 @@ FLVParser::parseNextTag(bool index_only)
 {
 	// lock the stream while reading from it, so actionscript
 	// won't mess with the parser on seek  or on getBytesLoaded
-	boost::mutex::scoped_lock streamLock(_streamMutex);
+	std::unique_lock<std::mutex> streamLock(_streamMutex);
 
 	if ( index_only && _indexingCompleted ) return false; 
 	if ( _parsingComplete ) return false;
@@ -338,7 +338,7 @@ FLVParser::parseNextTag(bool index_only)
 		completed = true;
 
         // update bytes loaded
-        boost::mutex::scoped_lock lock(_bytesLoadedMutex);
+        std::lock_guard<std::mutex> lock(_bytesLoadedMutex);
 		_bytesLoaded = _stream->tell(); 
 		return false;
 	}
@@ -356,7 +356,7 @@ FLVParser::parseNextTag(bool index_only)
 	}
 
 	if ( position > _bytesLoaded ) {
-		boost::mutex::scoped_lock lock(_bytesLoadedMutex);
+		std::lock_guard<std::mutex> lock(_bytesLoadedMutex);
 		_bytesLoaded = position;
 	}
 
@@ -444,7 +444,7 @@ FLVParser::parseNextTag(bool index_only)
 			log_error(_("Corrupt FLV: Meta tag unterminated!"));
 		}
 
-		boost::mutex::scoped_lock lock(_metaTagsMutex);
+		std::lock_guard<std::mutex> lock(_metaTagsMutex);
 		_metaTags.insert(std::make_pair(flvtag.timestamp, std::move(metaTag)));
 	}
 	else
@@ -508,7 +508,7 @@ FLVParser::getUInt24(std::uint8_t* in)
 std::uint64_t
 FLVParser::getBytesLoaded() const
 {
-	boost::mutex::scoped_lock lock(_bytesLoadedMutex);
+	std::lock_guard<std::mutex> lock(_bytesLoadedMutex);
 	return _bytesLoaded;
 }
 
@@ -565,7 +565,7 @@ FLVParser::readVideoFrame(std::uint32_t dataSize, std::uint32_t timestamp)
 void
 FLVParser::fetchMetaTags(OrderedMetaTags& tags, std::uint64_t ts)
 {
-	boost::mutex::scoped_lock lock(_metaTagsMutex);
+	std::lock_guard<std::mutex> lock(_metaTagsMutex);
 	if (!_metaTags.empty()) {
         MetaTags::iterator it = _metaTags.upper_bound(ts);
 

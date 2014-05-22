@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <cstdint>
 #include <boost/array.hpp>
 #include <sys/types.h>
@@ -69,7 +69,7 @@
 using namespace gnash;
 using namespace std;
 
-static boost::mutex stl_mutex;
+static std::mutex stl_mutex;
 
 namespace gnash
 {
@@ -174,7 +174,7 @@ void
 SSLServer::dump() {
 //    GNASH_REPORT_FUNCTION;
     
-    boost::mutex::scoped_lock lock(stl_mutex);
+    std::lock_guard<std::mutex> lock(stl_mutex);
   
     log_debug (_("==== The SSL header breaks down as follows: ===="));
 }

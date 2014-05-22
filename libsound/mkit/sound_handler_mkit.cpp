@@ -80,7 +80,7 @@ Mkit_sound_handler::~Mkit_sound_handler()
     if (_soundplayer != NULL)
         _soundplayer->Stop(true, true);
 
-//    boost::mutex::scoped_lock lock(_mutex);
+//    std::lock_guard<std::mutex> lock(_mutex);
 //#ifdef GNASH_DEBUG_HAIKU_AUDIO_PAUSING
 //    log_debug("Pausing Mkit Audio on destruction");
 //#endif
@@ -118,7 +118,7 @@ Mkit_sound_handler::FillNextBuffer(void *cookie, void *buffer, size_t size,
 void
 Mkit_sound_handler::fetchSamples(std::int16_t* to, unsigned int nSamples)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::fetchSamples(to, nSamples);
 
     // TODO: move this to base class !
@@ -146,7 +146,7 @@ Mkit_sound_handler::fetchSamples(std::int16_t* to, unsigned int nSamples)
 void
 Mkit_sound_handler::reset()
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::delete_all_sounds();
     sound_handler::stop_all_sounds();
 }
@@ -155,7 +155,7 @@ int
 Mkit_sound_handler::create_sound(std::unique_ptr<SimpleBuffer> data,
                                 std::unique_ptr<media::SoundInfo> sinfo)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::create_sound(data, sinfo);
 }
 
@@ -165,14 +165,14 @@ Mkit_sound_handler::addSoundBlock(unsigned char* data,
         int streamId)
 {
 
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::addSoundBlock(data, dataBytes, nSamples, streamId);
 }
 
 void
 Mkit_sound_handler::stop_sound(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::stop_sound(soundHandle);
 }
 
@@ -180,14 +180,14 @@ Mkit_sound_handler::stop_sound(int soundHandle)
 void
 Mkit_sound_handler::delete_sound(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::delete_sound(soundHandle);
 }
 
 void
 Mkit_sound_handler::stop_all_sounds()
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::stop_all_sounds();
 }
 
@@ -195,7 +195,7 @@ Mkit_sound_handler::stop_all_sounds()
 int
 Mkit_sound_handler::get_volume(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::get_volume(soundHandle);
 }
 
@@ -203,28 +203,28 @@ Mkit_sound_handler::get_volume(int soundHandle)
 void
 Mkit_sound_handler::set_volume(int soundHandle, int volume)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     sound_handler::set_volume(soundHandle, volume);
 }
 
 media::SoundInfo*
 Mkit_sound_handler::get_sound_info(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::get_sound_info(soundHandle);
 }
 
 unsigned int
 Mkit_sound_handler::get_duration(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::get_duration(soundHandle);
 }
 
 unsigned int
 Mkit_sound_handler::tell(int soundHandle)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::tell(soundHandle);
 }
 
@@ -295,7 +295,7 @@ Mkit_sound_handler::mix(std::int16_t* outSamples, std::int16_t* inSamples, unsig
 void
 Mkit_sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 {
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     sound_handler::plugInputStream(newStreamer);
 
@@ -314,21 +314,21 @@ Mkit_sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 void
 Mkit_sound_handler::mute()
 {
-    boost::mutex::scoped_lock lock(_mutedMutex);
+    std::lock_guard<std::mutex> lock(_mutedMutex);
     sound_handler::mute();
 }
 
 void
 Mkit_sound_handler::unmute()
 {
-    boost::mutex::scoped_lock lock(_mutedMutex);
+    std::lock_guard<std::mutex> lock(_mutedMutex);
     sound_handler::unmute();
 }
 
 bool
 Mkit_sound_handler::is_muted() const
 {
-    boost::mutex::scoped_lock lock(_mutedMutex);
+    std::lock_guard<std::mutex> lock(_mutedMutex);
     return sound_handler::is_muted();
 }
 

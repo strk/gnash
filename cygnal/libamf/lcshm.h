@@ -22,6 +22,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "amf.h"
 #include "element.h"
@@ -300,7 +301,7 @@ private:
 	
 	///Si added
 	/// This is the mutex that controls access to the sharedmemory
-    boost::mutex        _localconnection_mutex;
+    std::mutex        _localconnection_mutex;
 
     ///Si 
 	///Moved from LocalConnectoin class to here.

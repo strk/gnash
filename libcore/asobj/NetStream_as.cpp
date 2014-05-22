@@ -27,7 +27,7 @@
 #include <functional>
 #include <algorithm>
 #include <cstdint>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include "RunResources.h"
 #include "CharacterProxy.h"
@@ -163,7 +163,7 @@ NetStream_as::processStatusNotifications()
     StatusCode code = invalidStatus;
 
     {
-        boost::mutex::scoped_lock lock(_statusMutex);
+        std::lock_guard<std::mutex> lock(_statusMutex);
         std::swap(code, _statusCode);
     }
 
@@ -180,7 +180,7 @@ void
 NetStream_as::setStatus(StatusCode status)
 {
     // Get a lock to avoid messing with statuses while processing them
-    boost::mutex::scoped_lock lock(_statusMutex);
+    std::lock_guard<std::mutex> lock(_statusMutex);
     _statusCode = status;
 }
 
@@ -204,7 +204,7 @@ NetStream_as::bufferLength()
 std::unique_ptr<image::GnashImage>
 NetStream_as::get_video()
 {
-    boost::mutex::scoped_lock lock(image_mutex);
+    std::lock_guard<std::mutex> lock(image_mutex);
 
     return std::move(_imageframe);
 }
@@ -888,7 +888,7 @@ NetStream_as::pushDecodedAudioFrames(std::uint32_t ts)
     while (1) {
 
         // FIXME: use services of BufferedAudioStreamer for this
-        boost::mutex::scoped_lock lock(_audioStreamer._audioQueueMutex);
+        std::unique_lock<std::mutex> lock(_audioStreamer._audioQueueMutex);
 
         // The sound_handler mixer will pull decoded
         // audio frames off the _audioQueue whenever 
@@ -1339,9 +1339,11 @@ NetStream_as::update()
     if ( ! _parser->getVideoInfo() ) 
     {
         // FIXME: use services of BufferedAudioStreamer for this
-        boost::mutex::scoped_lock lock(_audioStreamer._audioQueueMutex);
-        bool emptyAudioQueue = _audioStreamer._audioQueue.empty();
-        lock.unlock();
+        bool emptyAudioQueue;
+        {
+            std::lock_guard<std::mutex> lock(_audioStreamer._audioQueueMutex);
+            emptyAudioQueue = _audioStreamer._audioQueue.empty();
+        }
 
         if ( emptyAudioQueue )
         {
@@ -1433,7 +1435,7 @@ NetStream_as::bytesTotal ()
 NetStream_as::DecodingState
 NetStream_as::decodingStatus(DecodingState newstate)
 {
-    boost::mutex::scoped_lock lock(_state_mutex);
+    std::lock_guard<std::mutex> lock(_state_mutex);
 
     if (newstate != DEC_NONE) {
         _decoding_state = newstate;
@@ -1507,7 +1509,7 @@ BufferedAudioStreamer::fetch(std::int16_t* samples, unsigned int nSamples, bool&
     std::uint8_t* stream = reinterpret_cast<std::uint8_t*>(samples);
     int len = nSamples*2;
 
-    boost::mutex::scoped_lock lock(_audioQueueMutex);
+    std::lock_guard<std::mutex> lock(_audioQueueMutex);
 
 #if 0
     log_debug("audio_streamer called, audioQueue size: %d, "
@@ -1552,7 +1554,7 @@ BufferedAudioStreamer::fetch(std::int16_t* samples, unsigned int nSamples, bool&
 void
 BufferedAudioStreamer::push(CursoredBuffer* audio)
 {
-    boost::mutex::scoped_lock lock(_audioQueueMutex);
+    std::lock_guard<std::mutex> lock(_audioQueueMutex);
 
     if ( _auxStreamer )
     {
@@ -1570,7 +1572,7 @@ BufferedAudioStreamer::push(CursoredBuffer* audio)
 void
 BufferedAudioStreamer::cleanAudioQueue()
 {
-    boost::mutex::scoped_lock lock(_audioQueueMutex);
+    std::lock_guard<std::mutex> lock(_audioQueueMutex);
     _audioQueue.clear();
 }
 

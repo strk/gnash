@@ -20,8 +20,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <memory>
 #include <functional>
 #include <algorithm>
@@ -97,7 +96,7 @@ Handler::addClient(int fd, Network::protocols_supported_e proto)
 {
     // GNASH_REPORT_FUNCTION;
 
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     
     log_debug("Adding %d to the client array.", fd);
     switch (proto) {
@@ -143,7 +142,7 @@ Handler::parseFirstRequest(int fd, gnash::Network::protocols_supported_e proto)
     string key;
     Network net;
     cygnal::Buffer *buf = 0;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     
     switch (proto) {
       case Network::NONE:
@@ -220,7 +219,7 @@ int
 Handler::recvMsg(int fd)
 {
     // GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     switch (_protocol[fd]) {
       case Network::NONE:
@@ -251,7 +250,7 @@ Handler::removeClient(int x)
 {
     // GNASH_REPORT_FUNCTION;
 
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 
     vector<int>::iterator it;
     for (it = _clients.begin(); it < _clients.end(); ++it) {

@@ -63,7 +63,7 @@ StreamingSoundData::playingBlock() const
 void
 StreamingSoundData::clearInstances()
 {
-    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+    std::lock_guard<std::mutex> lock(_soundInstancesMutex);
     _soundInstances.clear();
 }
 
@@ -79,7 +79,7 @@ StreamingSoundData::createInstance(media::MediaHandler& mh, unsigned long block)
 {
     std::unique_ptr<StreamingSound> ret(new StreamingSound(*this, mh, block));
 
-    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+    std::lock_guard<std::mutex> lock(_soundInstancesMutex);
 
     // Push the sound onto the playing sounds container.
     _soundInstances.push_back(ret.get());
@@ -95,7 +95,7 @@ StreamingSoundData::~StreamingSoundData()
 void
 StreamingSoundData::eraseActiveSound(InputStream* inst)
 {
-    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+    std::lock_guard<std::mutex> lock(_soundInstancesMutex);
 
     Instances::iterator it = std::find(
             _soundInstances.begin(),
@@ -114,28 +114,28 @@ StreamingSoundData::eraseActiveSound(InputStream* inst)
 bool
 StreamingSoundData::isPlaying() const
 {
-    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+    std::lock_guard<std::mutex> lock(_soundInstancesMutex);
     return !_soundInstances.empty();
 }
 
 size_t
 StreamingSoundData::numPlayingInstances() const
 {
-    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+    std::lock_guard<std::mutex> lock(_soundInstancesMutex);
     return _soundInstances.size();
 }
 
 InputStream*
 StreamingSoundData::firstPlayingInstance() const
 {
-    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+    std::lock_guard<std::mutex> lock(_soundInstancesMutex);
     return _soundInstances.front();
 }
 
 void
 StreamingSoundData::getPlayingInstances(std::vector<InputStream*>& to) const
 {
-    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+    std::lock_guard<std::mutex> lock(_soundInstancesMutex);
     for (Instances::const_iterator i=_soundInstances.begin(),
             e=_soundInstances.end();
             i!=e; ++i)

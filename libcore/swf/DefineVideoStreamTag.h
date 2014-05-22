@@ -19,7 +19,7 @@
 #ifndef GNASH_SWF_DEFINEVIDEOSTREAMTAG_H
 #define GNASH_SWF_DEFINEVIDEOSTREAMTAG_H
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <memory> 
 #include <vector> 
@@ -116,7 +116,7 @@ public:
     template<typename T>
     size_t visitSlice(const T& t, std::uint32_t from, std::uint32_t to) const {
 
-        boost::mutex::scoped_lock lock(_video_mutex);
+        std::lock_guard<std::mutex> lock(_video_mutex);
 
         // It's assumed that frame numbers are in order.
         EmbeddedFrames::const_iterator lower = std::lower_bound(
@@ -175,7 +175,7 @@ private:
 	SWFRect m_bound;
 
     // Mutable for locking in const member functions.
-	mutable boost::mutex _video_mutex;
+	mutable std::mutex _video_mutex;
 	
 	EmbeddedFrames _video_frames;
 

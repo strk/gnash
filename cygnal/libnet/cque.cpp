@@ -51,7 +51,7 @@ CQue::~CQue()
 //    GNASH_REPORT_FUNCTION;
 //    clear();
     que_t::iterator it;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
 //     for (it = _que.begin(); it != _que.end(); it++) {
 // 	std::shared_ptr<cygnal::Buffer> ptr = *(it);
 // 	if (ptr->size()) {	// FIXME: we probably want to delete ptr anyway,
@@ -65,7 +65,7 @@ void
 CQue::wait()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lk(_cond_mutex);
+    std::unique_lock<std::mutex> lk(_cond_mutex);
 #ifndef _WIN32
     _cond.wait(lk);
     log_unimpl(_("CQue::wait(win32)"));
@@ -89,7 +89,7 @@ size_t
 CQue::size()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     return _que.size();
 }
 
@@ -97,7 +97,7 @@ bool
 CQue::push(std::shared_ptr<cygnal::Buffer> data)
 {
 //     GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     _que.push_back(data);
 #ifdef USE_STATS_QUEUE
     _stats.totalbytes += data->size();
@@ -123,7 +123,7 @@ CQue::pop()
 {
 //    GNASH_REPORT_FUNCTION;
     std::shared_ptr<cygnal::Buffer> buf;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     if (_que.size()) {
         buf = _que.front();
         _que.pop_front();
@@ -139,7 +139,7 @@ std::shared_ptr<cygnal::Buffer>
 CQue::peek()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     if (_que.size()) {
         return _que.front();
     }
@@ -151,7 +151,7 @@ void
 CQue::clear()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     _que.clear();
 }
 
@@ -163,7 +163,7 @@ CQue::remove(std::shared_ptr<cygnal::Buffer> begin, std::shared_ptr<cygnal::Buff
     deque<std::shared_ptr<cygnal::Buffer> >::iterator it;
     deque<std::shared_ptr<cygnal::Buffer> >::iterator start;
     deque<std::shared_ptr<cygnal::Buffer> >::iterator stop;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     std::shared_ptr<cygnal::Buffer> ptr;
     for (it = _que.begin(); it != _que.end(); ++it) {
 	ptr = *(it);
@@ -184,7 +184,7 @@ CQue::remove(std::shared_ptr<cygnal::Buffer> element)
 {
     GNASH_REPORT_FUNCTION;
     deque<std::shared_ptr<cygnal::Buffer> >::iterator it;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     for (it = _que.begin(); it != _que.end(); ) {
 	std::shared_ptr<cygnal::Buffer> ptr = *(it);
 	if (ptr->reference() == element->reference()) {
@@ -262,7 +262,7 @@ CQue::dump()
 {
 //    GNASH_REPORT_FUNCTION;
     deque<std::shared_ptr<cygnal::Buffer> >::iterator it;
-    boost::mutex::scoped_lock lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex);
     std::cerr << std::endl << "CQue \"" << _name << "\" has "<< _que.size()
               << " buffers." << std::endl;
     for (it = _que.begin(); it != _que.end(); ++it) {

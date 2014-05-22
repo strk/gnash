@@ -20,8 +20,8 @@
 #ifndef GNASH_MEDIAPARSER_H
 #define GNASH_MEDIAPARSER_H
 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/condition.hpp>
+#include <mutex>
+#include <condition_variable>
 #include <memory>
 #include <deque>
 #include <map>
@@ -40,6 +40,9 @@ namespace gnash {
     namespace media {
         struct Id3Info;
     }
+}
+namespace std {
+    class thread;
 }
 
 namespace gnash {
@@ -485,7 +488,7 @@ public:
 	/// Return the time we want the parser thread to maintain in the buffer
 	DSOEXPORT std::uint64_t getBufferTime() const
 	{
-		boost::mutex::scoped_lock lock(_bufferTimeMutex);
+		std::lock_guard<std::mutex> lock(_bufferTimeMutex);
 		return _bufferTime;
 	}
 
@@ -496,7 +499,7 @@ public:
 	///
 	DSOEXPORT void setBufferTime(std::uint64_t t)
 	{
-		boost::mutex::scoped_lock lock(_bufferTimeMutex);
+		std::lock_guard<std::mutex> lock(_bufferTimeMutex);
 		_bufferTime=t;
 	}
 
@@ -661,7 +664,7 @@ protected:
 
 	/// The stream used to access the file
 	std::unique_ptr<IOChannel> _stream;
-	mutable boost::mutex _streamMutex;
+	mutable std::mutex _streamMutex;
 
 	static void parserLoopStarter(MediaParser* mp)
 	{
@@ -680,32 +683,32 @@ protected:
 
 	bool parserThreadKillRequested() const
 	{
-		boost::mutex::scoped_lock lock(_parserThreadKillRequestMutex);
+		std::lock_guard<std::mutex> lock(_parserThreadKillRequestMutex);
 		return _parserThreadKillRequested;
 	}
 
 	std::uint64_t _bufferTime;
-	mutable boost::mutex _bufferTimeMutex;
+	mutable std::mutex _bufferTimeMutex;
 
-	std::unique_ptr<boost::thread> _parserThread;
-	mutable boost::mutex _parserThreadKillRequestMutex;
+	std::unique_ptr<std::thread> _parserThread;
+	mutable std::mutex _parserThreadKillRequestMutex;
 	bool _parserThreadKillRequested;
-	boost::condition _parserThreadWakeup;
+	std::condition_variable _parserThreadWakeup;
 
 	/// Wait on the _parserThreadWakeup condition if buffer is full
 	/// or parsing was completed.
 	/// 
 	/// Callers *must* pass a locked lock on _qMutex
 	///
-	void waitIfNeeded(boost::mutex::scoped_lock& qMutexLock);
+	void waitIfNeeded(std::unique_lock<std::mutex>& qMutexLock);
 
 	void wakeupParserThread();
 
 	/// mutex protecting access to the a/v encoded frames queues
-	mutable boost::mutex _qMutex;
+	mutable std::mutex _qMutex;
 
 	/// Mutex protecting _bytesLoaded (read by main, set by parser)
-	mutable boost::mutex _bytesLoadedMutex;
+	mutable std::mutex _bytesLoadedMutex;
 
 	/// Method to check if buffer is full w/out locking the _qMutex
 	//
@@ -757,7 +760,7 @@ private:
 
 	void requestParserThreadKill()
 	{
-		boost::mutex::scoped_lock lock(_parserThreadKillRequestMutex);
+		std::lock_guard<std::mutex> lock(_parserThreadKillRequestMutex);
 		_parserThreadKillRequested=true;
 		_parserThreadWakeup.notify_all();
 	}

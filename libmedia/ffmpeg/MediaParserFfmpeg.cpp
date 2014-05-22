@@ -96,7 +96,7 @@ MediaParserFfmpeg::seek(std::uint32_t& pos)
 {
     // lock the stream while reading from it, so actionscript
     // won't mess with the parser on seek  or on getBytesLoaded
-    boost::mutex::scoped_lock streamLock(_streamMutex);
+    std::lock_guard<std::mutex> streamLock(_streamMutex);
 
     // NOTE: seeking when timestamps are unknown is a pain
     // See https://savannah.gnu.org/bugs/index.php?33085
@@ -238,7 +238,7 @@ MediaParserFfmpeg::parseNextFrame()
 {
 	// lock the stream while reading from it, so actionscript
 	// won't mess with the parser on seek  or on getBytesLoaded
-	boost::mutex::scoped_lock streamLock(_streamMutex);
+	std::lock_guard<std::mutex> streamLock(_streamMutex);
 
 	if ( _parsingComplete )
 	{

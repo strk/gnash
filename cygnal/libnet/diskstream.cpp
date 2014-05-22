@@ -55,9 +55,9 @@
 # include <sys/sendfile.h>
 #endif
 
-#include <boost/thread/mutex.hpp>
-static boost::mutex io_mutex;
-static boost::mutex mem_mutex;
+#include <mutex>
+static std::mutex io_mutex;
+static std::mutex mem_mutex;
 
 using std::string;
 
@@ -472,7 +472,7 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 
 	// lock in case two threads try to load the same file at the
 	// same time.
-	boost::mutex::scoped_lock lock(mem_mutex);
+	std::lock_guard<std::mutex> lock(mem_mutex);
 	
 #ifdef _WIN32
 	HANDLE handle = CreateFileMapping((HANDLE)_get_osfhandle(_filefd), NULL,
@@ -662,7 +662,7 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
     log_debug(_("Trying to open %s"), filespec);
     
     if (getFileStats(filespec)) {
-	boost::mutex::scoped_lock lock(io_mutex);
+	std::lock_guard<std::mutex> lock(io_mutex);
 	_filefd = ::open(_filespec.c_str(), O_RDONLY);
 	log_debug (_("Opening file %s (fd #%d), %lld bytes in size."),
 		   _filespec, _filefd,

@@ -47,7 +47,7 @@
 
 #include <memory>
 #include <cstdint>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <vector>
 #include <cassert>
 #include <string>
@@ -352,8 +352,8 @@ public:
     std::map<int, entry_t *> _handlers;
     std::vector<struct pollfd> _pollfds;
     // This is the mutex that controls access to the que.
-    boost::mutex	_poll_mutex;
-    boost::mutex	_net_mutex;
+    std::mutex	_poll_mutex;
+    std::mutex	_net_mutex;
 #ifdef USE_SSL
     std::unique_ptr<SSLClient> _ssl;
 #endif

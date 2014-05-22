@@ -22,7 +22,7 @@
 
 #include <string>
 #include <memory> // for unique_ptr
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <cstdint>
 
 #ifdef USE_FREETYPE 
@@ -161,7 +161,7 @@ private:
     static void close();
 
     /// Mutex protecting FreeType library (for initialization basically)
-    static boost::mutex    m_lib_mutex;
+    static std::mutex    m_lib_mutex;
 
     /// FreeType library
     static FT_Library    m_lib;

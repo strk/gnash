@@ -24,13 +24,14 @@
 #ifndef GNASH_FLVPARSER_H
 #define GNASH_FLVPARSER_H
 
-#include "dsodefs.h"
-#include "MediaParser.h" // for inheritance
-
 #include <memory>
 #include <map>
+#include <mutex>
 
-#include <boost/thread/mutex.hpp>
+#include <boost/utility.hpp> // noncopyable
+
+#include "dsodefs.h"
+#include "MediaParser.h" // for inheritance
 
 namespace gnash {
 namespace media {
@@ -281,7 +282,7 @@ private:
 
     MetaTags _metaTags;
 
-    boost::mutex _metaTagsMutex;
+    std::mutex _metaTagsMutex;
 };
 
 } // end of gnash::media namespace

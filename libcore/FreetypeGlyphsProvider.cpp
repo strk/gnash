@@ -241,13 +241,13 @@ private:
 
 // statics
 FT_Library FreetypeGlyphsProvider::m_lib = nullptr;
-boost::mutex FreetypeGlyphsProvider::m_lib_mutex;
+std::mutex FreetypeGlyphsProvider::m_lib_mutex;
 
 // static private
 void
 FreetypeGlyphsProvider::init()
 {
-    boost::mutex::scoped_lock lock(m_lib_mutex);
+    std::lock_guard<std::mutex> lock(m_lib_mutex);
 
     if (m_lib) return; 
 

@@ -551,8 +551,8 @@ LcShm::connect(const string& names)
 bool
 LcShm::connect(key_t key)
 {
-	boost::mutex::scoped_lock lock(_localconnection_mutex);
-   // GNASH_REPORT_FUNCTION;
+    std::lock_guard<std::mutex> lock(_localconnection_mutex);
+    // GNASH_REPORT_FUNCTION;
     
     if (SharedMem::attach() == false) {
         return false;
@@ -596,7 +596,7 @@ LcShm::send(const string&  name , const string&  domainname ,
             vector<cygnal::Element* >& data )
 {
     //GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_localconnection_mutex);
+    std::lock_guard<std::mutex> lock(_localconnection_mutex);
 	
 	std::vector<cygnal::Element* >::iterator iter;
 		   
@@ -758,7 +758,7 @@ LcShm::send(const string&  name , const string&  domainname ,
 ///  TODO:
 ///  This function should at do the following work:
 ///  1: Lock the shared memory
-///			boost::mutex::scoped_lock lock(_localconnection_mutex);
+///			std::lock_guard<std::mutex> lock(_localconnection_mutex);
 ///  2: Check if the current object is the listener
 ///         if findListener()
 ///         	Make sure the object is the listener for certain connection name

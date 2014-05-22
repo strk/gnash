@@ -34,6 +34,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <functional>
+#include <mutex>
+#include <condition_variable>
 
 #include "GnashSleep.h"
 #include "revno.h"
@@ -88,11 +91,6 @@ extern "C"{
 //#include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/time_zone_base.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/thread/thread.hpp>
-#include <functional>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/thread/tss.hpp>
 
 #ifndef POLLRDHUP
 #define POLLRDHUP 0
@@ -165,11 +163,11 @@ static Cache& cache = Cache::getDefaultInstance();
 //static std::map<std::string, Proc> procs; // = proc::getDefaultInstance();
 
 // This mutex is used to signify when all the threads are done.
-static boost::condition	alldone;
-static boost::mutex	alldone_mutex;
+static std::condition_variable	alldone;
+static std::mutex		alldone_mutex;
 
-static boost::condition	noclients;
-static boost::mutex	noclients_mutex;
+static std::condition_variable	noclients;
+static std::mutex		noclients_mutex;
 
 const char *proto_str[] = {
     "NONE",
@@ -373,7 +371,7 @@ Cygnal::removeHandler(const std::string &path)
     map<std::string, std::shared_ptr<Handler> >::iterator it;
     it = _handlers.find(path);
     if (it != _handlers.end()) {
-	boost::mutex::scoped_lock lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_handlers.erase(it);
     }
 }
@@ -528,7 +526,7 @@ main(int argc, char *argv[])
 
     // Lock a mutex the main() waits in before exiting. This is
     // because all the actually processing is done by other threads.
-    boost::mutex::scoped_lock lk(alldone_mutex);
+    std::unique_lock<std::mutex> lk(alldone_mutex);
     
     // Start the Admin handler. This allows one to connect to Cygnal
     // at port 1111 and dump statistics to the terminal for tuning
@@ -536,7 +534,7 @@ main(int argc, char *argv[])
     if (admin) {
 	Network::thread_params_t admin_data;
 	admin_data.port = gnash::ADMIN_PORT;
-	boost::thread admin_thread(std::bind(&admin_handler, &admin_data));
+	std::thread admin_thread(std::bind(&admin_handler, &admin_data));
     }
 
 //    Cvm cvm;
@@ -566,7 +564,7 @@ main(int argc, char *argv[])
 	http_data->port = port_offset + gnash::HTTP_PORT;
         http_data->hostname = hostname;
 	if (crcfile.getThreadingFlag()) {
-	    boost::thread http_thread(std::bind(&connection_handler, http_data));
+	    std::thread http_thread(std::bind(&connection_handler, http_data));
 	} else {
 	    connection_handler(http_data);
 	}
@@ -584,7 +582,7 @@ main(int argc, char *argv[])
 	rtmp_data->port = port_offset + gnash::RTMP_PORT;
         rtmp_data->hostname = hostname;
 	if (crcfile.getThreadingFlag()) {
-	    boost::thread rtmp_thread(std::bind(&connection_handler, rtmp_data));
+	    std::thread rtmp_thread(std::bind(&connection_handler, rtmp_data));
 	} else {
 	    connection_handler(rtmp_data);
 	}
@@ -890,7 +888,7 @@ connection_handler(Network::thread_params_t *args)
 		// in. Each port of could have a different protocol.
 		std::bind(event_handler, hargs);
 		if (crcfile.getThreadingFlag() == true) {
-		    boost::thread event_thread(std::bind(&event_handler, hargs));
+		    std::thread event_thread(std::bind(&event_handler, hargs));
 		} else {
 		    event_handler(hargs);
 		    // We're done, close this network connection
@@ -960,7 +958,7 @@ connection_handler(Network::thread_params_t *args)
 		    // with a connection_handler for each port we're interested
 		    // in. Each port of course has a different protocol.
 		    if (crcfile.getThreadingFlag() == true) {
-			boost::thread event_thread(std::bind(&event_handler, args));
+			std::thread event_thread(std::bind(&event_handler, args));
 		    } else {
 			event_handler(args);
 			// We're done, close this network connection

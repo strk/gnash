@@ -23,6 +23,7 @@
 
 #include <functional>
 #include <boost/checked_delete.hpp>
+#include <boost/utility.hpp> // noncopyable
 #include <cstdint> // For C99 int types
 
 #ifdef RESAMPLING_SPEEX

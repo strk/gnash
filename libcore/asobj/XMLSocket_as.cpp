@@ -20,7 +20,6 @@
 
 #include "XMLSocket_as.h"
 
-#include <boost/thread.hpp>
 #include <memory>
 #include <string>
 

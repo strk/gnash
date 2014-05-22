@@ -23,8 +23,7 @@
 #include <string>
 #include <map>
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
+#include <mutex>
 
 #include "network.h"
 #include "dsodefs.h"
@@ -67,7 +66,7 @@ private:
     std::map<std::string, int>  _cons;
     std::string                 _docroot;
     
-    boost::mutex	_mutex;
+    std::mutex	_mutex;
 };
 
 } // end of cygnal namespace

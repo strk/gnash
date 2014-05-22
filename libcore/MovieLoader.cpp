@@ -22,6 +22,7 @@
 #include <memory> 
 #include <functional>
 #include <algorithm>
+#include <thread>
 
 #include "log.h"
 #include "MovieFactory.h"
@@ -74,7 +75,7 @@ MovieLoader::processRequests()
         log_debug("processRequests: lock on requests: trying");
 #endif
 
-        boost::mutex::scoped_lock lock(_requestsMutex);
+        std::unique_lock<std::mutex> lock(_requestsMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
         log_debug("processRequests: lock on requests: obtained");
@@ -155,8 +156,7 @@ MovieLoader::clear()
 #ifdef GNASH_DEBUG_LOCKING
         log_debug("clear: lock on requests: trying");
 #endif
-
-        boost::mutex::scoped_lock requestsLock(_requestsMutex);
+        std::unique_lock<std::mutex> requestsLock(_requestsMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
         log_debug("clear: lock on requests: obtained");
@@ -166,7 +166,7 @@ MovieLoader::clear()
         log_debug("clear: lock on kill: trying");
 #endif
 
-        boost::mutex::scoped_lock lock(_killMutex);
+        std::unique_lock<std::mutex> lock(_killMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
         log_debug("clear: lock on kill: obtained");
@@ -341,7 +341,7 @@ MovieLoader::processCompletedRequests()
         log_debug("processCompletedRequests: lock on requests: trying");
 #endif
 
-        boost::mutex::scoped_lock requestsLock(_requestsMutex);
+        std::unique_lock<std::mutex> requestsLock(_requestsMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
         log_debug("processCompletedRequests: lock on requests: obtained");
@@ -401,7 +401,7 @@ MovieLoader::processCompletedRequests()
 bool
 MovieLoader::killed()
 {
-    boost::mutex::scoped_lock lock(_killMutex);
+    std::lock_guard<std::mutex> lock(_killMutex);
     return _killed;
 }
 
@@ -438,7 +438,7 @@ MovieLoader::loadMovie(const std::string& urlstr,
     log_debug("loadMovie: lock on requests: trying");
 #endif
 
-    boost::mutex::scoped_lock lock(_requestsMutex);
+    std::lock_guard<std::mutex> lock(_requestsMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
     log_debug("loadMovie: lock on requests: obtained");
@@ -451,7 +451,7 @@ MovieLoader::loadMovie(const std::string& urlstr,
     // Start or wake up the loader thread 
     if (!_thread.get()) {
         _killed=false;
-        _thread.reset(new boost::thread(std::bind(
+        _thread.reset(new std::thread(std::bind(
                         &MovieLoader::processRequests, this)));
     }
     else {
@@ -481,7 +481,7 @@ MovieLoader::setReachable() const
     log_debug("setReachable: lock on requests: trying");
 #endif
 
-    boost::mutex::scoped_lock lock(_requestsMutex);
+    std::lock_guard<std::mutex> lock(_requestsMutex);
 
 #ifdef GNASH_DEBUG_LOCKING
     log_debug("setReachable: lock on requests: obtained");

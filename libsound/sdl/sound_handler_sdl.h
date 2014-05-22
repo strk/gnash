@@ -25,7 +25,7 @@
 #include "sound_handler.h" // for inheritance
 
 #include <SDL_audio.h>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 // Forward declarations
 namespace gnash {
@@ -57,10 +57,10 @@ private:
     bool _audioOpened;
     
     /// Mutex for making sure threads doesn't mess things up
-    mutable boost::mutex _mutex;
+    mutable std::mutex _mutex;
 
     /// Mutex protecting _muted (defined in base class)
-    mutable boost::mutex _mutedMutex;
+    mutable std::mutex _mutedMutex;
 
     // See dox in sound_handler.h
     void mix(std::int16_t* outSamples, std::int16_t* inSamples,

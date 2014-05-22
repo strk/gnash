@@ -23,7 +23,7 @@
 
 
 #include <cstdint>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <iostream>

@@ -23,9 +23,10 @@
 
 #include <string>
 #include <map>
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#include <thread>
+#include <mutex>
 #include <functional> 
+#include <cassert>
 
 #include "URL.h" // for inlines
 
@@ -88,7 +89,7 @@ public:
 	{
 		assert(!_thread.get());
 		assert(_stream.get());
-		_thread.reset(new boost::thread(
+		_thread.reset(new std::thread(
                 std::bind(LoadVariablesThread::execLoadingThread, this)));
 	}
 
@@ -113,7 +114,7 @@ public:
 	///
 	bool completed()
 	{
-		boost::mutex::scoped_lock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		if (  _completed && _thread.get() )
 		{
 			_thread->join();
@@ -156,7 +157,7 @@ private:
 	/// Mutex-protected mutator for thread completion
 	void setCompleted()
 	{
-		boost::mutex::scoped_lock lock(_mutex);
+		std::lock_guard<std::mutex> lock(_mutex);
 		_completed = true;
 		//log_debug("Completed");
 	}
@@ -197,7 +198,7 @@ private:
 
         std::unique_ptr<IOChannel> _stream;
 
-        std::unique_ptr<boost::thread> _thread;
+        std::unique_ptr<std::thread> _thread;
 
 	ValuesMap _vals;
 
@@ -205,7 +206,7 @@ private:
 
 	bool _canceled;
 
-	boost::mutex _mutex;
+	std::mutex _mutex;
 };
 
 } // namespace gnash

@@ -28,6 +28,7 @@
 #include "swfdec_codec_gst.h"
 #include <iostream>
 #include <fstream>
+#include <mutex>
 
 #define PUSHBUF_SIZE 1024
 
@@ -121,7 +122,7 @@ MediaParserGst::getId3Info() const
 bool
 MediaParserGst::parseNextChunk()
 {
-    boost::mutex::scoped_lock streamLock(_streamMutex);
+    std::lock_guard<std::mutex> streamLock(_streamMutex);
 
     if (emitEncodedFrames()) {
         return true;
@@ -138,7 +139,7 @@ MediaParserGst::parseNextChunk()
     pushGstBuffer();
 
     {
-        boost::mutex::scoped_lock lock(_bytesLoadedMutex);
+        std::lock_guard<std::mutex> lock(_bytesLoadedMutex);
         _bytesLoaded = _stream->tell();
     }
 
@@ -151,7 +152,7 @@ MediaParserGst::parseNextChunk()
 std::uint64_t
 MediaParserGst::getBytesLoaded() const
 {
-    boost::mutex::scoped_lock lock(_bytesLoadedMutex);
+    std::lock_guard<std::mutex> lock(_bytesLoadedMutex);
     return _bytesLoaded;
 }
 

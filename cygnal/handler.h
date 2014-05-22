@@ -21,9 +21,8 @@
 
 #include <map>
 #include <cstdint>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <memory>
-//#include <boost/thread/condition.hpp>
 
 #include <vector>
 #include <string>
@@ -319,7 +318,7 @@ protected:
 
     std::map<int, std::string> _keys;
 private:    
-    boost::mutex			_mutex;
+    std::mutex			_mutex;
     
 // Remote Shared Objects. References are an index into this vector.
 //    std::map<std::string, std::shared_ptr<handler_t> > _handlers;

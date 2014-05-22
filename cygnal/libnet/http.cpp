@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <boost/tokenizer.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -62,7 +62,7 @@
 
 using std::string;
 
-static boost::mutex stl_mutex;
+static std::mutex stl_mutex;
 
 namespace gnash
 {
@@ -1554,7 +1554,7 @@ void
 HTTP::dump() {
 //    GNASH_REPORT_FUNCTION;
     
-    boost::mutex::scoped_lock lock(stl_mutex);
+    std::lock_guard<std::mutex> lock(stl_mutex);
         
     log_debug (_("==== The HTTP header breaks down as follows: ===="));
     log_debug (_("Filespec: %s"), _filespec.c_str());

@@ -33,9 +33,8 @@
 #include <set> 
 #include <string>
 #include <memory> 
-#include <boost/thread/thread.hpp>
-#include <boost/thread/condition.hpp>
-#include <memory>
+#include <mutex>
+#include <condition_variable>
 
 #include "movie_definition.h" // for inheritance
 #include "DefinitionTag.h" // for boost::intrusive_ptr visibility of dtor
@@ -57,6 +56,9 @@ namespace gnash {
     class SWFMovie;
     class RunResources;
     class Font;
+}
+namespace std {
+    class thread;
 }
 
 namespace gnash {
@@ -88,11 +90,11 @@ private:
 
     SWFMovieDefinition& _movie_def;
 
-    mutable boost::mutex _mutex;
-    std::unique_ptr<boost::thread> _thread;
+    mutable std::mutex _mutex;
+    std::unique_ptr<std::thread> _thread;
 
     /// Entry point for the actual thread
-    static void execute(SWFMovieLoader& ml, SWFMovieDefinition* md);
+    static void execute(SWFMovieDefinition* md);
 
 };
 
@@ -222,7 +224,7 @@ public:
     /// NOTE: this method locks _bytes_loaded_mutex
     ///
     size_t get_bytes_loaded() const {
-        boost::mutex::scoped_lock lock(_bytes_loaded_mutex);
+        std::lock_guard<std::mutex> lock(_bytes_loaded_mutex);
         return _bytes_loaded;
     }
 
@@ -276,7 +278,7 @@ public:
     // See dox in movie_definition.h
     void addControlTag(boost::intrusive_ptr<SWF::ControlTag> tag) {
         assert(tag);
-        boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+        std::lock_guard<std::mutex> lock(_frames_loaded_mutex);
         m_playlist[_frames_loaded].push_back(tag);
     }
 
@@ -298,7 +300,7 @@ public:
     virtual const PlayList* getPlaylist(size_t frame_number) const {
 
 #ifndef NDEBUG
-        boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+        std::lock_guard<std::mutex> lock(_frames_loaded_mutex);
         assert(frame_number <= _frames_loaded);
 #endif
 
@@ -403,7 +405,7 @@ private:
     CharacterDictionary    _dictionary;
 
     /// Mutex protecting _dictionary
-    mutable boost::mutex _dictionaryMutex;
+    mutable std::mutex _dictionaryMutex;
 
     typedef std::map<int, boost::intrusive_ptr<Font> > FontMap;
     FontMap m_fonts;
@@ -424,7 +426,7 @@ private:
     NamedFrameMap _namedFrames;
 
     // Mutex protecting access to _namedFrames
-    mutable boost::mutex _namedFramesMutex;
+    mutable std::mutex _namedFramesMutex;
 
     /// Allow mapping symbol to id case insensitively.
     typedef std::map<std::string, std::uint16_t,
@@ -434,7 +436,7 @@ private:
     Exports _exportTable;
 
     // Mutex protecting access to the export map.
-    mutable boost::mutex _exportedResourcesMutex;
+    mutable std::mutex _exportedResourcesMutex;
 
     /// Movies we import from; hold a ref on these,
     /// to keep them alive
@@ -454,10 +456,10 @@ private:
     /// This is needed because the loader thread will
     /// increment this number, while the virtual machine
     /// thread will read it.
-    mutable boost::mutex _frames_loaded_mutex;
+    mutable std::mutex _frames_loaded_mutex;
 
     /// A semaphore to signal load of a specific frame
-    mutable boost::condition _frame_reached_condition;
+    mutable std::condition_variable _frame_reached_condition;
 
     /// Set this to trigger signaling of loaded frame
     //
@@ -473,7 +475,7 @@ private:
     /// This is needed because the loader thread will
     /// increment this number, while the virtual machine
     /// thread will read it.
-    mutable boost::mutex _bytes_loaded_mutex;
+    mutable std::mutex _bytes_loaded_mutex;
 
     int m_loading_sound_stream;
 
@@ -508,7 +510,7 @@ private:
     /// NOTE: this method locks _bytes_loaded_mutex
     void setBytesLoaded(unsigned long bytes)
     {
-        boost::mutex::scoped_lock lock(_bytes_loaded_mutex);
+        std::lock_guard<std::mutex> lock(_bytes_loaded_mutex);
         _bytes_loaded=bytes;
     }
 

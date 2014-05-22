@@ -21,10 +21,10 @@
 #define SOUND_STREAMING_SOUND_DATA_H
 
 #include <vector>
-#include <memory> 
 #include <cassert>
-#include <boost/thread/mutex.hpp>
+#include <list>
 #include <memory>
+#include <mutex>
 #include <boost/ptr_container/ptr_vector.hpp>
 
 #include "SoundInfo.h" 
@@ -181,7 +181,7 @@ private:
     Instances _soundInstances;
 
     /// Mutex protecting access to _soundInstances
-    mutable boost::mutex _soundInstancesMutex;
+    mutable std::mutex _soundInstancesMutex;
 
     boost::ptr_vector<SimpleBuffer> _buffers;
 

@@ -26,7 +26,6 @@
 #include <string>
 #include <map>
 #include <algorithm>
-#include <boost/thread/thread.hpp>
 
 namespace gnash {
 
@@ -67,7 +66,7 @@ public:
     bool get(const std::string& key,
             boost::intrusive_ptr<movie_definition>* ret)
     {
-        boost::mutex::scoped_lock lock(_mapMutex);
+        std::lock_guard<std::mutex> lock(_mapMutex);
         LibraryContainer::iterator it = _map.find(key);
         if (it == _map.end()) return false;
         
@@ -88,14 +87,14 @@ public:
         temp.def = mov;
         temp.hitCount = 0;
 
-        boost::mutex::scoped_lock lock(_mapMutex);
+        std::lock_guard<std::mutex> lock(_mapMutex);
         _map[key] = temp;
     }
   
 
     void clear()
     {
-        boost::mutex::scoped_lock lock(_mapMutex);
+        std::lock_guard<std::mutex> lock(_mapMutex);
         _map.clear();
     }
   
@@ -118,14 +117,14 @@ private:
         }
 
         while (_map.size() > max) {
-            boost::mutex::scoped_lock lock(_mapMutex);
+            std::lock_guard<std::mutex> lock(_mapMutex);
             _map.erase(std::min_element(_map.begin(), _map.end(),
                         &findWorstHitCount));
         }
     
     }
 
-	mutable boost::mutex _mapMutex;
+    mutable std::mutex _mapMutex;
   
 };
 

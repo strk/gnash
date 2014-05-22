@@ -22,7 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string>
@@ -38,7 +38,7 @@ using std::string;
 using std::map;
 using std::endl;
 
-static boost::mutex cache_mutex;
+static std::mutex cache_mutex;
 
 namespace gnash
 {
@@ -78,7 +78,7 @@ void
 Cache::addPath(const std::string &name, const std::string &fullpath)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(cache_mutex);
+    std::lock_guard<std::mutex> lock(cache_mutex);
     _pathnames[name] = fullpath;
 }
 
@@ -86,7 +86,7 @@ void
 Cache::addResponse(const std::string &name, const std::string &response)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(cache_mutex);
+    std::lock_guard<std::mutex> lock(cache_mutex);
 
     _responses[name] = response;
 }
@@ -96,7 +96,7 @@ Cache::addFile(const std::string &name, std::shared_ptr<DiskStream> &file)
 {
     // GNASH_REPORT_FUNCTION;
 
-    boost::mutex::scoped_lock lock(cache_mutex);
+    std::lock_guard<std::mutex> lock(cache_mutex);
     log_network(_("Adding file %s to cache."), name);
     _files[name] = file;
 }
@@ -105,7 +105,7 @@ string &
 Cache::findPath(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(cache_mutex);
+    std::lock_guard<std::mutex> lock(cache_mutex);
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
     _pathname_lookups++;
@@ -122,7 +122,7 @@ string &
 Cache::findResponse(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(cache_mutex);
+    std::lock_guard<std::mutex> lock(cache_mutex);
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
     _response_lookups++;
@@ -141,7 +141,7 @@ Cache::findFile(const std::string &name)
 //    GNASH_REPORT_FUNCTION;
 
     log_network(_("Trying to find %s in the cache."), name);
-    boost::mutex::scoped_lock lock(cache_mutex);
+    std::lock_guard<std::mutex> lock(cache_mutex);
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
     _file_lookups++;
@@ -158,7 +158,7 @@ void
 Cache::removePath(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(cache_mutex);
+    std::lock_guard<std::mutex> lock(cache_mutex);
     _pathnames.erase(name);
 }
 
@@ -166,7 +166,7 @@ void
 Cache::removeResponse(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(cache_mutex);
+    std::lock_guard<std::mutex> lock(cache_mutex);
     _responses.erase(name);
 }
 
@@ -174,7 +174,7 @@ void
 Cache::removeFile(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(cache_mutex);
+    std::lock_guard<std::mutex> lock(cache_mutex);
     _files.erase(name);
 }
 
@@ -251,7 +251,7 @@ void
 Cache::dump(std::ostream& os) const
 {    
     GNASH_REPORT_FUNCTION;    
-    boost::mutex::scoped_lock lock(cache_mutex);
+    std::lock_guard<std::mutex> lock(cache_mutex);
 
     // Dump all the pathnames
     os << "Pathname cache has " << _pathnames.size() << " files." << endl;

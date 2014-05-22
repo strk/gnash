@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <vector>
 
 #include "utility.h"
@@ -922,7 +922,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
     fd_set              fdset;
     int                 ret = -1;
 
-//     boost::mutex::scoped_lock lock(_net_mutex);
+//     std::lock_guard<std::mutex> lock(_net_mutex);
 
     if (_debug) {
 	log_debug(_("Trying to read %d bytes from fd #%d"), nbytes, fd);
@@ -1114,7 +1114,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
     fd_set              fdset;
     int                 ret = -1;
 
-    boost::mutex::scoped_lock lock(_net_mutex);
+    std::lock_guard<std::mutex> lock(_net_mutex);
     
     // We need a writable, and not const point for byte arithmetic.
     byte_t *bufptr = const_cast<byte_t *>(buffer);
@@ -1241,7 +1241,7 @@ Network::addPollFD(struct pollfd &fd, Network::entry_t *func)
 //    GNASH_REPORT_FUNCTION;
 
     log_debug(_("%s: adding fd #%d to pollfds"), __PRETTY_FUNCTION__, fd.fd);
-    boost::mutex::scoped_lock lock(_poll_mutex);
+    std::lock_guard<std::mutex> lock(_poll_mutex);
     _handlers[fd.fd] = func;
      _pollfds.push_back(fd);
 //     notify();
@@ -1252,7 +1252,7 @@ Network::addPollFD(struct pollfd &fd)
 {
 //    GNASH_REPORT_FUNCTION;
     log_debug(_("%s: adding fd #%d to pollfds"), __PRETTY_FUNCTION__, fd.fd);
-    boost::mutex::scoped_lock lock(_poll_mutex);
+    std::lock_guard<std::mutex> lock(_poll_mutex);
      _pollfds.push_back(fd);
 //     notify();
 }
@@ -1261,7 +1261,7 @@ struct pollfd
 &Network::getPollFD(int index)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
+    std::lock_guard<std::mutex> lock(_poll_mutex);
     return _pollfds[index];
 }
 
@@ -1269,7 +1269,7 @@ struct pollfd *
 Network::getPollFDPtr()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
+    std::lock_guard<std::mutex> lock(_poll_mutex);
     return &_pollfds[0];
 }
 
@@ -1278,7 +1278,7 @@ Network::erasePollFD(int fd)
 {
 //    GNASH_REPORT_FUNCTION;
     log_debug(_("%s: erasing fd #%d from pollfds"), __PRETTY_FUNCTION__, fd);
-    boost::mutex::scoped_lock lock(_poll_mutex);
+    std::lock_guard<std::mutex> lock(_poll_mutex);
     if (_pollfds.size() > 0) {
 	vector<struct pollfd>::iterator it;
 	for (it=_pollfds.begin(); it<_pollfds.end(); ++it) {
@@ -1294,7 +1294,7 @@ void
 Network::erasePollFD(vector<struct pollfd>::iterator &itt)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
+    std::lock_guard<std::mutex> lock(_poll_mutex);
     if (_pollfds.size() == 1) {
  	_pollfds.clear();
      } else {
@@ -1306,7 +1306,7 @@ void
 Network::addEntry(int fd, Network::entry_t *func)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
+    std::lock_guard<std::mutex> lock(_poll_mutex);
     _handlers[fd] = func;
 }
 
@@ -1314,7 +1314,7 @@ Network::entry_t *
 Network::getEntry(int fd)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
+    std::lock_guard<std::mutex> lock(_poll_mutex);
     return _handlers[fd];
 }
 

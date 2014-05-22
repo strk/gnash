@@ -22,6 +22,7 @@
 #include "MediaParser.h"
 
 #include <functional>
+#include <thread>
 
 #include "log.h"
 #include "GnashSleep.h" // for usleep.
@@ -51,7 +52,7 @@ MediaParser::startParserThread()
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	log_debug("Starting MediaParser thread");
-	_parserThread.reset(new boost::thread(
+	_parserThread.reset(new std::thread(
                 std::bind(parserLoopStarter, this)));
 #endif
 }
@@ -60,7 +61,7 @@ std::uint64_t
 MediaParser::getBufferLength() const
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_qMutex);
+	std::lock_guard<std::mutex> lock(_qMutex);
 #endif
 	return getBufferLengthNoLock();
 }
@@ -70,7 +71,7 @@ bool
 MediaParser::isBufferEmpty() const
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_qMutex);
+	std::lock_guard<std::mutex> lock(_qMutex);
 #endif
 	return _videoFrames.empty() && _audioFrames.empty();
 }
@@ -146,7 +147,7 @@ bool
 MediaParser::nextFrameTimestamp(std::uint64_t& ts) const
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-    boost::mutex::scoped_lock lock(_qMutex);
+    std::lock_guard<std::mutex> lock(_qMutex);
 #else // ndef LOAD_MEDIA_IN_A_SEPARATE_THREAD
     while (!parsingCompleted() && _videoInfo.get() && _videoFrames.empty())
     {
@@ -186,7 +187,7 @@ bool
 MediaParser::nextVideoFrameTimestamp(std::uint64_t& ts) const
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_qMutex);
+	std::lock_guard<std::mutex> lock(_qMutex);
 #endif // def LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	const EncodedVideoFrame* ef = peekNextVideoFrame();
 	if ( ! ef ) return false;
@@ -198,7 +199,7 @@ std::unique_ptr<EncodedVideoFrame>
 MediaParser::nextVideoFrame()
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_qMutex);
+	std::lock_guard<std::mutex> lock(_qMutex);
 #else // ndef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	while (!parsingCompleted() && _videoInfo.get() && _videoFrames.empty())
 	{
@@ -221,7 +222,7 @@ std::unique_ptr<EncodedAudioFrame>
 MediaParser::nextAudioFrame()
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_qMutex);
+	std::lock_guard<std::mutex> lock(_qMutex);
 #else // ndef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	while (!parsingCompleted() && _audioInfo.get() && _audioFrames.empty())
 	{
@@ -244,7 +245,7 @@ bool
 MediaParser::nextAudioFrameTimestamp(std::uint64_t& ts) const
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_qMutex);
+	std::lock_guard<std::mutex> lock(_qMutex);
 #endif // def LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	const EncodedAudioFrame* ef = peekNextAudioFrame();
 	if ( ! ef ) return false;
@@ -300,7 +301,7 @@ void
 MediaParser::clearBuffers()
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_qMutex);
+	std::lock_guard<std::mutex> lock(_qMutex);
 #endif
 
 	for (VideoFrames::iterator i=_videoFrames.begin(),
@@ -325,7 +326,7 @@ void
 MediaParser::pushEncodedAudioFrame(std::unique_ptr<EncodedAudioFrame> frame)
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_qMutex);
+    std::unique_lock<std::mutex> lock(_qMutex);
 #endif
 	
     // Find location to insert this new frame to, so that
@@ -365,7 +366,7 @@ void
 MediaParser::pushEncodedVideoFrame(std::unique_ptr<EncodedVideoFrame> frame)
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	boost::mutex::scoped_lock lock(_qMutex);
+	std::unique_lock<std::mutex> lock(_qMutex);
 #endif
 
     // Find location to insert this new frame to, so that
@@ -400,7 +401,7 @@ MediaParser::pushEncodedVideoFrame(std::unique_ptr<EncodedVideoFrame> frame)
 }
 
 void
-MediaParser::waitIfNeeded(boost::mutex::scoped_lock& lock) 
+MediaParser::waitIfNeeded(std::unique_lock<std::mutex>& lock)
 {
 	//  We hold a lock on the queue here...
 	bool pc=parsingCompleted();
@@ -442,7 +443,7 @@ MediaParser::parserLoop()
 		// TODO: have a setParsingComplete() function
 		//       exposed in base class for taking care
 		//       of this on appropriate time.
-		boost::mutex::scoped_lock lock(_qMutex);
+		std::unique_lock<std::mutex> lock(_qMutex);
 		waitIfNeeded(lock);
 	}
 }

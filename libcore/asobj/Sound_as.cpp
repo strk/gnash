@@ -24,7 +24,7 @@
 #include "Sound_as.h"
 
 #include <string>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include <cstdint>
 #include <boost/optional.hpp>
 
@@ -239,7 +239,7 @@ private:
 
     bool _soundCompleted;
 
-    boost::mutex _soundCompletedMutex;
+    std::mutex _soundCompletedMutex;
 
     /// Thread-safe setter for _soundCompleted
     void markSoundCompleted(bool completed);
@@ -397,7 +397,7 @@ Sound_as::probeAudio()
         log_debug("Probing audio for end");
 #endif
 
-        boost::mutex::scoped_lock lock(_soundCompletedMutex);
+        std::lock_guard<std::mutex> lock(_soundCompletedMutex);
         if (_soundCompleted) {
             // when _soundCompleted is true we're NOT attached !
             // MediaParser may be still needed,
@@ -459,7 +459,7 @@ Sound_as::markReachableResources() const
 void
 Sound_as::markSoundCompleted(bool completed)
 {
-    boost::mutex::scoped_lock lock(_soundCompletedMutex);
+    std::lock_guard<std::mutex> lock(_soundCompletedMutex);
     _soundCompleted=completed;
 }
 
@@ -711,7 +711,7 @@ Sound_as::start(double secOff, int loops)
         {
             _startTime = secOff * 1000;
             std::uint32_t seekms = std::uint32_t(secOff * 1000);
-            // TODO: boost::mutex::scoped_lock parserLock(_parserMutex);
+            // TODO: std::lock_guard<std::mutex> parserLock(_parserMutex);
             bool seeked = _mediaParser->seek(seekms); // well, we try...
             log_debug("Seeked MediaParser to %d, returned: %d", seekms, seeked);
         }

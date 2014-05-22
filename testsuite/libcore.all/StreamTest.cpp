@@ -28,8 +28,6 @@
 #include "check.h"
 #endif
 
-#include <boost/thread/mutex.hpp>
-
 #include "IOChannel.h"
 #include "SWFStream.h"
 #include "log.h"

@@ -48,7 +48,7 @@ string_table::find(const std::string& t_f, bool insert_unfound)
 
 		if (insert_unfound) {
 			// First we lock.
-			boost::mutex::scoped_lock aLock(_lock);
+			std::lock_guard<std::mutex> lock(_lock);
 			// Then we see if someone else managed to sneak past us.
 			i = _table.get<StringValue>().find(t_f);
 			// If they did, use that value.
@@ -65,14 +65,14 @@ string_table::find(const std::string& t_f, bool insert_unfound)
 string_table::key
 string_table::insert(const std::string& to_insert)
 {
-	boost::mutex::scoped_lock aLock(_lock);
+    std::lock_guard<std::mutex> lock(_lock);
     return already_locked_insert(to_insert);
 }
 
 void
 string_table::insert_group(const svt* l, std::size_t size)
 {
-	boost::mutex::scoped_lock aLock(_lock);
+    std::lock_guard<std::mutex> lock(_lock);
     for (std::size_t i = 0; i < size; ++i) {
         // Copy to avoid changing the original table.
         const svt s = l[i];

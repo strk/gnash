@@ -23,8 +23,9 @@
 #include <vector>
 #include <memory> // for unique_ptr (composition)
 #include <cassert>
-#include <boost/thread/mutex.hpp>
 #include <memory>
+#include <mutex>
+#include <list>
 
 #include "SimpleBuffer.h" // for composition
 #include "SoundInfo.h" // for composition
@@ -186,7 +187,7 @@ private:
 
     /// Mutex protecting access to _soundInstances
     //
-    mutable boost::mutex _soundInstancesMutex;
+    mutable std::mutex _soundInstancesMutex;
 };
 
 } // gnash.sound namespace 

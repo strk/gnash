@@ -43,7 +43,7 @@
 #endif
 
 #include <ltdl.h>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #if defined(WIN32) || defined(_WIN32)
 int        lt_dlsetsearchpath   (const char *search_path);
