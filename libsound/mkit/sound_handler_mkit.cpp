@@ -312,27 +312,6 @@ Mkit_sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 }
 
 void
-Mkit_sound_handler::mute()
-{
-    std::lock_guard<std::mutex> lock(_mutedMutex);
-    sound_handler::mute();
-}
-
-void
-Mkit_sound_handler::unmute()
-{
-    std::lock_guard<std::mutex> lock(_mutedMutex);
-    sound_handler::unmute();
-}
-
-bool
-Mkit_sound_handler::is_muted() const
-{
-    std::lock_guard<std::mutex> lock(_mutedMutex);
-    return sound_handler::is_muted();
-}
-
-void
 Mkit_sound_handler::pause()
 {
     log_debug(_("Mkit: Mkit_sound_handler::pause"));

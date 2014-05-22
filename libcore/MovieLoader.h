@@ -19,12 +19,14 @@
 #ifndef GNASH_MOVIE_LOADER_H
 #define GNASH_MOVIE_LOADER_H
 
-#include <boost/intrusive_ptr.hpp>
+#include <atomic>
+#include <condition_variable>
 #include <string>
 #include <thread>
-#include <boost/ptr_container/ptr_list.hpp>
+
+#include <boost/intrusive_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include <condition_variable>
+#include <boost/ptr_container/ptr_list.hpp>
 
 #include "URL.h"
 #include "MovieClip.h" 
@@ -192,11 +194,7 @@ private:
     bool processCompletedRequest(const Request& r);
 
     /// Was thread kill requested ?
-    bool killed();
-
-    bool _killed;
-
-    std::mutex _killMutex;
+    std::atomic<bool> _killed;
 
     std::condition_variable _wakeup;
 

@@ -410,27 +410,6 @@ AOS4_sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 }
 
 void
-AOS4_sound_handler::mute()
-{
-    std::lock_guard<std::mutex> lock(_mutedMutex);
-    sound_handler::mute();
-}
-
-void
-AOS4_sound_handler::unmute()
-{
-    std::lock_guard<std::mutex> lock(_mutedMutex);
-    sound_handler::unmute();
-}
-
-bool
-AOS4_sound_handler::is_muted() const
-{
-    std::lock_guard<std::mutex> lock(_mutedMutex);
-    return sound_handler::is_muted();
-}
-
-void
 AOS4_sound_handler::pause()
 {
     //closeAudio();

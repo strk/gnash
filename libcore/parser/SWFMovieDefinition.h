@@ -28,6 +28,8 @@
 #endif
 
 #include <boost/intrusive_ptr.hpp>
+
+#include <atomic>
 #include <vector>
 #include <map>
 #include <set> 
@@ -213,17 +215,11 @@ public:
     /// except when parsing finishes, in which case
     /// it an index to on-past-last frame.
     ///
-    /// NOTE: this method locks _frames_loaded_mutex
-    ///
     virtual size_t get_loading_frame() const;
 
     /// Get number of bytes loaded from input stream
-    //
-    /// NOTE: this method locks _bytes_loaded_mutex
-    ///
     size_t get_bytes_loaded() const {
-        std::lock_guard<std::mutex> lock(_bytes_loaded_mutex);
-        return _bytes_loaded;
+        return _bytes_loaded.load();
     }
 
     /// Get total number of bytes as parsed from the SWF header
@@ -276,13 +272,13 @@ public:
     // See dox in movie_definition.h
     void addControlTag(boost::intrusive_ptr<SWF::ControlTag> tag) {
         assert(tag);
-        std::lock_guard<std::mutex> lock(_frames_loaded_mutex);
-        m_playlist[_frames_loaded].push_back(tag);
+        size_t frames_loaded = get_loading_frame();
+        m_playlist[frames_loaded].push_back(tag);
     }
 
     // See dox in movie_definition.h
     //
-    // locks _namedFramesMutex and _frames_loaded_mutex
+    // locks _namedFramesMutex
     //
     DSOTEXPORT void add_frame_name(const std::string& name);
 
@@ -298,8 +294,7 @@ public:
     virtual const PlayList* getPlaylist(size_t frame_number) const {
 
 #ifndef NDEBUG
-        std::lock_guard<std::mutex> lock(_frames_loaded_mutex);
-        assert(frame_number <= _frames_loaded);
+        assert(frame_number <= _frames_loaded.load());
 #endif
 
         PlayListMap::const_iterator it = m_playlist.find(frame_number);
@@ -447,14 +442,7 @@ private:
     int    m_version;
 
     /// Number of fully loaded frames
-    size_t    _frames_loaded;
-
-    /// A mutex protecting access to _frames_loaded
-    //
-    /// This is needed because the loader thread will
-    /// increment this number, while the virtual machine
-    /// thread will read it.
-    mutable std::mutex _frames_loaded_mutex;
+    std::atomic<size_t>    _frames_loaded;
 
     /// A semaphore to signal load of a specific frame
     mutable std::condition_variable _frame_reached_condition;
@@ -466,14 +454,7 @@ private:
     mutable size_t _waiting_for_frame;
 
     /// Number bytes loaded / parsed
-    unsigned long _bytes_loaded;
-
-    /// A mutex protecting access to _bytes_loaded
-    //
-    /// This is needed because the loader thread will
-    /// increment this number, while the virtual machine
-    /// thread will read it.
-    mutable std::mutex _bytes_loaded_mutex;
+    std::atomic<unsigned long> _bytes_loaded;
 
     int m_loading_sound_stream;
 
@@ -497,18 +478,11 @@ private:
     /// \brief
     /// Increment loaded frames count, signaling frame reached condition if
     /// any thread is waiting for that. See ensure_frame_loaded().
-    ///
-    /// NOTE: this method locks _frames_loaded_mutex
-    ///
-    /// @return the new value of _frames_loaded
     DSOTEXPORT virtual void incrementLoadedFrames();
 
     /// Set number of bytes loaded from input stream
-    //
-    /// NOTE: this method locks _bytes_loaded_mutex
     void setBytesLoaded(unsigned long bytes)
     {
-        std::lock_guard<std::mutex> lock(_bytes_loaded_mutex);
         _bytes_loaded=bytes;
     }
 

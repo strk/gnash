@@ -366,20 +366,20 @@ SWFMovieDefinition::completeLoad()
 bool
 SWFMovieDefinition::ensure_frame_loaded(size_t framenum) const
 {
-    std::unique_lock<std::mutex> lock(_frames_loaded_mutex);
-
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-    return (framenum <= _frames_loaded);
+    return (framenum <= _frames_loaded.load());
 #endif
 
-    if ( framenum <= _frames_loaded ) return true;
+    if ( framenum <= _frames_loaded.load() ) return true;
 
     _waiting_for_frame = framenum;
+    std::mutex m;
+    std::unique_lock<std::mutex> lock(m);
 
     // TODO: return false on timeout
     _frame_reached_condition.wait(lock);
 
-    return ( framenum <= _frames_loaded );
+    return ( framenum <= _frames_loaded.load() );
 }
 
 Movie*
@@ -499,7 +499,6 @@ SWFMovieDefinition::read_all_swf()
                 "SHOWFRAME tags found in stream. Pretending we loaded "
                 "all advertised frames"), m_frame_count, floaded);
         );
-        std::lock_guard<std::mutex> lock(_frames_loaded_mutex);
         _frames_loaded = m_frame_count;
         // Notify any thread waiting on frame reached condition
         _frame_reached_condition.notify_all();
@@ -509,35 +508,32 @@ SWFMovieDefinition::read_all_swf()
 size_t
 SWFMovieDefinition::get_loading_frame() const
 {
-    std::lock_guard<std::mutex> lock(_frames_loaded_mutex);
-    return _frames_loaded;
+    return _frames_loaded.load();
 }
 
 void
 SWFMovieDefinition::incrementLoadedFrames()
 {
-    std::lock_guard<std::mutex> lock(_frames_loaded_mutex);
-
     ++_frames_loaded;
 
-    if ( _frames_loaded > m_frame_count )
+    if ( _frames_loaded.load() > m_frame_count )
     {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("number of SHOWFRAME tags "
                 "in SWF stream '%s' (%d) exceeds "
                 "the advertised number in header (%d)."),
-                get_url(), _frames_loaded,
+                get_url(), _frames_loaded.load(),
                 m_frame_count);
         )
     }
 
 #ifdef DEBUG_FRAMES_LOAD
-    log_debug("Loaded frame %u/%u", _frames_loaded, m_frame_count);
+    log_debug("Loaded frame %u/%u", _frames_loaded.load(), m_frame_count);
 #endif
 
     // signal load of frame if anyone requested it
     // FIXME: _waiting_for_frame needs mutex ?
-    if (_waiting_for_frame && _frames_loaded >= _waiting_for_frame )
+    if (_waiting_for_frame && _frames_loaded.load() >= _waiting_for_frame )
     {
         // or should we notify_one ?
         // See: http://boost.org/doc/html/condition.html
@@ -564,9 +560,8 @@ void
 SWFMovieDefinition::add_frame_name(const std::string& n)
 {
     std::lock_guard<std::mutex> lock1(_namedFramesMutex);
-    std::lock_guard<std::mutex> lock2(_frames_loaded_mutex);
 
-    _namedFrames.insert(std::make_pair(n, _frames_loaded));
+    _namedFrames.insert(std::make_pair(n, _frames_loaded.load()));
 }
 
 bool

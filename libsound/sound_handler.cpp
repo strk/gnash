@@ -736,7 +736,7 @@ bool
 sound_handler::is_muted() const
 {
     // TODO: lock a mutex ?
-    return _muted;
+    return _muted.load();
 }
 
 void

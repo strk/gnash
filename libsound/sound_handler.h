@@ -23,6 +23,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include <atomic>
 #include <limits>
 #include <memory>
 #include <set>
@@ -312,15 +313,15 @@ public:
     virtual void reset();
         
     /// Call this to mute audio
-    virtual void mute();
+    void mute();
 
     /// Call this to unmute audio
-    virtual void unmute();
+    void unmute();
 
     /// Returns whether or not sound is muted.
     //
     /// @return true if muted, false if not
-    virtual bool is_muted() const;
+    bool is_muted() const;
 
     /// gnash calls this to pause audio
     virtual void pause() { _paused=true; }
@@ -497,7 +498,7 @@ private:
     bool _paused;
 
     /// True if sound is muted
-    bool _muted;
+    std::atomic<bool> _muted;
 
     /// Final output volume
     int _volume;

@@ -24,7 +24,6 @@
 #include "Sound_as.h"
 
 #include <string>
-#include <mutex>
 #include <cstdint>
 #include <boost/optional.hpp>
 
@@ -237,11 +236,9 @@ private:
     /// Probe audio
     void probeAudio();
 
-    bool _soundCompleted;
+    std::atomic<bool> _soundCompleted;
 
-    std::mutex _soundCompletedMutex;
-
-    /// Thread-safe setter for _soundCompleted
+    /// Setter for _soundCompleted
     void markSoundCompleted(bool completed);
 
     bool _soundLoaded;
@@ -356,7 +353,7 @@ Sound_as::probeAudio()
     if ( ! externalSound ) {
         // Only probe for sound complete
         assert(_soundHandler);
-        assert(!_soundCompleted);
+        assert(!_soundCompleted.load());
         if (!_soundHandler->isSoundPlaying(soundId)) {
             stopProbeTimer();
             // dispatch onSoundComplete 
@@ -397,8 +394,7 @@ Sound_as::probeAudio()
         log_debug("Probing audio for end");
 #endif
 
-        std::lock_guard<std::mutex> lock(_soundCompletedMutex);
-        if (_soundCompleted) {
+        if (_soundCompleted.load()) {
             // when _soundCompleted is true we're NOT attached !
             // MediaParser may be still needed,
             // if this is a non-streaming sound
@@ -459,7 +455,6 @@ Sound_as::markReachableResources() const
 void
 Sound_as::markSoundCompleted(bool completed)
 {
-    std::lock_guard<std::mutex> lock(_soundCompletedMutex);
     _soundCompleted=completed;
 }
 

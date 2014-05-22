@@ -138,10 +138,7 @@ MediaParserGst::parseNextChunk()
 
     pushGstBuffer();
 
-    {
-        std::lock_guard<std::mutex> lock(_bytesLoadedMutex);
-        _bytesLoaded = _stream->tell();
-    }
+    _bytesLoaded = _stream->tell();
 
     emitEncodedFrames();
 
@@ -152,8 +149,7 @@ MediaParserGst::parseNextChunk()
 std::uint64_t
 MediaParserGst::getBytesLoaded() const
 {
-    std::lock_guard<std::mutex> lock(_bytesLoadedMutex);
-    return _bytesLoaded;
+    return _bytesLoaded.load();
 }
 
 bool

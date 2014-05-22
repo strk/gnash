@@ -20,6 +20,7 @@
 #ifndef GNASH_MEDIAPARSER_H
 #define GNASH_MEDIAPARSER_H
 
+#include <atomic>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -484,10 +485,9 @@ public:
 	DSOEXPORT bool isBufferEmpty() const;
 
 	/// Return the time we want the parser thread to maintain in the buffer
-	DSOEXPORT std::uint64_t getBufferTime() const
+	DSOEXPORT std::uint_fast64_t getBufferTime() const
 	{
-		std::lock_guard<std::mutex> lock(_bufferTimeMutex);
-		return _bufferTime;
+		return _bufferTime.load();
 	}
 
 	/// Set the time we want the parser thread to maintain in the buffer
@@ -495,9 +495,8 @@ public:
 	/// @param t
 	///	Number of milliseconds to keep in the buffers.
 	///
-	DSOEXPORT void setBufferTime(std::uint64_t t)
+	DSOEXPORT void setBufferTime(std::uint_fast64_t t)
 	{
-		std::lock_guard<std::mutex> lock(_bufferTimeMutex);
 		_bufferTime=t;
 	}
 
@@ -629,7 +628,7 @@ protected:
 	bool _parsingComplete;
 
 	/// Number of bytes loaded
-	std::uint64_t _bytesLoaded;
+	std::atomic<std::uint_fast64_t> _bytesLoaded;
 
 	/// }@
 
@@ -681,16 +680,13 @@ protected:
 
 	bool parserThreadKillRequested() const
 	{
-		std::lock_guard<std::mutex> lock(_parserThreadKillRequestMutex);
-		return _parserThreadKillRequested;
+		return _parserThreadKillRequested.load();
 	}
 
-	std::uint64_t _bufferTime;
-	mutable std::mutex _bufferTimeMutex;
+        std::atomic<std::uint_fast64_t> _bufferTime;
 
 	std::thread _parserThread;
-	mutable std::mutex _parserThreadKillRequestMutex;
-	bool _parserThreadKillRequested;
+	std::atomic<bool> _parserThreadKillRequested;
 	std::condition_variable _parserThreadWakeup;
 
 	/// Wait on the _parserThreadWakeup condition if buffer is full
@@ -704,9 +700,6 @@ protected:
 
 	/// mutex protecting access to the a/v encoded frames queues
 	mutable std::mutex _qMutex;
-
-	/// Mutex protecting _bytesLoaded (read by main, set by parser)
-	mutable std::mutex _bytesLoadedMutex;
 
 	/// Method to check if buffer is full w/out locking the _qMutex
 	//
@@ -758,7 +751,6 @@ private:
 
 	void requestParserThreadKill()
 	{
-		std::lock_guard<std::mutex> lock(_parserThreadKillRequestMutex);
 		_parserThreadKillRequested=true;
 		_parserThreadWakeup.notify_all();
 	}

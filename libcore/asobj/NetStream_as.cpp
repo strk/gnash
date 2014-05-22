@@ -160,12 +160,9 @@ NetStream_as::processStatusNotifications()
     // TODO: check for System.onStatus too ! use a private
     // getStatusHandler() method for this.
     // Copy it to prevent threads changing it.
-    StatusCode code = invalidStatus;
+    StatusCode code = static_cast<StatusCode>(_statusCode.load());
 
-    {
-        std::lock_guard<std::mutex> lock(_statusMutex);
-        std::swap(code, _statusCode);
-    }
+    setStatus(invalidStatus);
 
     // Nothing to do if no more valid notifications.
     if (code == invalidStatus) return; 
@@ -180,7 +177,6 @@ void
 NetStream_as::setStatus(StatusCode status)
 {
     // Get a lock to avoid messing with statuses while processing them
-    std::lock_guard<std::mutex> lock(_statusMutex);
     _statusCode = status;
 }
 
@@ -1435,13 +1431,11 @@ NetStream_as::bytesTotal ()
 NetStream_as::DecodingState
 NetStream_as::decodingStatus(DecodingState newstate)
 {
-    std::lock_guard<std::mutex> lock(_state_mutex);
-
     if (newstate != DEC_NONE) {
         _decoding_state = newstate;
     }
 
-    return _decoding_state;
+    return static_cast<DecodingState>(_decoding_state.load());
 }
 
 //------- BufferedAudioStreamer (move in his own file)

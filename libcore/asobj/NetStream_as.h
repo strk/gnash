@@ -25,11 +25,13 @@
 #define __STDC_CONSTANT_MACROS
 #endif
 
-#include <boost/intrusive_ptr.hpp>
+#include <atomic>
 #include <string>
-#include <boost/ptr_container/ptr_deque.hpp>
 #include <memory>
 #include <mutex>
+
+#include <boost/intrusive_ptr.hpp>
+#include <boost/ptr_container/ptr_deque.hpp>
 
 #include "PlayHead.h" // for composition
 #include "Relay.h" // for ActiveRelay inheritance
@@ -526,12 +528,9 @@ private:
     /// The DisplayObject to invalidate on video updates
     DisplayObject* _invalidatedVideoCharacter;
 
-    DecodingState _decoding_state;
+    /// Stores DecodingState
+    std::atomic<int> _decoding_state;
 
-    // Mutex protecting _playback_state and _decoding_state
-    // (not sure a single one is appropriate)
-    std::mutex _state_mutex;
-    
     /// Video decoder
     std::unique_ptr<media::VideoDecoder> _videoDecoder;
 
@@ -567,11 +566,9 @@ private:
     BufferedAudioStreamer _audioStreamer;
 
     /// List of status messages to be processed
-    StatusCode _statusCode;
-
-    /// Mutex protecting _statusQueue
-    std::mutex _statusMutex;
-
+    //
+    /// Stores StatusCode
+    std::atomic<int> _statusCode;
 };
 
 void netstream_class_init(as_object& global, const ObjectURI& uri);

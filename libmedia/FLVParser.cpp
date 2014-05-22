@@ -338,7 +338,6 @@ FLVParser::parseNextTag(bool index_only)
 		completed = true;
 
         // update bytes loaded
-        std::lock_guard<std::mutex> lock(_bytesLoadedMutex);
 		_bytesLoaded = _stream->tell(); 
 		return false;
 	}
@@ -356,7 +355,6 @@ FLVParser::parseNextTag(bool index_only)
 	}
 
 	if ( position > _bytesLoaded ) {
-		std::lock_guard<std::mutex> lock(_bytesLoadedMutex);
 		_bytesLoaded = position;
 	}
 
@@ -508,8 +506,7 @@ FLVParser::getUInt24(std::uint8_t* in)
 std::uint64_t
 FLVParser::getBytesLoaded() const
 {
-	std::lock_guard<std::mutex> lock(_bytesLoadedMutex);
-	return _bytesLoaded;
+	return _bytesLoaded.load();
 }
 
 // would be called by parser thread

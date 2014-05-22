@@ -64,7 +64,7 @@ MovieLoader::processRequests()
     while (1) {
 
         // check for shutdown/cancel request
-        if (killed()) {
+        if (_killed.load() == true) {
 #ifdef GNASH_DEBUG_LOADMOVIE_REQUESTS_PROCESSING
             log_debug("Loader thread killed");
 #endif
@@ -166,8 +166,6 @@ MovieLoader::clear()
         log_debug("clear: lock on kill: trying");
 #endif
 
-        std::unique_lock<std::mutex> lock(_killMutex);
-
 #ifdef GNASH_DEBUG_LOCKING
         log_debug("clear: lock on kill: obtained");
 #endif
@@ -177,8 +175,6 @@ MovieLoader::clear()
 #ifdef GNASH_DEBUG_LOCKING
         log_debug("clear: lock on kill: release for kill");
 #endif
-
-        lock.unlock();
 
         log_debug("waking up loader thread");
 
@@ -393,15 +389,6 @@ MovieLoader::processCompletedRequests()
                     "release");
 #endif
     }
-}
-
-// private
-// runs in loader thread
-bool
-MovieLoader::killed()
-{
-    std::lock_guard<std::mutex> lock(_killMutex);
-    return _killed;
 }
 
 // public

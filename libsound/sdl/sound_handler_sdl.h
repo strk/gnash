@@ -59,9 +59,6 @@ private:
     /// Mutex for making sure threads doesn't mess things up
     mutable std::mutex _mutex;
 
-    /// Mutex protecting _muted (defined in base class)
-    mutable std::mutex _mutedMutex;
-
     // See dox in sound_handler.h
     void mix(std::int16_t* outSamples, std::int16_t* inSamples,
                 unsigned int nSamples, float volume);
@@ -127,18 +124,6 @@ public:
         
     // See dox in sound_handler.h
     virtual media::SoundInfo* get_sound_info(int soundHandle) const;
-
-    // See dox in sound_handler.h
-    // overridden to serialize access to the _muted member
-    virtual void mute();
-
-    // See dox in sound_handler.h
-    // overridden to serialize access to the _muted member
-    virtual void unmute();
-
-    // See dox in sound_handler.h
-    // overridden to serialize access to the _muted member
-    virtual bool is_muted() const;
 
     // See dox in sound_handler.h
     // overridden to close audio card
