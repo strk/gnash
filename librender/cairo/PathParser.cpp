@@ -17,10 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 //
 
-#include <boost/utility.hpp>
-#include "PathParser.h"
-#include <map>
 #include <functional>
+#include <iterator>
+#include <map>
+
+#include "PathParser.h"
 #include "log.h"
 
 namespace gnash
@@ -132,7 +133,7 @@ PathParser::append(const UnivocalPath& append_path)
   } else {
 
     for (std::vector<Edge>::const_reverse_iterator prev = edges.rbegin(),
-         it = boost::next(prev), end = edges.rend(); it != end; ++it, ++prev) {
+         it = std::next(prev), end = edges.rend(); it != end; ++it, ++prev) {
       if ((*prev).straight()) {
         lineTo((*it).ap);
       } else {

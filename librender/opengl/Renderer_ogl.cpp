@@ -24,6 +24,7 @@
 #include "Renderer_ogl.h"
 
 #include <boost/utility.hpp>
+#include <iterator>
 #include <functional>
 #include <list>
 #include <cstring>
@@ -1583,7 +1584,7 @@ public:
         contour.push_back(connector);
 
         const Path* tmp = connector;
-        connector = find_connecting_path(*connector, std::list<const Path*>(boost::next(it), end));
+        connector = find_connecting_path(*connector, std::list<const Path*>(std::next(it), end));
   
         // make sure we don't iterate over the connecting path in the for loop.
         path_refs.remove(tmp);

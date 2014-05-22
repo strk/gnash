@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <iterator>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -219,7 +220,7 @@ inplaceMerge(IterType begin, IterType middle, const IterType& end, ComparatorTyp
             IterType it = std::find_if(middle, end, 
                 [&](const value_type& v) { return !compare(v, next_high); });
 
-            std::copy(boost::next(middle), it, middle);
+            std::copy(std::next(middle), it, middle);
             *(--it) = next_high;
         }
         ++begin;
