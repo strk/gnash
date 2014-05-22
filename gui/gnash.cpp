@@ -31,11 +31,11 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
-#include <boost/function.hpp>
 #include <algorithm>
 #include <cstdlib>
 #include <utility>
 #include <functional>
+
 #ifdef ENABLE_NLS
 # include <clocale>
 #endif
