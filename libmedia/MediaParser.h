@@ -20,6 +20,7 @@
 #ifndef GNASH_MEDIAPARSER_H
 #define GNASH_MEDIAPARSER_H
 
+#include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <memory>
@@ -40,9 +41,6 @@ namespace gnash {
     namespace media {
         struct Id3Info;
     }
-}
-namespace std {
-    class thread;
 }
 
 namespace gnash {

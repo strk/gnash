@@ -21,6 +21,7 @@
 
 #include <boost/intrusive_ptr.hpp>
 #include <string>
+#include <thread>
 #include <boost/ptr_container/ptr_list.hpp>
 #include <boost/noncopyable.hpp>
 #include <condition_variable>
@@ -33,9 +34,6 @@ namespace gnash {
     class movie_root;
     class movie_definition;
     class as_object;
-}
-namespace std {
-    class thread;
 }
 
 namespace gnash {

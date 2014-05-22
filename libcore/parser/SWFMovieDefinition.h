@@ -34,6 +34,7 @@
 #include <string>
 #include <memory> 
 #include <mutex>
+#include <thread>
 #include <condition_variable>
 
 #include "movie_definition.h" // for inheritance
@@ -56,9 +57,6 @@ namespace gnash {
     class SWFMovie;
     class RunResources;
     class Font;
-}
-namespace std {
-    class thread;
 }
 
 namespace gnash {
