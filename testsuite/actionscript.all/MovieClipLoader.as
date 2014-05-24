@@ -394,12 +394,8 @@ function test3()
 
 }
 
-// Due to a bug in Gnash we must stop() before calling test1.
-// This is because Gnash's version of loadClip is blocking !!
-// TODO: fix it !
-stop();
-
 test1();
+stop();
 
 #else // OUTPUT_VERSION < 7
 
