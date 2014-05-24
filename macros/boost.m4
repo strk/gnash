@@ -34,10 +34,10 @@ AC_DEFUN([GNASH_PATH_BOOST],
   libname=""
   dnl this is a list of *required* headers. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
-  boost_headers="detail/lightweight_mutex.hpp thread/thread.hpp multi_index_container.hpp multi_index/key_extractors.hpp thread/mutex.hpp program_options/options_description.hpp iostreams/stream.hpp"
+  boost_headers="multi_index_container.hpp multi_index/key_extractors.hpp program_options/options_description.hpp iostreams/stream.hpp"
   dnl this is a list of *required* libraries. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
-  boost_libs="thread program_options system"
+  boost_libs="program_options"
   boost_plugin_libs="iostreams"
 
   dnl this is a list of *recommended* libraries. If any of these are missing,
@@ -106,14 +106,6 @@ AC_DEFUN([GNASH_PATH_BOOST],
     done
   done
 
-  dnl As of boost 1.47, the chrono library is required. You can get a list of
-  dnl when a Boost library was added at:
-  dnl http://www.boost.org/doc/libs/?sort=boost-version
-
-  gnash_boost_version=`grep "define.*BOOST_VERSION " ${gnash_boost_topdir}/version.hpp | cut -d ' ' -f 3`
-  if test ${gnash_boost_version} -ge 104700; then
-    boost_libs="${boost_libs} chrono"
-  fi
   dnl this is the default list for paths to search. This gets
   dnl redefined if --with-boost-lib= is specified.
   newlist=$libslist
