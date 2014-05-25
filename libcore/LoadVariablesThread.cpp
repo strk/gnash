@@ -150,6 +150,8 @@ LoadVariablesThread::startThread(std::unique_ptr<IOChannel> stream)
         throw NetworkException();
     }
 
+    // Passing IOStream* rather than unique_ptr serves to appease GCC 4.6,
+    // which insists the arguments are CopyConstructible rather than Movable.
     _vals = std::async(std::launch::async, completeLoad, stream.release(),
                        std::ref(_canceled));
 }
