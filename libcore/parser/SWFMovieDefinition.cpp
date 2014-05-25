@@ -457,7 +457,7 @@ SWFMovieDefinition::read_all_swf()
     try {
         while (left) {
 
-            if (_loadingCanceled) {
+            if (_loadingCanceled.load()) {
                 log_debug("Loading thread cancellation requested, "
                         "returning from read_all_swf");
                 return;
@@ -533,7 +533,7 @@ SWFMovieDefinition::incrementLoadedFrames()
 
     // signal load of frame if anyone requested it
     // FIXME: _waiting_for_frame needs mutex ?
-    if (_waiting_for_frame && _frames_loaded.load() >= _waiting_for_frame )
+    if (_waiting_for_frame.load() && _frames_loaded.load() >= _waiting_for_frame.load() )
     {
         // or should we notify_one ?
         // See: http://boost.org/doc/html/condition.html

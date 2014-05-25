@@ -199,7 +199,7 @@ public:
     
     /// Check whether tags should be executed using AVM2
     bool isAS3() const {
-        return _as3;
+        return _as3.load();
     }
 
     /// Return the advertised version for the SWFMovie.
@@ -448,10 +448,7 @@ private:
     mutable std::condition_variable _frame_reached_condition;
 
     /// Set this to trigger signaling of loaded frame
-    //
-    /// Make sure you _frames_loaded_mutex is locked
-    /// when accessing this member !
-    mutable size_t _waiting_for_frame;
+    mutable std::atomic<size_t> _waiting_for_frame;
 
     /// Number bytes loaded / parsed
     std::atomic<unsigned long> _bytes_loaded;
@@ -470,6 +467,8 @@ private:
     std::unique_ptr<IOChannel> _in;
 
     /// swf end position (as read from header)
+    // This is set by readHeader, and used in the parsing thread, which starts
+    // after readHeader() runs.
     size_t _swf_end_pos;
 
     /// asyncronous SWF loader and parser
@@ -487,7 +486,7 @@ private:
     }
 
     /// A flag set to true when load cancellation is requested
-    bool _loadingCanceled;
+    std::atomic<bool> _loadingCanceled;
 
     /// Movies we import resources from
     std::set< boost::intrusive_ptr<movie_definition> > _importSources;
@@ -502,7 +501,7 @@ private:
     ///         movie_root with the same RunResources as its first definition.
     const RunResources& _runResources;
 
-    bool _as3;
+    std::atomic<bool> _as3;
 
 };
 
