@@ -23,9 +23,8 @@
 
 #include <string>
 #include <map>
-#include <thread>
-#include <mutex>
-#include <functional> 
+#include <functional>
+#include <future>
 #include <cassert>
 
 #include "URL.h" // for inlines
@@ -79,61 +78,20 @@ public:
 	~LoadVariablesThread();
 
 	/// Return the name,value map parsed out of the loaded stream
-	ValuesMap& getValues()
+	ValuesMap getValues()
 	{
-		return _vals;
+		return _vals.get();
 	}
 
-	/// Start the load and parse thread
-	void process()
-	{
-		assert(!_thread.joinable());
-		assert(_stream.get());
-		_thread = std::thread(
-                    std::bind(LoadVariablesThread::execLoadingThread, this));
-	}
-
-	/// Cancel a download in progress
-	//
-	/// Locks _mutex
-	///
-	void cancel();
-
-	/// Return true if loading/parsing is in progress
-	bool inProgress()
-	{
-		// TODO: should we mutex-protect this ?
-		return _thread.joinable();
-	}
-
-	/// Mutex-protected inspector for thread completion
-	//
-	/// Only call this method from the same thread that
-	/// also called process(), as the thread will be joined
-	/// if it completed.
-	///
 	bool completed()
 	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		if (  _completed && _thread.joinable() )
-		{
-			_thread.join();
-		}
-		return _completed;
+#if (__GNUC__ == 4 && __GNUC_MINOR__ <= 6)
+                return _vals.wait_for(std::chrono::seconds(0));
+#else
+                std::future_status status = _vals.wait_for(std::chrono::seconds(0));
+                return status == std::future_status::ready;
+#endif
 	}
-
-	size_t getBytesLoaded() const
-	{
-		// TODO: should we mutex-protect this ?
-		return _bytesLoaded;
-	}
-
-	size_t getBytesTotal() const
-	{
-		// TODO: should we mutex-protect this ?
-		return _bytesTotal;
-	}
-
 
 private:
 
@@ -141,71 +99,18 @@ private:
 	LoadVariablesThread& operator==(const LoadVariablesThread&); 
 	LoadVariablesThread(const LoadVariablesThread&); 
 
-	/// Since I haven't found a way to pass boost::thread 
-	/// constructor a non-static function, this is here to
-	/// workaround that limitation (in either boost or more
-	/// likely my own knowledge of it)
-	static void execLoadingThread(LoadVariablesThread* ptr)
-	{
-		//log_debug("LoadVars loading thread started");
-		ptr->completeLoad();
-		//log_debug("LoadVars loading thread completed");
-	}
-
-
-	/// Mutex-protected mutator for thread completion
-	void setCompleted()
-	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		_completed = true;
-		//log_debug("Completed");
-	}
-
+        void startThread(std::unique_ptr<IOChannel> stream);
 
 	/// Load all data from the _stream input.
 	//
 	/// This function should be run by a separate thread.
 	///
-	void completeLoad();
+	static ValuesMap completeLoad(IOChannel* stream,
+                                      std::atomic<bool>& canceled);
 
-	/// Parse an url-encoded query string
-	//
-	/// Variables in the string will be added as properties
-	/// of this object.
-	///
-	/// @param querystring
-	///	An url-encoded query string.
-	///	The string will be parsed using URL::parse_querystring
-	///
-	/// @return the number of variables found in the string
-	///
-	size_t parse(const std::string& str)
-	{
-		URL::parse_querystring(str, _vals);
-		return _vals.size();
-	}
+        std::future<ValuesMap> _vals;
 
-	/// Check if download cancel was requested
-	//
-	/// Locks _mutex
-	///
-	bool cancelRequested();
-
-	size_t _bytesLoaded;
-
-	size_t _bytesTotal;
-
-        std::unique_ptr<IOChannel> _stream;
-
-        std::thread _thread;
-
-	ValuesMap _vals;
-
-	bool _completed;
-
-	bool _canceled;
-
-	std::mutex _mutex;
+	std::atomic<bool> _canceled;
 };
 
 } // namespace gnash

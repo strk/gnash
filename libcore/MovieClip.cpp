@@ -1899,7 +1899,6 @@ MovieClip::loadVariables(const std::string& urlstr,
             }
             _loadVariableRequests.push_back(new LoadVariablesThread(sp, url));
         }
-        _loadVariableRequests.back().process();
     }
     catch (const NetworkException& ex) {
         log_error(_("Could not load variables from %s"), url.str());
@@ -1909,9 +1908,7 @@ MovieClip::loadVariables(const std::string& urlstr,
 void
 MovieClip::processCompletedLoadVariableRequest(LoadVariablesThread& request)
 {
-    assert(request.completed());
-
-    MovieVariables& vals = request.getValues();
+    MovieVariables vals = request.getValues();
     setVariables(vals);
 
     // We want to call a clip-event too if available, see bug #22116

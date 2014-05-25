@@ -30,20 +30,19 @@
 
 namespace gnash {
 
-void
-LoadVariablesThread::completeLoad()
+// static
+LoadVariablesThread::ValuesMap
+LoadVariablesThread::completeLoad(IOChannel* varstream,
+   std::atomic<bool>& canceled)
 {
+    std::unique_ptr<IOChannel> stream(varstream);
 #ifdef DEBUG_LOAD_VARIABLES
     log_debug("completeLoad called");
 #endif
+        ValuesMap parseResult;
 
-
-	// TODO: how to set _bytesTotal ?
-
-	// this is going to override any previous setting,
-	// better do this inside a subclass (in a separate thread)
-	_bytesLoaded = 0;
-	_bytesTotal = _stream->size();
+	int bytesLoaded = 0;
+	int bytesTotal = stream->size();
 
 	std::string toparse;
 
@@ -51,13 +50,13 @@ LoadVariablesThread::completeLoad()
 	std::unique_ptr<char[]> buf(new char[chunkSize]);
 	unsigned int parsedLines = 0;
 	// TODO: use read_string ?
-	while ( size_t bytesRead = _stream->read(buf.get(), chunkSize) )
+	while ( size_t bytesRead = stream->read(buf.get(), chunkSize) )
 	{
 #ifdef DEBUG_LOAD_VARIABLES
             log_debug("Read %u bytes", bytesRead);
 #endif
 
-		if ( _bytesLoaded )
+		if ( bytesLoaded )
 		{
 			std::string chunk(buf.get(), bytesRead);
 			toparse += chunk;
@@ -92,7 +91,7 @@ LoadVariablesThread::completeLoad()
 #ifdef DEBUG_LOAD_VARIABLES
 			log_debug("parseable: %s", parseable);
 #endif
-			parse(parseable);
+                        URL::parse_querystring(toparse, parseResult);
 			toparse = toparse.substr(lastamp+1);
 #ifdef DEBUG_LOAD_VARIABLES
 			log_debug("toparse nextline: %s", toparse);
@@ -100,93 +99,72 @@ LoadVariablesThread::completeLoad()
 			++parsedLines;
 		}
 
-		_bytesLoaded += bytesRead;
+		bytesLoaded += bytesRead;
 
 		// eof, get out !
-		if ( _stream->eof() ) break;
+		if ( stream->eof() ) break;
 
-		if ( cancelRequested() ) {
+		if ( canceled.load() ) {
                     log_debug("Cancelling LoadVariables download thread...");
-			_stream.reset();
-			return;
+			stream.reset();
+			return parseResult;
 		}
 	}
 
 	if ( ! toparse.empty() ) {
-		parse(toparse);
+            URL::parse_querystring(toparse, parseResult);
 	}
 
 	try {
-		_stream->go_to_end();
+		stream->go_to_end();
 	}
         catch (IOException& ex) {
         log_error(_("Stream couldn't seek to end: %s"), ex.what());
 	}
 	
-    _bytesLoaded = _stream->tell();
-	if ( _bytesTotal !=  _bytesLoaded ) {
+        bytesLoaded = stream->tell();
+	if ( bytesTotal !=  bytesLoaded ) {
             log_error(_("Size of 'variables' stream advertised to be %d bytes,"
                           " but turned out to be %d bytes."),
-			_bytesTotal, _bytesLoaded);
-		_bytesTotal = _bytesLoaded;
+			bytesTotal, bytesLoaded);
 	}
 
-	_stream.reset(); // we don't need the IOChannel anymore
-
 	//dispatchLoadEvent();
-	setCompleted();
+
+        return parseResult;
 }
 
 LoadVariablesThread::LoadVariablesThread(const StreamProvider& sp,
         const URL& url, const std::string& postdata)
-	:
-	_bytesLoaded(0),
-	_bytesTotal(0),
-	_stream(sp.getStream(url, postdata)),
-	_completed(false),
-	_canceled(false)
+	: _canceled(false)
 {
-	if ( ! _stream.get() )
-	{
-		throw NetworkException();
-	}
+    startThread(sp.getStream(url, postdata));
 }
 
 LoadVariablesThread::LoadVariablesThread(const StreamProvider& sp,
         const URL& url)
-	:
-	_bytesLoaded(0),
-	_bytesTotal(0),
-	_stream(sp.getStream(url)),
-	_completed(false),
-	_canceled(false)
+    : _canceled(false)
 {
-	if ( ! _stream.get() )
-	{
-		throw NetworkException();
-	}
+    startThread(sp.getStream(url));
 }
 
 void
-LoadVariablesThread::cancel()
+LoadVariablesThread::startThread(std::unique_ptr<IOChannel> stream)
 {
-	std::lock_guard<std::mutex> lock(_mutex);
-	_canceled = true;
-}
+    if (!stream) {
+        throw NetworkException();
+    }
 
-bool
-LoadVariablesThread::cancelRequested()
-{
-	std::lock_guard<std::mutex> lock(_mutex);
-	return _canceled;
+    _vals = std::async(std::launch::async, completeLoad, stream.release(), 
+        std::ref(_canceled));
 }
 
 LoadVariablesThread::~LoadVariablesThread()
 {
-	if ( _thread.joinable() )
+	if ( _vals.valid() )
 	{
-		cancel();
-		_thread.join();
+		_canceled = true;
+		_vals.wait();
 	}
 }
 
