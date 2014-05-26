@@ -106,13 +106,6 @@ SWFMovieLoader::isSelfThread() const
     return std::this_thread::get_id() == _thread.get_id();
 }
 
-// static..
-void
-SWFMovieLoader::execute(SWFMovieDefinition* md)
-{
-    md->read_all_swf();
-}
-
 bool
 SWFMovieLoader::start()
 {
@@ -125,7 +118,7 @@ SWFMovieLoader::start()
     // Those tests do seem a bit redundant, though...
     std::lock_guard<std::mutex> lock(_mutex);
 
-    _thread = std::thread(std::bind(execute, &_movie_def));
+    _thread = std::thread(&SWFMovieDefinition::read_all_swf, &_movie_def);
 
     return true;
 }

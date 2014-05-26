@@ -92,10 +92,6 @@ private:
 
     mutable std::mutex _mutex;
     std::thread _thread;
-
-    /// Entry point for the actual thread
-    static void execute(SWFMovieDefinition* md);
-
 };
 
 /// The Characters dictionary associated with each SWF file.
