@@ -498,9 +498,9 @@ SWFMovieDefinition::read_all_swf()
         );
         _frames_loaded = m_frame_count;
         // Notify any thread waiting on frame reached condition
-        _frame_reached_condition.notify_all();
     }
     _loadingCanceled = true;
+    _frame_reached_condition.notify_all();
 }
 
 size_t
