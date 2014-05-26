@@ -370,14 +370,18 @@ SWFMovieDefinition::ensure_frame_loaded(size_t framenum) const
     return (framenum <= _frames_loaded.load());
 #endif
 
-    if ( framenum <= _frames_loaded.load() ) return true;
-
     _waiting_for_frame = framenum;
+
     std::mutex m;
     std::unique_lock<std::mutex> lock(m);
 
     // TODO: return false on timeout
-    _frame_reached_condition.wait(lock);
+
+    // Make sure we don't wait here if the frame has been loaded, or the
+    // loading thread has finished.
+    _frame_reached_condition.wait(lock, [&] () {
+            return framenum <= _frames_loaded.load() || _loadingCanceled;
+        });
 
     return ( framenum <= _frames_loaded.load() );
 }
@@ -503,6 +507,7 @@ SWFMovieDefinition::read_all_swf()
         // Notify any thread waiting on frame reached condition
         _frame_reached_condition.notify_all();
     }
+    _loadingCanceled = true;
 }
 
 size_t
