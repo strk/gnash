@@ -533,7 +533,7 @@ SWFMovieDefinition::incrementLoadedFrames()
 
     // signal load of frame if anyone requested it
     // FIXME: _waiting_for_frame needs mutex ?
-    if (_waiting_for_frame.load() && _frames_loaded.load() >= _waiting_for_frame.load() )
+    if (_frames_loaded.load() >= _waiting_for_frame.load() )
     {
         // or should we notify_one ?
         // See: http://boost.org/doc/html/condition.html
