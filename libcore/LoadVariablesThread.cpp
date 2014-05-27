@@ -125,6 +125,7 @@ LoadVariablesThread::completeLoad(IOChannel* varstream,
     }
 
     //dispatchLoadEvent();
+    canceled = true;
 
     return parseResult;
 }

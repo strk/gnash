@@ -85,12 +85,7 @@ public:
 
 	bool completed()
 	{
-#if (__GNUC__ == 4 && __GNUC_MINOR__ <= 6)
-                return _vals.wait_for(std::chrono::seconds(0));
-#else
-                std::future_status status = _vals.wait_for(std::chrono::seconds(0));
-                return status == std::future_status::ready;
-#endif
+                return _canceled;
 	}
 
 private:
@@ -110,6 +105,9 @@ private:
 
         std::future<ValuesMap> _vals;
 
+	/// Indicates either whether cancellation was requested, or whether the
+	/// thread has finished executing code, from the perspective of the
+	/// variables loading thread thread and the main thread respectively.
 	std::atomic<bool> _canceled;
 };
 
