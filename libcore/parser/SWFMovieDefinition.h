@@ -40,7 +40,6 @@
 #include <condition_variable>
 
 #include "movie_definition.h" // for inheritance
-#include "DefinitionTag.h" // for boost::intrusive_ptr visibility of dtor
 #include "StringPredicates.h" 
 #include "SWFRect.h"
 #include "GnashNumeric.h"
@@ -59,6 +58,9 @@ namespace gnash {
     class SWFMovie;
     class RunResources;
     class Font;
+    namespace SWF {
+        class DefinitionTag;
+    }
 }
 
 namespace gnash {

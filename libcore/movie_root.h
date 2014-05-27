@@ -93,7 +93,6 @@
 #include "VM.h"
 #include "HostInterface.h"
 #include "log.h"
-#include "IOChannel.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"

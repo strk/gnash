@@ -57,6 +57,7 @@
 #include "log.h"
 #include "HostInterface.h"
 #include "RunResources.h"
+#include "IOChannel.h"
 
 using namespace gnash;
 
