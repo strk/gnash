@@ -35,6 +35,7 @@
 #include "Renderer.h"
 #include "ManualClock.h" // for use by advance
 #include "StreamProvider.h" // for passing to RunResources
+#include "IOChannel.h"
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
 
