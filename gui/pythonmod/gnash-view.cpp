@@ -41,6 +41,7 @@
 #include "Global_as.h"
 #include "NamingPolicy.h"
 #include "StreamProvider.h"
+#include "GnashFactory.h"
 
 enum
 {
