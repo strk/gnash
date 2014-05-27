@@ -58,6 +58,7 @@
 #include "HostInterface.h"
 #include "RunResources.h"
 #include "IOChannel.h"
+#include "MediaHandler.h"
 #include "GnashFactory.h"
 
 using namespace gnash;

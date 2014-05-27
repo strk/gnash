@@ -21,12 +21,23 @@
 #ifndef GNASH_RUN_INFO_H
 #define GNASH_RUN_INFO_H
 
+#include <memory>
 #include <string>
-#include "StreamProvider.h"
-#include "Renderer.h"
-#include "sound_handler.h"
-#include "MediaHandler.h"
-#include "TagLoadersTable.h"
+#include <cassert>
+
+namespace gnash {
+    class Renderer;
+    class StreamProvider;
+    namespace SWF {
+        class TagLoadersTable;
+    }
+    namespace media {
+        class MediaHandler;
+    }
+    namespace sound {
+        class sound_handler;
+    }
+}
 
 namespace gnash {
 

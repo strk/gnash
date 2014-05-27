@@ -52,6 +52,7 @@
 #include "IOChannel.h" // for proper dtor call
 #include "GnashSleep.h" // for usleep compatibility.
 #include "GnashFactory.h"
+#include "MediaHandler.h"
 #include "StreamProvider.h"
 #include "RunResources.h"
 #include "HostInterface.h"

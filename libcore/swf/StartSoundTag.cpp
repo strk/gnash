@@ -27,6 +27,7 @@
 #include "RunResources.h"
 #include "SoundInfoRecord.h"
 #include "MovieClip.h"
+#include "sound_handler.h"
 
 #include <limits>
 

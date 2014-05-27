@@ -52,6 +52,7 @@
 #include "RunResources.h"
 #include "VM.h"
 #include "GnashEnums.h"
+#include "MediaHandler.h"
 #include "gtk_canvas.h"
 
 #ifdef HAVE_VA_VA_H

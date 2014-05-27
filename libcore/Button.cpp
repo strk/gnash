@@ -46,6 +46,7 @@
 #include "RunResources.h"
 #include "sound_definition.h"
 #include "Transform.h"
+#include "sound_handler.h"
 
 /** \page buttons Buttons and mouse behaviour
 
