@@ -51,12 +51,6 @@
     if (!warned) { warned = true; x; } \
 }
 
-# include <boost/preprocessor/arithmetic/inc.hpp>
-# include <boost/preprocessor/repetition/enum_params.hpp>
-# include <boost/preprocessor/repetition/repeat.hpp>
-# include <boost/preprocessor/repetition/repeat_from_to.hpp>
-# include <boost/preprocessor/seq/for_each.hpp>
-
 // Mingw32 (win32 console) doesn't use the standard GCC defines that
 // Gnash used for debug messages, so make it so...
 #ifndef __FUNCDNAME__
@@ -252,78 +246,98 @@ DSOEXPORT void processLog_swferror(const boost::format& fmt);
 DSOEXPORT void processLog_aserror(const boost::format& fmt);
 DSOEXPORT void processLog_abc(const boost::format& fmt);
 
-/// This heap of steaming preprocessor code magically converts
-/// printf-style statements into boost::format messages using templates.
-//
-/// Macro to feed boost::format strings to the boost::format object,
-/// producing code like this: "% t1 % t2 % t3 ..."
-#define TOKENIZE_FORMAT(z, n, t) % t##n
-
-/// Macro to add a number of arguments to the templated function
-/// corresponding to the number of template arguments. Produces code
-/// like this: "const T0& t0, const T1& t1, const T2& t2 ..."
-#define TOKENIZE_ARGS(z, n, t) BOOST_PP_COMMA_IF(n) const T##n& t##n
-
-/// This is a sequence of different log message types to be used in
-/// the code. Append the name to log_ to call the function, e.g. 
-/// log_error, log_unimpl.
-#define LOG_TYPES (error) (debug) (unimpl) (aserror) (swferror) \
-    (security) (action) (parse) (trace) (abc) (network)
-
-/// This actually creates the template functions using the TOKENIZE
-/// functions above. The templates look like this:
-//
-/// template<typename T0 , typename T1 , typename T2>
-/// void log_error(const T0& t0 , const T1& t1 , const T2& t2)
-/// {
-///     if (LogFile::getDefaultInstance().getVerbosity() == 0) return;
-///     boost::format f(t0);
-///     using namespace boost::io;
-///     f.exceptions(all_error_bits ^ (too_many_args_bit |
-///                                    too_few_args_bit |
-///                                    bad_format_string_bit));
-///     processLog_error(f % t1 % t2);
-/// }
-///
-/// Only not as nicely indented.
-///
-/// Use "g++ -E log.h" or "cpp log.h" to check.
-#define LOG_TEMPLATES(z, n, data)\
-template<BOOST_PP_ENUM_PARAMS(BOOST_PP_INC(n), typename T)>\
-inline void log_##data(BOOST_PP_REPEAT(BOOST_PP_INC(n), TOKENIZE_ARGS, t)) \
-{\
-    if (LogFile::getDefaultInstance().getVerbosity() == 0) return; \
-    boost::format f(t0); \
-    using namespace boost::io; \
-    f.exceptions(all_error_bits ^ (too_many_args_bit | \
-                                   too_few_args_bit | \
-                                   bad_format_string_bit)); \
-    processLog_##data(f BOOST_PP_REPEAT_FROM_TO(1, \
-            BOOST_PP_INC(n), \
-            TOKENIZE_FORMAT, t));\
+template <typename FuncType>
+inline void
+log_impl(boost::format& fmt, FuncType func)
+{
+    func(fmt);
 }
 
-/// Defines the maximum number of template arguments
-//
-/// The preprocessor generates templates with 1..ARG_NUMBER
-/// arguments.
-#define ARG_NUMBER 10
+template<typename FuncType, typename Arg, typename... Args>
+inline void
+log_impl(boost::format& fmt, FuncType processFunc, Arg arg, Args... args)
+{
+    fmt % arg;
+    log_impl(fmt, processFunc, args...);
+}
 
-/// Calls the macro LOG_TEMPLATES an ARG_NUMBER number
-/// of times, each time adding an extra typename argument to the
-/// template.
-#define GENERATE_LOG_TYPES(r, _, t) \
-    BOOST_PP_REPEAT(ARG_NUMBER, LOG_TEMPLATES, t)
+template<typename StringType, typename FuncType, typename... Args>
+inline void
+log_impl(StringType msg, FuncType func, Args... args)
+{
+    boost::format fmt(msg);
+    using namespace boost::io;
+    fmt.exceptions(all_error_bits ^ (too_many_args_bit |
+                                   too_few_args_bit |
+                                   bad_format_string_bit));
+    log_impl(fmt, func, args...);
+}
 
-/// Calls the template generator for each log type in the
-/// sequence LOG_TYPES.
-BOOST_PP_SEQ_FOR_EACH(GENERATE_LOG_TYPES, _, LOG_TYPES)
+template<typename StringType, typename... Args>
+inline void log_network(StringType msg, Args... args)
+{
+    log_impl(msg, processLog_network, args...);
+}
 
-#undef TOKENIZE_ARGS
-#undef TOKENIZE_FORMAT
-#undef GENERATE_LOG_TYPES
-#undef LOG_TEMPLATES
-#undef ARG_NUMBER
+template<typename StringType, typename... Args>
+inline void log_error(StringType msg, Args... args)
+{
+    log_impl(msg, processLog_error, args...);
+}
+
+template<typename StringType, typename... Args>
+inline void log_unimpl(StringType msg, Args... args)
+{
+    log_impl(msg, processLog_unimpl, args...);
+}
+
+template<typename StringType, typename... Args>
+inline void log_trace(StringType msg, Args... args)
+{
+    log_impl(msg, processLog_trace, args...);
+}
+
+template<typename StringType, typename... Args>
+inline void log_debug(StringType msg, Args... args)
+{
+    log_impl(msg, processLog_debug, args...);
+}
+
+template<typename StringType, typename... Args>
+inline void log_action(StringType msg, Args... args)
+{
+    log_impl(msg, processLog_action, args...);
+}
+
+template<typename StringType, typename... Args>
+inline void log_parse(StringType msg, Args... args)
+{
+    log_impl(msg, processLog_parse, args...);
+}
+
+template<typename StringType, typename... Args>
+inline void log_security(StringType msg, Args... args)
+{
+    log_impl(msg, processLog_security, args...);
+}
+
+template<typename StringType, typename... Args>
+inline void log_swferror(StringType msg, Args... args)
+{
+    log_impl(msg, processLog_swferror, args...);
+}
+
+template<typename StringType, typename... Args>
+inline void log_aserror(StringType msg, Args... args)
+{
+    log_impl(msg, processLog_aserror, args...);
+}
+
+template<typename StringType, typename... Args>
+inline void log_abc(StringType msg, Args... args)
+{
+    log_impl(msg, processLog_abc, args...);
+}
 
 /// Convert a sequence of bytes to hex or ascii format.
 //
