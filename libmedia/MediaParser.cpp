@@ -51,8 +51,7 @@ MediaParser::startParserThread()
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	log_debug("Starting MediaParser thread");
-	_parserThread = std::thread(
-                std::bind(parserLoopStarter, this));
+	_parserThread = std::thread(&MediaParser::parserLoop, this);
 #endif
 }
 

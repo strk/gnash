@@ -663,11 +663,6 @@ protected:
 	std::unique_ptr<IOChannel> _stream;
 	mutable std::mutex _streamMutex;
 
-	static void parserLoopStarter(MediaParser* mp)
-	{
-		mp->parserLoop();
-	}
-
 	/// The parser loop runs in a separate thread
 	/// and calls parseNextChunk until killed.
 	///
