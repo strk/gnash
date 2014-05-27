@@ -23,7 +23,6 @@
 
 #include "dsodefs.h" // DSOEXPORT
 #include "VideoConverter.h"
-#include "GnashFactory.h"
 
 #include <vector>
 #include <memory>
@@ -32,6 +31,7 @@
 // Forward declarations
 namespace gnash {
     class IOChannel;
+    template<typename T, typename Init, typename Key> class GnashFactory;
     namespace media {
         class VideoDecoder;
         class AudioDecoder;
@@ -62,7 +62,7 @@ struct DSOEXPORT RegisterAllHandlers
     RegisterAllHandlers();
 };
 
-typedef GnashFactory<MediaHandler, RegisterAllHandlers> MediaFactory;
+using MediaFactory = GnashFactory<MediaHandler, RegisterAllHandlers, std::string>;
 
 /// The MediaHandler class acts as a factory to provide parser and decoders
 class DSOEXPORT MediaHandler

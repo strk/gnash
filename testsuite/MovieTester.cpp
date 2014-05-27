@@ -38,6 +38,7 @@
 #include "IOChannel.h"
 #include "swf/TagLoadersTable.h"
 #include "swf/DefaultTagLoaders.h"
+#include "GnashFactory.h"
 
 #ifdef RENDERER_CAIRO
 # include "Renderer_cairo.h"

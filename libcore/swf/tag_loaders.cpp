@@ -35,6 +35,7 @@
 #include "swf/TagLoadersTable.h"
 #include "URL.h"
 #include "GnashException.h"
+#include "GnashAlgorithm.h"
 #include "sound_definition.h"
 #include "SoundInfo.h"
 #include "MediaHandler.h"

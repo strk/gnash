@@ -28,6 +28,7 @@
 #include "IOChannel.h"
 #include "AudioDecoderSimple.h"
 #include "log.h"
+#include "GnashFactory.h"
 
 #ifdef DECODING_SPEEX
 # include "AudioDecoderSpeex.h"

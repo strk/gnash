@@ -47,6 +47,7 @@
 #include "GnashException.h"
 #include "revno.h"
 #include "MediaHandler.h"
+#include "GnashFactory.h"
 #include "utility.h"
 #include "accumulator.h"
 #include "GnashFileUtilities.h"

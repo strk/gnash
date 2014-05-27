@@ -51,7 +51,7 @@ namespace gnash {
 ///                 are registered. This helps avoid problems with
 ///                 unpredictable static initialization.
 /// @tparam Key     The type to be used as a key.
-template<typename T, typename Init = void, typename Key = std::string>
+template<typename T, typename Init, typename Key>
 class DSOEXPORT GnashFactory
 {
 public:

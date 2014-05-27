@@ -29,6 +29,7 @@
 #include "AudioInputGst.h"
 #include "FLVParser.h"
 #include "MediaParser.h"
+#include "GnashFactory.h"
 
 #ifdef DECODING_SPEEX
 #include "AudioDecoderSpeex.h"
