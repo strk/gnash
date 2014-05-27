@@ -3012,7 +3012,7 @@ ActionShiftLeft(ActionExec& thread)
     std::uint32_t amount = saneShiftParam(toInt(env.top(0), getVM(env)));
     std::int32_t value = toInt(env.top(1), getVM(env));
 
-    value = value << amount;
+    value = static_cast<std::uint32_t>(value) << amount;
 
     env.top(1) = value;
     env.drop(1);
