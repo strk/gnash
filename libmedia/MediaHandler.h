@@ -62,7 +62,7 @@ struct DSOEXPORT RegisterAllHandlers
     RegisterAllHandlers();
 };
 
-using MediaFactory = GnashFactory<MediaHandler, RegisterAllHandlers, std::string>;
+typedef GnashFactory<MediaHandler, RegisterAllHandlers, std::string> MediaFactory;
 
 /// The MediaHandler class acts as a factory to provide parser and decoders
 class DSOEXPORT MediaHandler
