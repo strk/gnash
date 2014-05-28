@@ -484,7 +484,8 @@ private:
     }
 
     /// A flag set to true when load cancellation is requested
-    std::atomic<bool> _loadingCanceled;
+    mutable std::mutex _loadingCanceledMutex;
+    bool _loadingCanceled;
 
     /// Movies we import resources from
     std::set< boost::intrusive_ptr<movie_definition> > _importSources;

@@ -150,6 +150,7 @@ SWFMovieDefinition::SWFMovieDefinition(const RunResources& runResources)
 SWFMovieDefinition::~SWFMovieDefinition()
 {
     // Request cancellation of the loading thread
+    std::lock_guard<std::mutex> lock(_loadingCanceledMutex);
     _loadingCanceled = true;
 }
 
@@ -362,11 +363,13 @@ SWFMovieDefinition::ensure_frame_loaded(size_t framenum) const
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
     return (framenum <= _frames_loaded.load());
 #endif
+    if ( framenum <= _frames_loaded.load() ) {
+        return true;
+    }
 
     _waiting_for_frame = framenum;
 
-    std::mutex m;
-    std::unique_lock<std::mutex> lock(m);
+    std::unique_lock<std::mutex> lock(_loadingCanceledMutex);
 
     // TODO: return false on timeout
 
@@ -454,13 +457,16 @@ SWFMovieDefinition::read_all_swf()
     try {
         while (left) {
 
-            if (_loadingCanceled.load()) {
-                log_debug("Loading thread cancellation requested, "
-                        "returning from read_all_swf");
-                return;
+            {
+                std::lock_guard<std::mutex> lock(_loadingCanceledMutex);
+                if (_loadingCanceled) {
+                    log_debug("Loading thread cancellation requested, "
+                              "returning from read_all_swf");
+                    return;
+                }
             }
             if (!parser.read(std::min<size_t>(left, chunkSize))) break;
-            
+
             left -= parser.bytesRead();
             setBytesLoaded(startPos + parser.bytesRead());
         }
@@ -499,7 +505,10 @@ SWFMovieDefinition::read_all_swf()
         _frames_loaded = m_frame_count;
         // Notify any thread waiting on frame reached condition
     }
-    _loadingCanceled = true;
+    {
+        std::lock_guard<std::mutex> lock(_loadingCanceledMutex);
+        _loadingCanceled = true;
+    }
     _frame_reached_condition.notify_all();
 }
 
