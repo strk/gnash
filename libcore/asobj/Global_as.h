@@ -21,12 +21,6 @@
 #define GNASH_GLOBAL_H
 
 #include <string>
-#include <boost/preprocessor/arithmetic/inc.hpp>
-#include <boost/preprocessor/repetition/enum_params.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
-#include <boost/preprocessor/repetition/repeat_from_to.hpp>
-#include <boost/preprocessor/seq/for_each.hpp>
-#include <boost/preprocessor/facilities/empty.hpp>
 #include <memory>
 
 #include "as_object.h" 
@@ -201,13 +195,9 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
 	return val;
 }
 
-/// Helper macros for callMethod arguments.
-#define FUNC_PARAM(z, n, t) BOOST_PP_COMMA_IF(n) t arg##n
-#define VALUE_ARG(z, n, t) BOOST_PP_COMMA_IF(n) arg##n
-
 /// Call a member function of this object in an AS-compatible way
 //
-/// This is a macro to cope with a varying number of arguments. The function
+/// This is a variadic function to cope with a varying number of arguments. Its
 /// signature is as follows:
 //
 /// as_value callMethod(as_object* obj, const ObjectURI& uri,
@@ -224,26 +214,33 @@ invoke(const as_value& method, const as_environment& env, as_object* this_ptr,
 /// @param arg0..argN   The arguments to pass
 ///
 /// @return             The return value of the call (possibly undefined).
-#define CALL_METHOD(x, n, t) \
-inline as_value \
-callMethod(as_object* obj, const ObjectURI& uri BOOST_PP_COMMA_IF(n)\
-        BOOST_PP_REPEAT(n, FUNC_PARAM, const as_value&)) {\
-    if (!obj) return as_value();\
-    as_value func;\
-    if (!obj->get_member(uri, &func)) return as_value();\
-    fn_call::Args args;\
-    BOOST_PP_EXPR_IF(n, (args += BOOST_PP_REPEAT(n, VALUE_ARG, BOOST_PP_EMPTY));)\
-    return invoke(func, as_environment(getVM(*obj)), obj, args);\
+
+inline as_value
+callMethod(fn_call::Args& args, as_object* obj, const ObjectURI& uri)
+{
+    if (!obj) return as_value();
+    as_value func;
+    if (!obj->get_member(uri, &func)) return as_value();
+
+    return invoke(func, as_environment(getVM(*obj)), obj, args);
 }
 
-/// The maximum number of as_value arguments allowed in callMethod functions.
-#define MAX_ARGS 4
-BOOST_PP_REPEAT(BOOST_PP_INC(MAX_ARGS), CALL_METHOD, BOOST_PP_EMPTY)
+template <typename Param, typename... Params>
+inline as_value
+callMethod(fn_call::Args& args, as_object* obj, const ObjectURI& uri, Param param, Params... params)
+{
+    args += param;
+    return callMethod(args, obj, uri, params...);
+}
 
-#undef VALUE_ARG
-#undef FUNC_PARAM
-#undef MAX_ARGS
-#undef CALL_METHOD
+
+template <typename... Params>
+inline as_value
+callMethod(as_object* obj, const ObjectURI& uri, Params... params)
+{
+    fn_call::Args args;
+    return callMethod(args, obj, uri, params...);
+}
 
 /// Convenience function for finding a class constructor.
 //
