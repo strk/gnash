@@ -55,7 +55,7 @@ class DSOEXPORT SWFMatrix
 public:
 
     /// Construct an identity SWFMatrix
-    SWFMatrix()
+    constexpr SWFMatrix()
         :
         _a(65536),
         _b(0),

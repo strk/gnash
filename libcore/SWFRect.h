@@ -46,14 +46,14 @@ class SWFRect
 
 public:
 
-    static const std::int32_t rectNull = 0x80000000;
-    static const std::int32_t rectMax = 0x7fffffff;
+    constexpr static std::int32_t rectNull = 0x80000000;
+    constexpr static std::int32_t rectMax = 0x7fffffff;
     
     /// Ouput operator
     friend std::ostream& operator<< (std::ostream& os, const SWFRect& SWFRect);
 
     /// Construct a NULL rectangle
-    SWFRect()
+    constexpr SWFRect()
         :
        _xMin(rectNull),
        _yMin(rectNull),
@@ -62,7 +62,7 @@ public:
     {}
 
     /// Construct a rectangle with given coordinates
-    SWFRect(int xmin, int ymin, int xmax, int ymax)
+    constexpr SWFRect(int xmin, int ymin, int xmax, int ymax)
         :
         _xMin(xmin),
         _yMin(ymin),

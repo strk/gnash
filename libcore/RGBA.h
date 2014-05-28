@@ -39,7 +39,7 @@ public:
     /// Construct default RGBA value.
     //
     /// Default value is 0xffffffff (solid white).
-    rgba()
+    constexpr rgba()
         :
         m_r(255),
         m_g(255),

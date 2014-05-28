@@ -46,7 +46,7 @@ public:
 	std::int32_t  y;  // TWIPS
 
 	/// Construct a Point2d with default x and y coordinates
-	Point2d()
+	constexpr Point2d()
 		:
 		x(0), y(0)
 	{
