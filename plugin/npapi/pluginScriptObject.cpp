@@ -725,19 +725,14 @@ GnashPluginScriptObject::readPlayer(int fd)
         return empty;
     }
 
-    std::string buf(bytes, '\0');
+    char buf[bytes];
 
-    // FIXME: writing into string data buffers is an undefined operation.
-    int ret = ::read(fd, &buf[0], bytes);
-    if (ret <= 0) {
+    int ret = ::read(fd, buf, bytes);
+    if (ret <= 0 || ret > bytes) {
         return empty;
     }
 
-    if (ret < bytes) {
-        buf.resize(ret);
-    }
-
-    return buf;
+    return std::string(buf, ret);
 }
 
 
