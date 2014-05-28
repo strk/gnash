@@ -23,15 +23,14 @@
 
 #include <string>
 #include <map>
-#include <functional>
 #include <future>
-#include <cassert>
+#include <atomic>
 
-#include "URL.h" // for inlines
 
 namespace gnash {
     class StreamProvider;
     class IOChannel;
+    class URL;
 }
 
 namespace gnash {

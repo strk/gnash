@@ -34,7 +34,6 @@
 
 #include "ControlTag.h"
 #include "movie_definition.h" // for inlines
-#include "DisplayList.h" // DisplayList 
 #include "DisplayObjectContainer.h"
 #include "as_environment.h" // for composition
 #include "DynamicShape.h" // for composition
@@ -50,6 +49,7 @@ namespace gnash {
     class TextField;
     class BitmapData_as;
     class CachedBitmap;
+    class DisplayList;
     namespace SWF {
         class PlaceObject2Tag;
     }

@@ -21,7 +21,6 @@
 #define GNASH_CHARACTER_PROXY_H
 
 #include <string>
-#include <cassert>
 #include "dsodefs.h"
 
 // Forward declarations

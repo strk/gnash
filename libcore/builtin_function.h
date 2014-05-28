@@ -20,9 +20,12 @@
 #define GNASH_BUILTIN_FUNCTION_H
 
 #include "UserFunction.h" 
-#include "fn_call.h"
 
 #include <cassert>
+
+namespace gnash {
+    class fn_call;
+}
 
 namespace gnash {
 
