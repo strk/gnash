@@ -218,7 +218,7 @@ XML_as::parseAttribute(XMLNode_as* node, xml_iterator& it,
 
     // This ensures values are not inserted twice, which is expected
     // behaviour
-    attributes.insert(std::make_pair(name, value));
+    attributes.emplace(name, value);
 
 }
 

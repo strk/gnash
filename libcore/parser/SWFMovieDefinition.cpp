@@ -176,7 +176,7 @@ void
 SWFMovieDefinition::add_font(int font_id, boost::intrusive_ptr<Font> f)
 {
     assert(f);
-    m_fonts.insert(std::make_pair(font_id, f));
+    m_fonts.emplace(font_id, f);
 }
 
 Font*
@@ -215,7 +215,7 @@ void
 SWFMovieDefinition::addBitmap(int id, boost::intrusive_ptr<CachedBitmap> im)
 {
     assert(im);
-    _bitmaps.insert(std::make_pair(id, im));
+    _bitmaps.emplace(id, im);
 }
 
 sound_sample*
@@ -237,8 +237,7 @@ SWFMovieDefinition::add_sound_sample(int id, sound_sample* sam)
     log_parse(_("Add sound sample %d assigning id %d"),
         id, sam->m_sound_handler_id);
     )
-    m_sound_samples.insert(std::make_pair(id,
-                boost::intrusive_ptr<sound_sample>(sam)));
+    m_sound_samples.emplace(id, boost::intrusive_ptr<sound_sample>(sam));
 }
 
 // Read header and assign url
@@ -568,7 +567,7 @@ SWFMovieDefinition::add_frame_name(const std::string& n)
 {
     std::lock_guard<std::mutex> lock1(_namedFramesMutex);
 
-    _namedFrames.insert(std::make_pair(n, _frames_loaded.load()));
+    _namedFrames.emplace(n, _frames_loaded.load());
 }
 
 bool

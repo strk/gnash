@@ -1432,7 +1432,7 @@ nsPluginInstance::startProc()
                          _childpid);
 
         if (!cookiefile.empty()) {
-            cookiemap.insert(std::make_pair(_childpid, cookiefile));
+            cookiemap.emplace(_childpid, cookiefile);
             gnash::log_debug("Pid %d associated with cookiefile %s",
                 _childpid, cookiefile);
         }

@@ -823,7 +823,7 @@ movie_root::addIntervalTimer(std::unique_ptr<Timer> timer)
 
     std::shared_ptr<Timer> addTimer(timer.release());
 
-    _intervalTimers.insert(std::make_pair(id, addTimer));
+    _intervalTimers.emplace(id, addTimer);
 
     return id;
 }
@@ -1732,7 +1732,7 @@ movie_root::executeTimers()
         else {
             unsigned long elapsed;
             if (timer->expired(now, elapsed)) {
-                expiredTimers.insert(std::make_pair(elapsed, timer));
+                expiredTimers.emplace(elapsed, timer);
             }
         }
 

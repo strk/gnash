@@ -443,7 +443,7 @@ FLVParser::parseNextTag(bool index_only)
 		}
 
 		std::lock_guard<std::mutex> lock(_metaTagsMutex);
-		_metaTags.insert(std::make_pair(flvtag.timestamp, std::move(metaTag)));
+		_metaTags.emplace(flvtag.timestamp, std::move(metaTag));
 	}
 	else
 	{

@@ -113,7 +113,7 @@ public:
     }
 
     void queueCall(size_t n, const std::string& call) {
-        _calls.insert(std::make_pair(n, call));
+        _calls.emplace(n, call);
     }
 
     std::string getCall(size_t n) {

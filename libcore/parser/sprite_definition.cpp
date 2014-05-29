@@ -94,7 +94,7 @@ sprite_definition::add_frame_name(const std::string& name)
 
     // It's fine for loaded frames to exceed frame count. Should be
     // adjusted at the end of parsing.
-    _namedFrames.insert(std::make_pair(name, m_loading_frame));
+    _namedFrames.emplace(name, m_loading_frame);
 }
 
 bool
