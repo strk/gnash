@@ -90,8 +90,7 @@ extern "C" {
 #include <cstdlib> // std::getenv
 #include <mutex>
 
-#include <boost/version.hpp>
-#include <boost/assign/list_of.hpp>
+#include <boost/format.hpp>
 
 
 //#define GNASH_CURL_VERBOSE 1
@@ -1381,38 +1380,39 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
 const NetworkAdapter::ReservedNames&
 NetworkAdapter::reservedNames()
 {
-    static const ReservedNames names = boost::assign::list_of
-    ("Accept-Ranges")
-    ("Age")
-    ("Allow")
-    ("Allowed")
-    ("Connection")
-    ("Content-Length")
-    ("Content-Location")
-    ("Content-Range")
-    ("ETag")
-    ("GET")
-    ("Host")
-    ("HEAD")
-    ("Last-Modified")
-    ("Locations")
-    ("Max-Forwards")
-    ("POST")
-    ("Proxy-Authenticate")
-    ("Proxy-Authorization")
-    ("Public")
-    ("Range")
-    ("Retry-After")
-    ("Server")
-    ("TE")
-    ("Trailer")
-    ("Transfer-Encoding")
-    ("Upgrade")
-    ("URI")
-    ("Vary")
-    ("Via")
-    ("Warning")
-    ("WWW-Authenticate");
+    static const ReservedNames names = {
+    "Accept-Ranges",
+    "Age",
+    "Allow",
+    "Allowed",
+    "Connection",
+    "Content-Length",
+    "Content-Location",
+    "Content-Range",
+    "ETag",
+    "GET",
+    "Host",
+    "HEAD",
+    "Last-Modified",
+    "Locations",
+    "Max-Forwards",
+    "POST",
+    "Proxy-Authenticate",
+    "Proxy-Authorization",
+    "Public",
+    "Range",
+    "Retry-After",
+    "Server",
+    "TE",
+    "Trailer",
+    "Transfer-Encoding",
+    "Upgrade",
+    "URI",
+    "Vary",
+    "Via",
+    "Warning",
+    "WWW-Authenticate"
+    };
 
     return names;
 }

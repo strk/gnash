@@ -25,7 +25,6 @@
 #include "DisplayObject.h"
 
 #include <utility>
-#include <boost/assign/list_of.hpp>
 #include <functional>
 #include <boost/logic/tribool.hpp>
 
@@ -1580,22 +1579,23 @@ getBlendModeMap()
 {
     /// BLENDMODE_UNDEFINED has no matching string in AS. It is included
     /// here for logging purposes.
-    static const BlendModeMap bm = boost::assign::map_list_of
-        (DisplayObject::BLENDMODE_UNDEFINED, "undefined")
-        (DisplayObject::BLENDMODE_NORMAL, "normal")
-        (DisplayObject::BLENDMODE_LAYER, "layer")
-        (DisplayObject::BLENDMODE_MULTIPLY, "multiply")
-        (DisplayObject::BLENDMODE_SCREEN, "screen")
-        (DisplayObject::BLENDMODE_LIGHTEN, "lighten")
-        (DisplayObject::BLENDMODE_DARKEN, "darken")
-        (DisplayObject::BLENDMODE_DIFFERENCE, "difference")
-        (DisplayObject::BLENDMODE_ADD, "add")
-        (DisplayObject::BLENDMODE_SUBTRACT, "subtract")
-        (DisplayObject::BLENDMODE_INVERT, "invert")
-        (DisplayObject::BLENDMODE_ALPHA, "alpha")
-        (DisplayObject::BLENDMODE_ERASE, "erase")
-        (DisplayObject::BLENDMODE_OVERLAY, "overlay")
-        (DisplayObject::BLENDMODE_HARDLIGHT, "hardlight");
+    static const BlendModeMap bm = {
+        {DisplayObject::BLENDMODE_UNDEFINED, "undefined"},
+        {DisplayObject::BLENDMODE_NORMAL, "normal"},
+        {DisplayObject::BLENDMODE_LAYER, "layer"},
+        {DisplayObject::BLENDMODE_MULTIPLY, "multiply"},
+        {DisplayObject::BLENDMODE_SCREEN, "screen"},
+        {DisplayObject::BLENDMODE_LIGHTEN, "lighten"},
+        {DisplayObject::BLENDMODE_DARKEN, "darken"},
+        {DisplayObject::BLENDMODE_DIFFERENCE, "difference"},
+        {DisplayObject::BLENDMODE_ADD, "add"},
+        {DisplayObject::BLENDMODE_SUBTRACT, "subtract"},
+        {DisplayObject::BLENDMODE_INVERT, "invert"},
+        {DisplayObject::BLENDMODE_ALPHA, "alpha"},
+        {DisplayObject::BLENDMODE_ERASE, "erase"},
+        {DisplayObject::BLENDMODE_OVERLAY, "overlay"},
+        {DisplayObject::BLENDMODE_HARDLIGHT, "hardlight"}
+    };
 
     return bm;
 }

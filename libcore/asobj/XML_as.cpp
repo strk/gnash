@@ -23,7 +23,6 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
-#include <boost/assign/list_of.hpp>
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
@@ -940,12 +939,13 @@ setIdMap(as_object& xml, XMLNode_as& childNode, const std::string& val)
 const Entities&
 getEntities()
 {
-    static const Entities entities = boost::assign::map_list_of
-        ("&amp;", "&")
-        ("&quot;", "\"")
-        ("&lt;", "<")
-        ("&gt;", ">")
-        ("&apos;", "'");
+    static const Entities entities = {
+        {"&amp;", "&"},
+        {"&quot;", "\""},
+        {"&lt;", "<"},
+        {"&gt;", ">"},
+        {"&apos;", "'"}
+    };
 
     return entities;
 }

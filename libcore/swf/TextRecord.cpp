@@ -18,7 +18,6 @@
 
 #include "TextRecord.h"
 
-#include <boost/assign/list_of.hpp>
 #include <vector>
 
 #include "TypesParser.h"
@@ -248,12 +247,13 @@ TextRecord::displayRecords(Renderer& renderer, const Transform& xform,
                 //       square is not hard-coded anymore but can be
                 //       queried from the font class
                 //
-                static const std::vector<point> emptyCharBox =
-                    boost::assign::list_of (point(32, 32))
-                                           (point(480, 32))
-                                           (point(480, -656))
-                                           (point(32, -656))
-                                           (point(32,32));
+                static const std::vector<point> emptyCharBox = {
+                    point(32, 32),
+                    point(480, 32),
+                    point(480, -656),
+                    point(32, -656),
+                    point(32,32)
+                };
                 renderer.drawLine(emptyCharBox, textColor, m);
 #endif
 
@@ -284,9 +284,10 @@ TextRecord::displayRecords(Renderer& renderer, const Transform& xform,
             // 1/4 the EM square offset far from baseline 
             std::int16_t posY = int(y+int((unitsPerEM/4)*scale));
 
-            const std::vector<point> underline = boost::assign::list_of
-                (point(startX, posY))
-                (point(endX, posY));
+            const std::vector<point> underline = {
+                point(startX, posY),
+                point(endX, posY)
+            };
 
             renderer.drawLine(underline, textColor, mat);
         }

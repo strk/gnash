@@ -28,7 +28,6 @@
 #include <limits> 
 #include <sstream>
 #include <boost/lexical_cast.hpp>
-#include <boost/assign/list_of.hpp>
 
 #include "as_object.h"
 #include "builtin_function.h"
@@ -344,41 +343,41 @@ avm1Classes()
     // Since we maintain separate lists for AVM1 and AVM2, these are all
     // considered to be in the 'Global' namespace (AVM1 has no namespaces)
     // An ObjectURI constructed without a namespace is in the global namespace.
-    static const ClassHierarchy::NativeClasses s = boost::assign::list_of
-
-        (N(system_class_init, NSV::CLASS_SYSTEM, 1))
-        (N(stage_class_init, NSV::CLASS_STAGE, 1))
-        (N(movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 3))
-        (N(textfield_class_init, NSV::CLASS_TEXT_FIELD, 3))
-        (N(math_class_init, NSV::CLASS_MATH, 4))
-        (N(boolean_class_init, NSV::CLASS_BOOLEAN, 5))
-        (N(button_class_init, NSV::CLASS_BUTTON, 5))
-        (N(color_class_init, NSV::CLASS_COLOR, 5))
-        (N(selection_class_init, NSV::CLASS_SELECTION, 5))
-        (N(sound_class_init, NSV::CLASS_SOUND, 5))
-        (N(xmlsocket_class_init, NSV::CLASS_XMLSOCKET, 5))
-        (N(date_class_init, NSV::CLASS_DATE, 5))
-        (N(xmlnode_class_init, NSV::CLASS_XMLNODE, 5))
-        (N(xml_class_init, NSV::CLASS_XML, 5))
-        (N(mouse_class_init, NSV::CLASS_MOUSE, 5))
-        (N(number_class_init, NSV::CLASS_NUMBER, 5))
-        (N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, 5))
-        (N(key_class_init, NSV::CLASS_KEY, 5))
-        (N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, 5))
-        (N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, 5))
-        (N(video_class_init, NSV::CLASS_VIDEO, 6))
-        (N(camera_class_init, NSV::CLASS_CAMERA, 5))
-        (N(microphone_class_init, NSV::CLASS_MICROPHONE, 5))
-        (N(sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, 5))
-        (N(loadvars_class_init, NSV::CLASS_LOAD_VARS, 5))
-        (N(localconnection_class_init, NSV::CLASS_LOCALCONNECTION, 6))
-        (N(netconnection_class_init, NSV::CLASS_NET_CONNECTION, 6))
-        (N(netstream_class_init, NSV::CLASS_NET_STREAM, 6))
-        (N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, 5))
-        (N(contextmenuitem_class_init, NSV::CLASS_CONTEXTMENUITEM, 5))
-        (N(moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER, 5))
-        (N(Error_class_init, NSV::CLASS_ERROR, 5))
-        (N(accessibility_class_init, NSV::CLASS_ACCESSIBILITY, 5));
+    static const ClassHierarchy::NativeClasses s = {
+        N(system_class_init, NSV::CLASS_SYSTEM, 1),
+        N(stage_class_init, NSV::CLASS_STAGE, 1),
+        N(movieclip_class_init, NSV::CLASS_MOVIE_CLIP, 3),
+        N(textfield_class_init, NSV::CLASS_TEXT_FIELD, 3),
+        N(math_class_init, NSV::CLASS_MATH, 4),
+        N(boolean_class_init, NSV::CLASS_BOOLEAN, 5),
+        N(button_class_init, NSV::CLASS_BUTTON, 5),
+        N(color_class_init, NSV::CLASS_COLOR, 5),
+        N(selection_class_init, NSV::CLASS_SELECTION, 5),
+        N(sound_class_init, NSV::CLASS_SOUND, 5),
+        N(xmlsocket_class_init, NSV::CLASS_XMLSOCKET, 5),
+        N(date_class_init, NSV::CLASS_DATE, 5),
+        N(xmlnode_class_init, NSV::CLASS_XMLNODE, 5),
+        N(xml_class_init, NSV::CLASS_XML, 5),
+        N(mouse_class_init, NSV::CLASS_MOUSE, 5),
+        N(number_class_init, NSV::CLASS_NUMBER, 5),
+        N(textformat_class_init, NSV::CLASS_TEXT_FORMAT, 5),
+        N(key_class_init, NSV::CLASS_KEY, 5),
+        N(AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, 5),
+        N(textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, 5),
+        N(video_class_init, NSV::CLASS_VIDEO, 6),
+        N(camera_class_init, NSV::CLASS_CAMERA, 5),
+        N(microphone_class_init, NSV::CLASS_MICROPHONE, 5),
+        N(sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, 5),
+        N(loadvars_class_init, NSV::CLASS_LOAD_VARS, 5),
+        N(localconnection_class_init, NSV::CLASS_LOCALCONNECTION, 6),
+        N(netconnection_class_init, NSV::CLASS_NET_CONNECTION, 6),
+        N(netstream_class_init, NSV::CLASS_NET_STREAM, 6),
+        N(contextmenu_class_init, NSV::CLASS_CONTEXTMENU, 5),
+        N(contextmenuitem_class_init, NSV::CLASS_CONTEXTMENUITEM, 5),
+        N(moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER, 5),
+        N(Error_class_init, NSV::CLASS_ERROR, 5),
+        N(accessibility_class_init, NSV::CLASS_ACCESSIBILITY, 5)
+    };
 
     return s;
 }

@@ -36,9 +36,7 @@
 #include <cctype>
 #include <utility>
 #include <map>
-#include <boost/assign/list_of.hpp>
 #include <functional>
-#include <boost/tuple/tuple.hpp>
 
 #include "utf8.h"
 #include "log.h"
@@ -265,9 +263,9 @@ TextField::show_cursor(Renderer& renderer, const SWFMatrix& mat)
         }
     }
 
-    const std::vector<point> line = boost::assign::list_of
-        (point(x, y))
-        (point(x, y + h));
+    const std::vector<point> line = {
+        point(x, y),
+        point(x, y + h)};
     
     renderer.drawLine(line, rgba(0, 0, 0, 255), mat);
 }
@@ -310,11 +308,11 @@ TextField::display(Renderer& renderer, const Transform& base)
         std::int32_t ymin = _bounds.get_y_min();
         std::int32_t ymax = _bounds.get_y_max();
 
-        const std::vector<point> coords = boost::assign::list_of
-            (point(xmin, ymin))
-            (point(xmax, ymin))
-            (point(xmax, ymax))
-            (point(xmin, ymax));
+        const std::vector<point> coords = {
+            point(xmin, ymin),
+            point(xmax, ymin),
+            point(xmax, ymax),
+            point(xmin, ymax)};
 
         rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
         rgba backgroundColor = drawBackground ? getBackgroundColor() :

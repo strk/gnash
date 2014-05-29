@@ -22,7 +22,6 @@
 #include <cerrno>
 #include <cstring>
 #include <cstdint> // for boost::?int??_t
-#include <boost/assign/list_of.hpp>
 #include <functional>
 
 #include "GnashSystemIOHeaders.h"
@@ -659,13 +658,13 @@ validFunctionName(const std::string& func)
 
     typedef std::vector<std::string> ReservedNames;
 
-    static const ReservedNames reserved = boost::assign::list_of
-        ("send")
-        ("onStatus")
-        ("close")
-        ("connect")
-        ("domain")
-        ("allowDomain");
+    static const ReservedNames reserved = {
+        "send",
+        "onStatus",
+        "close",
+        "connect",
+        "domain",
+        "allowDomain"};
 
     const ReservedNames::const_iterator it =
         std::find_if(reserved.begin(), reserved.end(),

@@ -26,7 +26,6 @@
 
 #include <vector>
 #include <algorithm> 
-#include <boost/assign/list_of.hpp>
 
 #include "MovieClip.h"
 #include "Renderer.h"
@@ -61,7 +60,7 @@
 
 #ifndef DISABLE_REGION_UPDATES_DEBUGGING
 // a runtime check would make the { x; } block conditionally executed
-#define IF_DEBUG_REGION_UPDATES(x) { if (_showUpdatedRegions) { x } }
+#define IF_DEBUG_REGION_UPDATES(...) do { if (_showUpdatedRegions) {  __VA_ARGS__; } } while(0);
 #else
 #define IF_DEBUG_REGION_UPDATES(x) 
 #endif
@@ -806,18 +805,19 @@ Gui::display(movie_root* m)
                     float ymin = bounds.getMinY();
                     float ymax = bounds.getMaxY();
                     
-                    const std::vector<point> box = boost::assign::list_of
-                        (point(xmin, ymin))
-                        (point(xmax, ymin))
-                        (point(xmax, ymax))
-                        (point(xmin, ymax));
+                    const std::vector<point> box = {
+                        point(xmin, ymin),
+                        point(xmax, ymin),
+                        point(xmax, ymax),
+                        point(xmin, ymax)
+                    };
                     
                     _renderer->draw_poly(box, rgba(0,0,0,0), rgba(255,0,0,255),
                                          SWFMatrix(), false);
                     
                 }
             }
-            );
+        );
         
         // show frame on screen
         renderBuffer();	

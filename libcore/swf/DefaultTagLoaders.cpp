@@ -112,136 +112,136 @@ addDefaultLoaders(TagLoadersTable& table)
     // expected not to be used. They are generally documented
     // by Alexis to exist (without any known structure), but not
     // by Adobe.
-    const std::vector<TagPair> tags = boost::assign::list_of
+    const std::vector<TagPair> tags = {
         // 01: nothing to do for an end tag.
-        (TagPair(SWF::END, ignore))
+        TagPair(SWF::END,ignore),
         // 02
-        (TagPair(SWF::DEFINESHAPE, DefineShapeTag::loader))
+        TagPair(SWF::DEFINESHAPE,DefineShapeTag::loader),
         // 03
-        (TagPair(SWF::FREECHARACTER, unexpected)) 
-        (TagPair(SWF::PLACEOBJECT, PlaceObject2Tag::loader))
-        (TagPair(SWF::REMOVEOBJECT, RemoveObjectTag::loader)) // 05
-        (TagPair(SWF::DEFINEBITS, DefineBitsTag::loader))
-        (TagPair(SWF::DEFINEBUTTON, DefineButtonTag::loader))
-        (TagPair(SWF::JPEGTABLES, jpeg_tables_loader))
-        (TagPair(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader))
-        (TagPair(SWF::DEFINEFONT, DefineFontTag::loader))
-        (TagPair(SWF::DEFINETEXT, DefineTextTag::loader))
-        (TagPair(SWF::DOACTION, DoActionTag::loader))
-        (TagPair(SWF::DEFINEFONTINFO, DefineFontInfoTag::loader))
-        (TagPair(SWF::DEFINESOUND, define_sound_loader))
-        (TagPair(SWF::STARTSOUND, StartSoundTag::loader))
-        (TagPair(SWF::STOPSOUND, unexpected)) // 16 
+        TagPair(SWF::FREECHARACTER,unexpected),
+        TagPair(SWF::PLACEOBJECT,PlaceObject2Tag::loader),
+        TagPair(SWF::REMOVEOBJECT,RemoveObjectTag::loader),// 05
+        TagPair(SWF::DEFINEBITS,DefineBitsTag::loader),
+        TagPair(SWF::DEFINEBUTTON,DefineButtonTag::loader),
+        TagPair(SWF::JPEGTABLES,jpeg_tables_loader),
+        TagPair(SWF::SETBACKGROUNDCOLOR,SetBackgroundColorTag::loader),
+        TagPair(SWF::DEFINEFONT,DefineFontTag::loader),
+        TagPair(SWF::DEFINETEXT,DefineTextTag::loader),
+        TagPair(SWF::DOACTION,DoActionTag::loader),
+        TagPair(SWF::DEFINEFONTINFO,DefineFontInfoTag::loader),
+        TagPair(SWF::DEFINESOUND,define_sound_loader),
+        TagPair(SWF::STARTSOUND,StartSoundTag::loader),
+        TagPair(SWF::STOPSOUND,unexpected),// 16
         // 17
-        (TagPair(SWF::DEFINEBUTTONSOUND, DefineButtonSoundTag::loader))
+        TagPair(SWF::DEFINEBUTTONSOUND,DefineButtonSoundTag::loader),
         // 18
-        (TagPair(SWF::SOUNDSTREAMHEAD, SoundStreamHeadTag::loader))
+        TagPair(SWF::SOUNDSTREAMHEAD,SoundStreamHeadTag::loader),
         // 19
-        (TagPair(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader))
-        (TagPair(SWF::DEFINELOSSLESS, DefineBitsTag::loader))
-        (TagPair(SWF::DEFINEBITSJPEG2, DefineBitsTag::loader))
-        (TagPair(SWF::DEFINESHAPE2, DefineShapeTag::loader))
-        (TagPair(SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader)) // 23
-        (TagPair(SWF::PROTECT, ignore))
-        (TagPair(SWF::PATHSAREPOSTSCRIPT, unexpected)) // 25
-        (TagPair(SWF::PLACEOBJECT2, PlaceObject2Tag::loader))
+        TagPair(SWF::SOUNDSTREAMBLOCK,StreamSoundBlockTag::loader),
+        TagPair(SWF::DEFINELOSSLESS,DefineBitsTag::loader),
+        TagPair(SWF::DEFINEBITSJPEG2,DefineBitsTag::loader),
+        TagPair(SWF::DEFINESHAPE2,DefineShapeTag::loader),
+        TagPair(SWF::DEFINEBUTTONCXFORM,DefineButtonCxformTag::loader),// 23
+        TagPair(SWF::PROTECT,ignore),
+        TagPair(SWF::PATHSAREPOSTSCRIPT,unexpected),// 25
+        TagPair(SWF::PLACEOBJECT2,PlaceObject2Tag::loader),
         // 28
-        (TagPair(SWF::REMOVEOBJECT2, RemoveObjectTag::loader)) 
-        (TagPair(SWF::SYNCFRAME, unexpected)) // 29
-        (TagPair(SWF::FREEALL, unexpected)) // 31
-        (TagPair(SWF::DEFINESHAPE3, DefineShapeTag::loader))
-        (TagPair(SWF::DEFINETEXT2, DefineText2Tag::loader))
+        TagPair(SWF::REMOVEOBJECT2,RemoveObjectTag::loader),
+        TagPair(SWF::SYNCFRAME,unexpected),// 29
+        TagPair(SWF::FREEALL,unexpected),// 31
+        TagPair(SWF::DEFINESHAPE3,DefineShapeTag::loader),
+        TagPair(SWF::DEFINETEXT2,DefineText2Tag::loader),
         // 37
-        (TagPair(SWF::DEFINEBUTTON2, DefineButton2Tag::loader))
-        (TagPair(SWF::DEFINEBITSJPEG3, DefineBitsTag::loader))
-        (TagPair(SWF::DEFINELOSSLESS2, DefineBitsTag::loader))
-        (TagPair(SWF::DEFINEEDITTEXT, DefineEditTextTag::loader))
-        (TagPair(SWF::DEFINEVIDEO, unexpected)) // 38
-        (TagPair(SWF::DEFINESPRITE, sprite_loader))
-        (TagPair(SWF::NAMECHARACTER, unexpected)) // 40
-        (TagPair(SWF::SERIALNUMBER, serialnumber_loader)) // 41
-        (TagPair(SWF::DEFINETEXTFORMAT, unexpected)) // 42
-        (TagPair(SWF::FRAMELABEL, frame_label_loader)) // 43
-        (TagPair(SWF::DEFINEBEHAVIOR, unexpected)) // 44
+        TagPair(SWF::DEFINEBUTTON2,DefineButton2Tag::loader),
+        TagPair(SWF::DEFINEBITSJPEG3,DefineBitsTag::loader),
+        TagPair(SWF::DEFINELOSSLESS2,DefineBitsTag::loader),
+        TagPair(SWF::DEFINEEDITTEXT,DefineEditTextTag::loader),
+        TagPair(SWF::DEFINEVIDEO,unexpected),// 38
+        TagPair(SWF::DEFINESPRITE,sprite_loader),
+        TagPair(SWF::NAMECHARACTER,unexpected),// 40
+        TagPair(SWF::SERIALNUMBER,serialnumber_loader),// 41
+        TagPair(SWF::DEFINETEXTFORMAT,unexpected),// 42
+        TagPair(SWF::FRAMELABEL,frame_label_loader),// 43
+        TagPair(SWF::DEFINEBEHAVIOR,unexpected),// 44
         // 45
-        (TagPair(SWF::SOUNDSTREAMHEAD2, SoundStreamHeadTag::loader))
+        TagPair(SWF::SOUNDSTREAMHEAD2,SoundStreamHeadTag::loader),
         // 46
-        (TagPair(SWF::DEFINEMORPHSHAPE, DefineMorphShapeTag::loader))
+        TagPair(SWF::DEFINEMORPHSHAPE,DefineMorphShapeTag::loader),
         // 47
-        (TagPair(SWF::FRAMETAG, unexpected))
+        TagPair(SWF::FRAMETAG,unexpected),
         // 48
-        (TagPair(SWF::DEFINEFONT2, DefineFontTag::loader))
-        (TagPair(SWF::GENCOMMAND, unexpected)) // 49
-        (TagPair(SWF::DEFINECOMMANDOBJ, unexpected)) // 50
-        (TagPair(SWF::CHARACTERSET, unexpected)) // 51
-        (TagPair(SWF::FONTREF, unexpected)) // 52
-        (TagPair(SWF::DEFINEFUNCTION, unexpected)) // 53 
-        (TagPair(SWF::PLACEFUNCTION, unexpected)) // 54 
-        (TagPair(SWF::GENTAGOBJECT, unexpected)) // 55 
-        (TagPair(SWF::EXPORTASSETS, ExportAssetsTag::loader)) // 56
-        (TagPair(SWF::IMPORTASSETS, ImportAssetsTag::loader)) // 57
-        (TagPair(SWF::ENABLEDEBUGGER, ignore))    // 58
+        TagPair(SWF::DEFINEFONT2,DefineFontTag::loader),
+        TagPair(SWF::GENCOMMAND,unexpected),// 49
+        TagPair(SWF::DEFINECOMMANDOBJ,unexpected),// 50
+        TagPair(SWF::CHARACTERSET,unexpected),// 51
+        TagPair(SWF::FONTREF,unexpected),// 52
+        TagPair(SWF::DEFINEFUNCTION,unexpected),// 53
+        TagPair(SWF::PLACEFUNCTION,unexpected),// 54
+        TagPair(SWF::GENTAGOBJECT,unexpected),// 55
+        TagPair(SWF::EXPORTASSETS,ExportAssetsTag::loader),// 56
+        TagPair(SWF::IMPORTASSETS,ImportAssetsTag::loader),// 57
+        TagPair(SWF::ENABLEDEBUGGER,ignore),   // 58
         // 59
-        (TagPair(SWF::INITACTION, DoInitActionTag::loader)) 
+        TagPair(SWF::INITACTION,DoInitActionTag::loader),
         // 60
-        (TagPair(SWF::DEFINEVIDEOSTREAM, DefineVideoStreamTag::loader))
+        TagPair(SWF::DEFINEVIDEOSTREAM,DefineVideoStreamTag::loader),
         // 61
-        (TagPair(SWF::VIDEOFRAME, VideoFrameTag::loader))
+        TagPair(SWF::VIDEOFRAME,VideoFrameTag::loader),
         // 62
-        (TagPair(SWF::DEFINEFONTINFO2, DefineFontInfoTag::loader))
+        TagPair(SWF::DEFINEFONTINFO2,DefineFontInfoTag::loader),
         // 63
-        (TagPair(SWF::DEBUGID, ignore))
+        TagPair(SWF::DEBUGID,ignore),
         // 64
-        (TagPair(SWF::ENABLEDEBUGGER2, ignore))
-        (TagPair(SWF::SCRIPTLIMITS, ScriptLimitsTag::loader)) //65
-        (TagPair(SWF::SETTABINDEX, SetTabIndexTag::loader)) //66 
-        // TODO: Alexis reference says these are 83, 84. The 67, 68 comes from
+        TagPair(SWF::ENABLEDEBUGGER2,ignore),
+        TagPair(SWF::SCRIPTLIMITS,ScriptLimitsTag::loader),//65
+        TagPair(SWF::SETTABINDEX,SetTabIndexTag::loader),//66
+        // TODO: Alexis reference says these are 83,84. The 67,68 comes from
         // Tamarin. Figure out which one is correct (possibly both are).
         // 67
-        (TagPair(SWF::DEFINESHAPE4_, DefineShapeTag::loader))
+        TagPair(SWF::DEFINESHAPE4_,DefineShapeTag::loader),
         // 68
-        (TagPair(SWF::DEFINEMORPHSHAPE2_, DefineMorphShapeTag::loader))
+        TagPair(SWF::DEFINEMORPHSHAPE2_,DefineMorphShapeTag::loader),
         // 69
-        (TagPair(SWF::FILEATTRIBUTES, file_attributes_loader))
+        TagPair(SWF::FILEATTRIBUTES,file_attributes_loader),
         // 70
-        (TagPair(SWF::PLACEOBJECT3, PlaceObject2Tag::loader))
+        TagPair(SWF::PLACEOBJECT3,PlaceObject2Tag::loader),
         // 71
-        (TagPair(SWF::IMPORTASSETS2, ImportAssetsTag::loader))
+        TagPair(SWF::IMPORTASSETS2,ImportAssetsTag::loader),
         // 73
-        (TagPair(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader))
+        TagPair(SWF::DEFINEALIGNZONES,DefineFontAlignZonesTag::loader),
         // 74
-        (TagPair(SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader))
+        TagPair(SWF::CSMTEXTSETTINGS,CSMTextSettingsTag::loader),
         // 75
-        (TagPair(SWF::DEFINEFONT3, DefineFontTag::loader))
+        TagPair(SWF::DEFINEFONT3,DefineFontTag::loader),
         // 77
-        (TagPair(SWF::METADATA, metadata_loader))
+        TagPair(SWF::METADATA,metadata_loader),
         // 78
-        (TagPair(SWF::DEFINESCALINGGRID, DefineScalingGridTag::loader))
+        TagPair(SWF::DEFINESCALINGGRID,DefineScalingGridTag::loader),
         // 83
-        (TagPair(SWF::DEFINESHAPE4, DefineShapeTag::loader))
+        TagPair(SWF::DEFINESHAPE4,DefineShapeTag::loader),
         // 84
-        (TagPair(SWF::DEFINEMORPHSHAPE2, DefineMorphShapeTag::loader))
+        TagPair(SWF::DEFINEMORPHSHAPE2,DefineMorphShapeTag::loader),
         // 88
-        (TagPair(SWF::DEFINEFONTNAME, DefineFontNameTag::loader))
+        TagPair(SWF::DEFINEFONTNAME,DefineFontNameTag::loader),
         // 89
-        (TagPair(SWF::STARTSOUND2, StartSound2Tag::loader))
+        TagPair(SWF::STARTSOUND2,StartSound2Tag::loader),
         // 90
-        (TagPair(SWF::DEFINEBITSJPEG4, DefineBitsTag::loader))
+        TagPair(SWF::DEFINEBITSJPEG4,DefineBitsTag::loader),
         // 777
-        (TagPair(SWF::REFLEX, reflex_loader))
+        TagPair(SWF::REFLEX,reflex_loader)
 #ifdef ENABLE_AVM2
         // The following tags are AVM2 only.
         // 72 -- AS3 codeblock.
-        (TagPair(SWF::DOABC, DoABCTag::loader)) 
+        ,TagPair(SWF::DOABC,DoABCTag::loader),
         // 76
-        (TagPair(SWF::SYMBOLCLASS, SymbolClassTag::loader))
+        TagPair(SWF::SYMBOLCLASS,SymbolClassTag::loader),
         // 82
-        (TagPair(SWF::DOABCDEFINE, DoABCTag::loader))
+        TagPair(SWF::DOABCDEFINE,DoABCTag::loader),
         // 86
-        (TagPair(SWF::DEFINESCENEANDFRAMELABELDATA,
-                DefineSceneAndFrameLabelDataTag::loader))
+        TagPair(SWF::DEFINESCENEANDFRAMELABELDATA,
+                DefineSceneAndFrameLabelDataTag::loader)
 #endif
-        ;
+        };
 
     std::for_each(tags.begin(), tags.end(), AddLoader(table));
 
