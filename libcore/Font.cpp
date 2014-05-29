@@ -306,7 +306,7 @@ Font::add_os_glyph(std::uint16_t code)
     // Add the new glyph id
     _deviceCodeTable[code] = newOffset;
 
-    _deviceGlyphTable.push_back(GlyphInfo(std::move(sh), advance));
+    _deviceGlyphTable.emplace_back(std::move(sh), advance);
 
     return newOffset;
 }

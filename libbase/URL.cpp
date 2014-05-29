@@ -77,7 +77,7 @@ URL::normalize_path(std::string& path)
         }
     }
     // add last component 
-    components.push_back(std::string(prev+1, path.end()));
+    components.emplace_back(prev+1, path.end());
     
     path = "";
     for (std::vector<std::string>::const_iterator i=components.begin(),

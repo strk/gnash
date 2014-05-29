@@ -1843,7 +1843,7 @@ movieclip_beginGradientFill(const fn_call& fn)
         color.parseRGB(col);
         color.m_a = alp;
 
-        gradients.push_back(GradientRecord(rat, color));
+        gradients.emplace_back(rat, color);
     }
 
     // Make sure we don't try to construct a GradientFill with only 1 stop!

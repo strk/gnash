@@ -1458,7 +1458,7 @@ void
 movie_root::addLoadableObject(as_object* obj, std::unique_ptr<IOChannel> str)
 {
     std::shared_ptr<IOChannel> io(str.release());
-    _loadCallbacks.push_back(LoadCallback(io, obj));
+    _loadCallbacks.emplace_back(io, obj);
 }
 
 void
@@ -2201,34 +2201,34 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
     /// This is when there is a hosting application.
     std::vector<as_value> fnargs;
     // The first argument we push on the stack is the URL
-    fnargs.push_back(as_value(urlstr));
+    fnargs.emplace_back(urlstr);
     
     // The second argument we push is the method
     switch (method) {
       case MovieClip::METHOD_POST:
-          fnargs.push_back(as_value("POST"));
+          fnargs.emplace_back("POST");
           break;
       case MovieClip::METHOD_GET:
-          fnargs.push_back(as_value("GET"));
+          fnargs.emplace_back("GET");
           break;
       case MovieClip::METHOD_NONE:
       default:
-          fnargs.push_back(as_value("GET"));
+          fnargs.emplace_back("GET");
           break;
     }
 
     // The third argument is the target, which is something like _blank
     // or _self.
     if (!target.empty()) {
-        fnargs.push_back(as_value(target));
+        fnargs.emplace_back(target);
     }
     // Add any data as the optional 4th argument
     if (!data.empty()) {
         // We have to write a value here so the data field is the fourth
         if (target.empty()) {
-            fnargs.push_back(as_value("none"));
+            fnargs.emplace_back("none");
         }
-        fnargs.push_back(as_value(data));
+        fnargs.emplace_back(data);
     }
 
     // TODO: should mutex-protect this ?

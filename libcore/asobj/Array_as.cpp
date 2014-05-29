@@ -155,7 +155,7 @@ class PushToIndexedVector
 public:
     PushToIndexedVector(std::vector<indexed_as_value>& v) : _v(v), _i(0) {}
     void operator()(const as_value& val) {
-        _v.push_back(indexed_as_value(val, _i));
+        _v.emplace_back(val, _i);
         ++_i;
     }
 private:

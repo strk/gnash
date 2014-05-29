@@ -330,7 +330,7 @@ public:
     void 
     drawLineTo(std::int32_t dx, std::int32_t dy)
     {
-        m_edges.push_back(Edge(dx, dy, dx, dy)); 
+        m_edges.emplace_back(dx, dy, dx, dy);
     }
 
     /// Draw a curve.
@@ -353,7 +353,7 @@ public:
     void 
     drawCurveTo(std::int32_t cdx, std::int32_t cdy, std::int32_t adx, std::int32_t ady)
     {
-        m_edges.push_back(Edge(cdx, cdy, adx, ady)); 
+        m_edges.emplace_back(cdx, cdy, adx, ady);
     }
 
     /// Remove all edges and reset style infomation 
@@ -382,8 +382,7 @@ public:
         const Edge& lastedge = m_edges.back();
         if ( lastedge.ap != ap )
         {
-            Edge newedge(ap, ap);
-            m_edges.push_back(newedge);
+            m_edges.emplace_back(ap, ap);
         }
     }
 

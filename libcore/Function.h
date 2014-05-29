@@ -110,7 +110,7 @@ public:
     /// @param reg      The register for the argument.
     /// @param name     The name of the argument.
 	void add_arg(std::uint8_t reg, const ObjectURI& name) {
-        _args.push_back(Argument(reg, name));
+            _args.emplace_back(reg, name);
 	}
 
     /// Set the length in bytes of the function code.

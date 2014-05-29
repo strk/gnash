@@ -253,7 +253,7 @@ VM::pushCallFrame(UserFunction& func)
         throw ActionLimitException(ss.str()); 
     }
 
-    _callStack.push_back(CallFrame(&func));
+    _callStack.emplace_back(&func);
     return _callStack.back();
 }
 

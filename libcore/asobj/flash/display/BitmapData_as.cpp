@@ -586,7 +586,7 @@ struct VectorPusher
         as_value x, y;
         if (!p->get_member(NSV::PROP_X, &x)) return;
         if (!p->get_member(NSV::PROP_Y, &y)) return;
-        _offsets.push_back(Vector(toInt(x, _vm), toInt(y, _vm)));
+        _offsets.emplace_back(toInt(x, _vm), toInt(y, _vm));
     }
 
 private:

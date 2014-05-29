@@ -63,12 +63,12 @@ PathParser::run(const SWFCxForm& cx, const SWFMatrix& /*mat*/)
 
     int leftfill = _paths[i].getLeftFill();
     if (leftfill) {
-      unipathvec[leftfill-1].push_front(UnivocalPath(&_paths[i], UnivocalPath::FILL_LEFT));
+      unipathvec[leftfill-1].emplace_front(&_paths[i], UnivocalPath::FILL_LEFT);
     }
 
     int rightfill = _paths[i].getRightFill();
     if (rightfill) {
-      unipathvec[rightfill-1].push_front(UnivocalPath(&_paths[i], UnivocalPath::FILL_RIGHT));
+      unipathvec[rightfill-1].emplace_front(&_paths[i], UnivocalPath::FILL_RIGHT);
     }
   }
 
