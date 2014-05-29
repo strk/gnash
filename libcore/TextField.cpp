@@ -2119,7 +2119,7 @@ TextField::parseHTML(std::wstring& tag,
         // Skip attribute closer.
         ++it;
 
-        attributes.emplace(attname, attvalue);
+        attributes.insert(std::make_pair(attname, attvalue));
         attname.clear();
         attvalue.clear();
 

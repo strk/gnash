@@ -42,7 +42,7 @@ bool
 TagLoadersTable::registerLoader(SWF::TagType t, TagLoader lf)
 {
 	assert(lf);
-    return _loaders.emplace(t, lf).second;
+    return _loaders.insert(std::make_pair(t, lf)).second;
 }
 
 } // namespace gnash::SWF

@@ -97,7 +97,7 @@ SWFMovie::addCharacter(std::uint16_t id)
 {
     // If a character is already known, we don't want to mark it uninitialized
     // again.
-    _characters.emplace(id, false);
+    _characters.insert(std::make_pair(id, false));
 }
 
 bool

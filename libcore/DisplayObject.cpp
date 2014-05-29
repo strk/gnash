@@ -1621,32 +1621,45 @@ getURIMap(const typename Map::key_compare& cmp)
     const Setter n = nullptr;
 
     Map ret(cmp);
-    ret.emplace(NSV::PROP_uX, GetterSetter(&getX, &setX));
-    ret.emplace(NSV::PROP_uY, GetterSetter(&getY, &setY));
-    ret.emplace(NSV::PROP_uXSCALE, GetterSetter(&getScaleX, &setScaleX));
-    ret.emplace(NSV::PROP_uYSCALE, GetterSetter(&getScaleY, &setScaleY));
-    ret.emplace(NSV::PROP_uROTATION, GetterSetter(&getRotation, &setRotation));
-    ret.emplace(NSV::PROP_uHIGHQUALITY,
-                GetterSetter(&getHighQuality, &setHighQuality));
-    ret.emplace(NSV::PROP_uQUALITY, GetterSetter(&getQuality, &setQuality));
-    ret.emplace(NSV::PROP_uALPHA, GetterSetter(&getAlpha, &setAlpha));
-    ret.emplace(NSV::PROP_uWIDTH, GetterSetter(&getWidth, &setWidth));
-    ret.emplace(NSV::PROP_uHEIGHT, GetterSetter(&getHeight, &setHeight));
-    ret.emplace(NSV::PROP_uNAME, GetterSetter(&getNameProperty, &setName));
-    ret.emplace(NSV::PROP_uVISIBLE, GetterSetter(&getVisible, &setVisible));
-    ret.emplace(NSV::PROP_uSOUNDBUFTIME,
-                GetterSetter(&getSoundBufTime, &setSoundBufTime));
-    ret.emplace(NSV::PROP_uFOCUSRECT,
-                GetterSetter(&getFocusRect, &setFocusRect));
-    ret.emplace(NSV::PROP_uDROPTARGET, GetterSetter(&getDropTarget, n));
-    ret.emplace(NSV::PROP_uCURRENTFRAME, GetterSetter(&getCurrentFrame, n));
-    ret.emplace(NSV::PROP_uFRAMESLOADED, GetterSetter(&getFramesLoaded, n));
-    ret.emplace(NSV::PROP_uTOTALFRAMES, GetterSetter(&getTotalFrames, n));
-    ret.emplace(NSV::PROP_uURL, GetterSetter(&getURL, n));
-    ret.emplace(NSV::PROP_uTARGET, GetterSetter(&getTarget, n));
-    ret.emplace(NSV::PROP_uXMOUSE, GetterSetter(&getMouseX, n));
-    ret.emplace(NSV::PROP_uYMOUSE, GetterSetter(&getMouseY, n));
-    ret.emplace(NSV::PROP_uPARENT, GetterSetter(&getParent, n));
+    ret.insert(std::make_pair(NSV::PROP_uX, GetterSetter(&getX, &setX)));
+    ret.insert(std::make_pair(NSV::PROP_uY, GetterSetter(&getY, &setY)));
+    ret.insert(std::make_pair(NSV::PROP_uXSCALE,
+                GetterSetter(&getScaleX, &setScaleX)));
+    ret.insert(std::make_pair(NSV::PROP_uYSCALE,
+                GetterSetter(&getScaleY, &setScaleY)));
+    ret.insert(std::make_pair(NSV::PROP_uROTATION,
+                GetterSetter(&getRotation, &setRotation)));
+    ret.insert(std::make_pair(NSV::PROP_uHIGHQUALITY,
+                GetterSetter(&getHighQuality, &setHighQuality)));
+    ret.insert(std::make_pair(NSV::PROP_uQUALITY,
+                GetterSetter(&getQuality, &setQuality)));
+    ret.insert(std::make_pair(NSV::PROP_uALPHA,
+                GetterSetter(&getAlpha, &setAlpha)));
+    ret.insert(std::make_pair(NSV::PROP_uWIDTH,
+                GetterSetter(&getWidth, &setWidth)));
+    ret.insert(std::make_pair(NSV::PROP_uHEIGHT,
+                GetterSetter(&getHeight, &setHeight)));
+    ret.insert(std::make_pair(NSV::PROP_uNAME,
+                GetterSetter(&getNameProperty, &setName)));
+    ret.insert(std::make_pair(NSV::PROP_uVISIBLE,
+                GetterSetter(&getVisible, &setVisible)));
+    ret.insert(std::make_pair(NSV::PROP_uSOUNDBUFTIME,
+                GetterSetter(&getSoundBufTime, &setSoundBufTime)));
+    ret.insert(std::make_pair(NSV::PROP_uFOCUSRECT,
+                GetterSetter(&getFocusRect, &setFocusRect)));
+    ret.insert(std::make_pair(NSV::PROP_uDROPTARGET,
+                GetterSetter(&getDropTarget, n)));
+    ret.insert(std::make_pair(NSV::PROP_uCURRENTFRAME,
+                GetterSetter(&getCurrentFrame, n)));
+    ret.insert(std::make_pair(NSV::PROP_uFRAMESLOADED,
+                GetterSetter(&getFramesLoaded, n)));
+    ret.insert(std::make_pair(NSV::PROP_uTOTALFRAMES,
+                GetterSetter(&getTotalFrames, n)));
+    ret.insert(std::make_pair(NSV::PROP_uURL, GetterSetter(&getURL, n)));
+    ret.insert(std::make_pair(NSV::PROP_uTARGET, GetterSetter(&getTarget, n)));
+    ret.insert(std::make_pair(NSV::PROP_uXMOUSE, GetterSetter(&getMouseX, n)));
+    ret.insert(std::make_pair(NSV::PROP_uYMOUSE, GetterSetter(&getMouseY, n)));
+    ret.insert(std::make_pair(NSV::PROP_uPARENT, GetterSetter(&getParent, n)));
     return ret;
 }
 

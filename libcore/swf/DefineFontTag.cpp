@@ -69,7 +69,7 @@ DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
         // Code table is made of std::uint16_t's.
         for (size_t i=0; i < glyphCount; ++i) {
             const std::uint16_t code = in.read_u16();
-            table.emplace(code, i);
+            table.insert(std::make_pair(code, i));
         }
     }
     else {
@@ -77,7 +77,7 @@ DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
         in.ensureBytes(1 * glyphCount);
         for (size_t i = 0; i < glyphCount; ++i) {
             const std::uint8_t code = in.read_u8();
-            table.emplace(code, i);
+            table.insert(std::make_pair(code, i));
         }
     }
 }
@@ -319,7 +319,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m,
 
             // Remember this adjustment; we can look it up quickly
             // later using the DisplayObject pair as the key.
-            if (!_kerningPairs.emplace(k, adjustment).second) {
+            if (!_kerningPairs.insert(std::make_pair(k, adjustment)).second) {
                 IF_VERBOSE_MALFORMED_SWF(
                     log_swferror(_("Repeated kerning pair found - ignoring"));
                 );
