@@ -49,26 +49,26 @@ public:
     point cp; // control point, TWIPS
     point ap; // anchor    point, TWIPS
 
-    Edge() 
+    constexpr Edge()
         :
         cp(0, 0),
         ap(0, 0)
     {}
     
-    Edge(std::int32_t cx, std::int32_t cy, std::int32_t ax,
-            std::int32_t ay)
+    constexpr Edge(std::int32_t cx, std::int32_t cy, std::int32_t ax,
+                   std::int32_t ay)
         :
         cp(cx, cy),
         ap(ax, ay)
     {}
 
-    Edge(const Edge& from)
+    constexpr Edge(const Edge& from)
         : 
         cp(from.cp),
         ap(from.ap)
     {}
 
-    Edge(const point& ncp, const point& nap)
+    constexpr Edge(const point& ncp, const point& nap)
         :
         cp(ncp),
         ap(nap)

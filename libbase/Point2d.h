@@ -53,7 +53,7 @@ public:
 	}
 
 	/// Construct a Point2d with given x and y ordinates
-	Point2d(std::int32_t cx, std::int32_t cy)
+	constexpr Point2d(std::int32_t cx, std::int32_t cy)
 		:
 		x(cx), y(cy)
 	{
