@@ -27,10 +27,6 @@
 
 namespace gnash {
 
-const std::int32_t SWFRect::rectNull;
-const std::int32_t SWFRect::rectMax;
-
-
 // Set ourself to bound a rectangle that has been transformed by m.  
 void
 SWFRect::enclose_transformed_rect(const SWFMatrix& m, const SWFRect& r)
