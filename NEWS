@@ -4,15 +4,18 @@ YYYY/MM/DD
 Caveats:
 * The in-tree copy of jemalloc has been removed in preference to linking
   the system-installed jemalloc library.
-* The minimum required version of FFMPEG/libavcodec (if available) is 53.35.0.
+* The minimum required version of FFMPEG/libavcodec (if available) is
+  53.35.0.
 * Extensions support is now disabled by default.
+* The minimum GCC version required to build Gnash is 4.6.0.
 
 Improvements since 0.8.10 release are:
 
  * Fix opening of external URL with Gnash Standalone (#31833)
  * Stability fixes in image handling, (CVE-2012-1175, #39388, #37629).
- * Stability fixes in parsing (#34686) and ActionScript handling (#39385, #39404).
- * NPAPI Plugin stability fix (#36002).
+ * Stability fixes in parsing (#34686) and ActionScript handling (#39385,
+   #39404).
+ * NPAPI Plugin stability fix (#36002, #42199) and a file descriptor leak.
  * Improved NetStream ActionScript class support.
  * Add support for IPv6 [TODO: affects Socket/XML, and what else?].
  * Fix build against recent Boost, FFMPEG and libav.
