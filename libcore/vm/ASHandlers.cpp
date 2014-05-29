@@ -27,7 +27,6 @@
 #include <string>
 #include <vector>
 #include <boost/random.hpp>
-#include <boost/lexical_cast.hpp>
 #include <algorithm> 
 
 #include "log.h"
@@ -2371,7 +2370,7 @@ ActionInitArray(ActionExec& thread)
     // Fill the elements with the initial values from the stack.
     for (int i = 0; i < array_size; i++) {
         const ObjectURI& k = 
-            getURI(vm, boost::lexical_cast<std::string>(i));
+            getURI(vm, std::to_string(i));
         ao->set_member(k, env.pop());
     }
 

@@ -995,7 +995,7 @@ ObjectURI
 arrayKey(VM& vm, size_t i)
 {
     // TODO: tell getURI that the string is already lowercase!
-    return getURI(vm, boost::lexical_cast<std::string>(i), true);
+    return getURI(vm, std::to_string(i), true);
 }
 
 namespace {
@@ -1559,7 +1559,7 @@ join(as_object* array, const std::string& separator)
 
     for (size_t i = 0; i < size; ++i) {
         if (i) s += separator;
-        const std::string& index = boost::lexical_cast<std::string>(i);
+        const std::string& index = std::to_string(i);
         const as_value& el = getOwnProperty(*array, getURI(vm, index));
         s += el.to_string(version);
     }

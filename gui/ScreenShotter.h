@@ -23,7 +23,6 @@
 #include <string>
 #include <set>
 #include <algorithm>
-#include <boost/lexical_cast.hpp>
 
 #include "GnashEnums.h"
 
@@ -126,7 +125,7 @@ public:
             if (t) (*t)();
             _done.insert(frameAdvance);
 
-            saveImage(r, boost::lexical_cast<std::string>(frameAdvance));
+            saveImage(r, std::to_string(frameAdvance));
             _immediate = false;
         }
         

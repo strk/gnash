@@ -1804,7 +1804,7 @@ movieclip_beginGradientFill(const fn_call& fn)
     gradients.reserve(stops);
     for (size_t i = 0; i < stops; ++i) {
 
-        const ObjectURI& key = getURI(vm, boost::lexical_cast<std::string>(i));
+        const ObjectURI& key = getURI(vm, std::to_string(i));
 
         as_value colVal = getMember(*colors, key);
         std::uint32_t col = colVal.is_number() ? toInt(colVal, getVM(fn)) : 0;

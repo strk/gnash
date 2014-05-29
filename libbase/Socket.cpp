@@ -26,7 +26,6 @@
 
 #include <cerrno>
 #include <csignal>
-#include <boost/lexical_cast.hpp>
 #include <cstdint>
 
 #include "GnashSystemNetHeaders.h"
@@ -131,7 +130,7 @@ addrinfo* getAddrInfo(const std::string& hostname, std::uint16_t port)
     req.ai_family = AF_UNSPEC;  // Allow IPv4 or IPv6
     req.ai_socktype = SOCK_STREAM;
 
-    std::string portNo = boost::lexical_cast<std::string>(port);
+    std::string portNo = std::to_string(port);
     int code = getaddrinfo(hostname.c_str(), portNo.c_str(), &req, &ans);
     if (code != 0) {
         log_error(_("getaddrinfo() failed with code: #%d - %s"),
