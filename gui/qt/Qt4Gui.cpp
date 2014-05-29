@@ -23,7 +23,6 @@
 #endif
 
 #include <map>
-#include <boost/assign/list_inserter.hpp>
 
 #include <QMainWindow>
 #include <QX11Info>
@@ -699,38 +698,38 @@ Qt4Gui::setupKeyMap()
     // be harmful to do it more.
     assert (_keyMap.empty());
     
-    boost::assign::insert(_keyMap)
-    (Qt::Key_Backspace, gnash::key::BACKSPACE)
-    (Qt::Key_Tab, gnash::key::TAB)
-    (Qt::Key_Clear, gnash::key::CLEAR)
-    (Qt::Key_Return, gnash::key::ENTER)
-    (Qt::Key_Enter, gnash::key::ENTER)
-    (Qt::Key_Shift, gnash::key::SHIFT)
-    (Qt::Key_Control, gnash::key::CONTROL)
-    (Qt::Key_Alt, gnash::key::ALT)
-    (Qt::Key_CapsLock, gnash::key::CAPSLOCK)
-    (Qt::Key_Escape, gnash::key::ESCAPE)
-    (Qt::Key_Space, gnash::key::SPACE)
-    (Qt::Key_PageDown, gnash::key::PGDN)
-    (Qt::Key_PageUp, gnash::key::PGUP)
-    (Qt::Key_Home, gnash::key::HOME)
-    (Qt::Key_End, gnash::key::END)
-    (Qt::Key_Left, gnash::key::LEFT)
-    (Qt::Key_Up, gnash::key::UP)
-    (Qt::Key_Right, gnash::key::RIGHT)
-    (Qt::Key_Down, gnash::key::DOWN)
-    (Qt::Key_Insert, gnash::key::INSERT)
-    (Qt::Key_Delete, gnash::key::DELETEKEY)
-    (Qt::Key_Help, gnash::key::HELP)
-    (Qt::Key_NumLock, gnash::key::NUM_LOCK)
-    (Qt::Key_Semicolon, gnash::key::SEMICOLON)
-    (Qt::Key_Equal, gnash::key::EQUALS)
-    (Qt::Key_Minus, gnash::key::MINUS)
-    (Qt::Key_Slash, gnash::key::SLASH)
-    (Qt::Key_BracketLeft, gnash::key::LEFT_BRACKET)
-    (Qt::Key_Backslash, gnash::key::BACKSLASH)
-    (Qt::Key_BracketRight, gnash::key::RIGHT_BRACKET)
-    (Qt::Key_QuoteDbl, gnash::key::DOUBLE_QUOTE);
+    _keyMap = {
+    {Qt::Key_Backspace, gnash::key::BACKSPACE},
+    {Qt::Key_Tab, gnash::key::TAB},
+    {Qt::Key_Clear, gnash::key::CLEAR},
+    {Qt::Key_Return, gnash::key::ENTER},
+    {Qt::Key_Enter, gnash::key::ENTER},
+    {Qt::Key_Shift, gnash::key::SHIFT},
+    {Qt::Key_Control, gnash::key::CONTROL},
+    {Qt::Key_Alt, gnash::key::ALT},
+    {Qt::Key_CapsLock, gnash::key::CAPSLOCK},
+    {Qt::Key_Escape, gnash::key::ESCAPE},
+    {Qt::Key_Space, gnash::key::SPACE},
+    {Qt::Key_PageDown, gnash::key::PGDN},
+    {Qt::Key_PageUp, gnash::key::PGUP},
+    {Qt::Key_Home, gnash::key::HOME},
+    {Qt::Key_End, gnash::key::END},
+    {Qt::Key_Left, gnash::key::LEFT},
+    {Qt::Key_Up, gnash::key::UP},
+    {Qt::Key_Right, gnash::key::RIGHT},
+    {Qt::Key_Down, gnash::key::DOWN},
+    {Qt::Key_Insert, gnash::key::INSERT},
+    {Qt::Key_Delete, gnash::key::DELETEKEY},
+    {Qt::Key_Help, gnash::key::HELP},
+    {Qt::Key_NumLock, gnash::key::NUM_LOCK},
+    {Qt::Key_Semicolon, gnash::key::SEMICOLON},
+    {Qt::Key_Equal, gnash::key::EQUALS},
+    {Qt::Key_Minus, gnash::key::MINUS},
+    {Qt::Key_Slash, gnash::key::SLASH},
+    {Qt::Key_BracketLeft, gnash::key::LEFT_BRACKET},
+    {Qt::Key_Backslash, gnash::key::BACKSLASH},
+    {Qt::Key_BracketRight, gnash::key::RIGHT_BRACKET},
+    {Qt::Key_QuoteDbl, gnash::key::DOUBLE_QUOTE} };
 }
 
 void

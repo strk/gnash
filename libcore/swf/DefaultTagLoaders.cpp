@@ -22,7 +22,6 @@
 
 #include "DefaultTagLoaders.h"
 
-#include <boost/assign.hpp>
 #include <set>
 
 #include "SWF.h"
