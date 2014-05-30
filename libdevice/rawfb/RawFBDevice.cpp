@@ -38,17 +38,11 @@ namespace renderer {
 
 namespace rawfb {
     
-// The debug log used by all the gnash libraries.
-static LogFile& dbglogfile = LogFile::getDefaultInstance();
-
-
 RawFBDevice::RawFBDevice()
     : _fd(0),
       _fbmem(nullptr)
 {
     // GNASH_REPORT_FUNCTION;
-
-    //    dbglogfile.setVerbosity();
 }
 
 RawFBDevice::RawFBDevice(int /* vid */)
