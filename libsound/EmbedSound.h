@@ -60,7 +60,7 @@ public:
     /// @param data The encoded sound data.
     /// @param info encoding info
     /// @param volume initial volume (0..100). Optional, defaults to 100.
-    EmbedSound(std::unique_ptr<SimpleBuffer> data, const media::SoundInfo& info,
+    EmbedSound(std::unique_ptr<SimpleBuffer> data, media::SoundInfo info,
             int volume);
 
     ~EmbedSound();

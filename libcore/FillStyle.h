@@ -40,10 +40,10 @@ namespace gnash {
 class GradientRecord
 {
 public:
-    GradientRecord(std::uint8_t ratio, const rgba& color)
+    GradientRecord(std::uint8_t ratio, rgba color)
         :
         ratio(ratio),
-        color(color)
+        color(std::move(color))
     { }
     
     //data:
@@ -90,12 +90,12 @@ public:
     /// Construct a BitmapFill from arbitrary bitmap data.
     //
     /// TODO: check the smoothing policy here!
-    BitmapFill(Type t, const CachedBitmap* bi, const SWFMatrix& m,
+    BitmapFill(Type t, const CachedBitmap* bi, SWFMatrix m,
             SmoothingPolicy pol);
 
     /// Construct a static BitmapFill using a SWF tag.
     BitmapFill(SWF::FillType t, movie_definition* md, std::uint16_t id,
-            const SWFMatrix& m);
+            SWFMatrix m);
 
     /// Destructor
     ~BitmapFill();
@@ -248,9 +248,9 @@ struct DSOEXPORT SolidFill
 public:
 
     /// Construct a SolidFill.
-    explicit SolidFill(const rgba& c)
+    explicit SolidFill(rgba c)
         :
-        _color(c)
+        _color(std::move(c))
     { }
 
     /// Copy a SolidFill.

@@ -45,9 +45,9 @@ public:
 	/// A little helper for indexing.
 	struct svt
 	{
-		svt(const std::string& val, std::size_t i)
+		svt(std::string val, std::size_t i)
             :
-			value(val),
+			value(std::move(val)),
             id(i)
         {}
 

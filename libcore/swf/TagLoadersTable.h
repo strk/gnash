@@ -54,9 +54,9 @@ public:
 	TagLoadersTable() {}
 
     /// Construct a TagLoadersTable by copying another table
-    TagLoadersTable(const Loaders& loaders)
+    TagLoadersTable(Loaders loaders)
         :
-        _loaders(loaders)
+        _loaders(std::move(loaders))
     {}
 	
     ~TagLoadersTable() {}

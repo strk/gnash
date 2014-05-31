@@ -68,11 +68,11 @@ ScreenShotter::ScreenShotter(const std::string& fileName, int quality)
 {
 }
 
-ScreenShotter::ScreenShotter(const std::string& fileName, FileType type,
+ScreenShotter::ScreenShotter(std::string fileName, FileType type,
         int quality)
     :
     _immediate(false),
-    _fileName(fileName),
+    _fileName(std::move(fileName)),
     _last(false),
     _type(type),
     _quality(quality)

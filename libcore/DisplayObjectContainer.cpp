@@ -48,7 +48,7 @@ public:
             DisplayObject::InfoTree::iterator it)
         :
         _tr(tr),
-        _it(it)
+        _it(std::move(it))
     {}
 
     void operator()(DisplayObject* ch) {

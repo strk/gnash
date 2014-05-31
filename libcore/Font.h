@@ -105,7 +105,7 @@ public:
     ///
     /// @param italic
     ///    Whether to use the italic variant of the font.
-    Font(const std::string& name, bool bold = false, bool italic = false);
+    Font(std::string name, bool bold = false, bool italic = false);
 
     ~Font();
 

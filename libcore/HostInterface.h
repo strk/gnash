@@ -66,11 +66,11 @@ namespace gnash {
 class CustomMessage
 {
 public:
-    explicit CustomMessage(const std::string& s,
-            const boost::any& arg = boost::blank())
+    explicit CustomMessage(std::string s,
+            boost::any arg = boost::blank())
         :
-        _name(s),
-        _arg(arg)
+        _name(std::move(s)),
+        _arg(std::move(arg))
     {}
     const std::string& name() const { return _name; }
     const boost::any& arg() const { return _arg; }
@@ -181,10 +181,10 @@ public:
         EXTERNALINTERFACE_ZOOM
     };
 
-    explicit HostMessage(KnownEvent e, const boost::any& arg = boost::blank())
+    explicit HostMessage(KnownEvent e, boost::any arg = boost::blank())
         :
         _event(e),
-        _arg(arg)
+        _arg(std::move(arg))
     {}
 
     KnownEvent event() const { return _event; }

@@ -289,32 +289,32 @@ class Property
 
 public:
 
-	Property(const ObjectURI& uri, const as_value& value,
-            const PropFlags& flags)
+	Property(ObjectURI uri, const as_value& value,
+            PropFlags flags)
         :
         _bound(value),
-		_uri(uri),
-		_flags(flags),
+		_uri(std::move(uri)),
+		_flags(std::move(flags)),
         _destructive(false)
 	{}
 
-	Property(const ObjectURI& uri,
+	Property(ObjectURI uri,
 		as_function* getter, as_function* setter, 
-		const PropFlags& flags, bool destroy = false)
+		PropFlags flags, bool destroy = false)
         :
         _bound(GetterSetter(getter, setter)),
-        _uri(uri),
-		_flags(flags), 
+        _uri(std::move(uri)),
+		_flags(std::move(flags)), 
 		_destructive(destroy)
 	{}
 
-	Property(const ObjectURI& uri, as_c_function_ptr getter,
-            as_c_function_ptr setter, const PropFlags& flags,
+	Property(ObjectURI uri, as_c_function_ptr getter,
+            as_c_function_ptr setter, PropFlags flags,
             bool destroy = false)
 		:
         _bound(GetterSetter(getter, setter)),
-        _uri(uri),
-		_flags(flags),
+        _uri(std::move(uri)),
+		_flags(std::move(flags)),
         _destructive(destroy)
 	{}
 

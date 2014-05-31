@@ -81,10 +81,10 @@ namespace {
 class AggStyle 
 {
 public:
-    AggStyle(bool solid, const agg::rgba8& color = agg::rgba8(0,0,0,0))
+    AggStyle(bool solid, agg::rgba8 color = agg::rgba8(0,0,0,0))
       :
       _solid(solid),
-      _color(color)
+      _color(std::move(color))
     {
     }
     
@@ -242,14 +242,14 @@ class GradientStyle : public AggStyle
 public:
   
     GradientStyle(const GradientFill& fs, const SWFMatrix& mat,
-            const SWFCxForm& cx, int norm_size, GradientType gr = GradientType())
+            SWFCxForm cx, int norm_size, GradientType gr = GradientType())
         :
         AggStyle(false),
-        m_cx(cx),
+        m_cx(std::move(cx)),
         m_tr(mat.a() / 65536.0, mat.b() / 65536.0, mat.c() / 65536.0,
               mat.d() / 65536.0, mat.tx(), mat.ty()),
         m_span_interpolator(m_tr),
-        m_gradient_adaptor(gr),
+        m_gradient_adaptor(std::move(gr)),
         m_sg(m_span_interpolator, m_gradient_adaptor, m_gradient_lut, 0,
                 norm_size),
       
@@ -365,10 +365,10 @@ class BitmapStyle : public AggStyle
 public:
     
   BitmapStyle(int width, int height, int rowlen, std::uint8_t* data,
-    const SWFMatrix& mat, const SWFCxForm& cx)
+    const SWFMatrix& mat, SWFCxForm cx)
     :
     AggStyle(false),
-    m_cx(cx),
+    m_cx(std::move(cx)),
     m_rbuf(data, width, height, rowlen),  
     m_pixf(m_rbuf),
     m_img_src(m_pixf),

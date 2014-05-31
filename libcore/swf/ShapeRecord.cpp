@@ -52,8 +52,8 @@ public:
     Lerp(typename T::const_iterator style1, typename T::const_iterator style2,
             const double ratio)
         :
-        _style1(style1),
-        _style2(style2),
+        _style1(std::move(style1)),
+        _style2(std::move(style2)),
         _ratio(ratio)
     {}
 

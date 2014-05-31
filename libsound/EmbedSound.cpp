@@ -33,9 +33,9 @@ namespace gnash {
 namespace sound {
 
 EmbedSound::EmbedSound(std::unique_ptr<SimpleBuffer> data,
-        const media::SoundInfo& info, int nVolume)
+        media::SoundInfo info, int nVolume)
     :
-    soundinfo(info),
+    soundinfo(std::move(info)),
     volume(nVolume),
     _buf(data.release())
 {

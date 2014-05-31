@@ -73,9 +73,9 @@ namespace {
 
 }
 
-String_as::String_as(const std::string& s)
+String_as::String_as(std::string s)
     :
-    _string(s)
+    _string(std::move(s))
 {
 }
 

@@ -56,7 +56,7 @@ public:
     ///                     connections.
     /// @param base         The base URL, used to resolve URLs.
     /// @param np           A policy to decide the name of cached files.
-	StreamProvider(const URL& original, const URL& base,
+	StreamProvider(URL original, URL base,
             std::unique_ptr<NamingPolicy> np =
             std::unique_ptr<NamingPolicy>(new NamingPolicy));
 

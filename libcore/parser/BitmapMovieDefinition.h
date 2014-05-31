@@ -59,7 +59,7 @@ public:
 	///  - provided url
 	///
 	BitmapMovieDefinition(std::unique_ptr<image::GnashImage> image,
-            Renderer* renderer, const std::string& url);
+            Renderer* renderer, std::string url);
 
     virtual DisplayObject* createDisplayObject(Global_as&, DisplayObject*)
         const;

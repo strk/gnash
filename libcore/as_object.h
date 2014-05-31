@@ -60,10 +60,10 @@ class Trigger
 {
 public:
 
-    Trigger(const std::string& propname, as_function& trig,
+    Trigger(std::string propname, as_function& trig,
             const as_value& customArg)
         :
-        _propname(propname),
+        _propname(std::move(propname)),
         _func(&trig),
         _customArg(customArg),
         _executing(false),

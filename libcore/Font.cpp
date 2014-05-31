@@ -88,9 +88,9 @@ Font::Font(std::unique_ptr<SWF::DefineFontTag> ft)
     }
 }
 
-Font::Font(const std::string& name, bool bold, bool italic)
+Font::Font(std::string name, bool bold, bool italic)
     :
-    _name(name),
+    _name(std::move(name)),
     _unicodeChars(false),
     _shiftJISChars(false),
     _ansiChars(true),

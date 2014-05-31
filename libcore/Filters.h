@@ -22,6 +22,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <utility>
 
 namespace gnash {
     class SWFStream;
@@ -132,7 +133,7 @@ public:
     {}
 
     ColorMatrixFilter(std::vector<float> a_matrix) :
-        m_matrix(a_matrix)
+        m_matrix(std::move(a_matrix))
     {}
 
 protected:
@@ -163,13 +164,13 @@ public:
     {}
 
     ConvolutionFilter(std::uint8_t matrixX, std::uint8_t matrixY,
-        const std::vector<float>& _matrix, float divisor, float bias,
+        std::vector<float>  _matrix, float divisor, float bias,
         bool preserveAlpha, bool clamp, std::uint32_t color,
         std::uint8_t alpha)
         :
         _matrixX(matrixX),
         _matrixY(matrixY),
-        _matrix(_matrix),
+        _matrix(std::move(_matrix)),
         _divisor(divisor),
         _bias(bias),
         _preserveAlpha(preserveAlpha),
@@ -291,7 +292,7 @@ public:
         float blurX, float blurY, float strength,
         std::uint8_t quality, glow_types type, bool knockout) :
         m_distance(distance), m_angle(angle),
-        m_colors(colors), m_alphas(alphas), m_ratios(ratios),
+        m_colors(std::move(colors)), m_alphas(std::move(alphas)), m_ratios(std::move(ratios)),
         m_blurX(blurX), m_blurY(blurY), m_strength(strength),
         m_quality(quality), m_type(type), m_knockout(knockout)
     {}
@@ -337,8 +338,8 @@ public:
         std::vector<std::uint8_t> ratios,
         float blurX, float blurY, float strength,
         std::uint8_t quality, glow_types type, bool knockout) :
-        m_distance(distance), m_angle(angle), m_colors(colors), m_alphas(alphas),
-        m_ratios(ratios), m_blurX(blurX), m_blurY(blurY), m_strength(strength),
+        m_distance(distance), m_angle(angle), m_colors(std::move(colors)), m_alphas(std::move(alphas)),
+        m_ratios(std::move(ratios)), m_blurX(blurX), m_blurY(blurY), m_strength(strength),
         m_quality(quality), m_type(type), m_knockout(knockout)
     {}
 

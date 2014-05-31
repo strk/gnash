@@ -43,7 +43,7 @@ public:
     ScreenShotter(const std::string& fileName, int quality = 100);
     
     /// Create a ScreenShotter, specifying the output type.
-    ScreenShotter(const std::string& fileName, FileType f, int quality = 100);
+    ScreenShotter(std::string fileName, FileType f, int quality = 100);
 
     ~ScreenShotter();
 

@@ -22,6 +22,7 @@
 
 #include "SWFMatrix.h"
 #include "SWFCxForm.h"
+#include <utility>
 
 namespace gnash {
 
@@ -36,11 +37,11 @@ public:
     /// Construct a Transform
     //
     /// Any arguments not supplied are identity transformations.
-    explicit Transform(const SWFMatrix& m = SWFMatrix(),
-            const SWFCxForm& cx = SWFCxForm())
+    explicit Transform(SWFMatrix m = SWFMatrix(),
+            SWFCxForm cx = SWFCxForm())
         :
-        matrix(m),
-        colorTransform(cx)
+        matrix(std::move(m)),
+        colorTransform(std::move(cx))
     {}
 
     Transform(const Transform& other)

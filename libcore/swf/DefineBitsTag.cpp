@@ -77,7 +77,7 @@ class StreamAdapter : public IOChannel
         :
         s(str),
         startPos(s.tell()),
-        endPos(maxPos),
+        endPos(std::move(maxPos)),
         currPos(startPos)
     {
         assert(endPos >= startPos);

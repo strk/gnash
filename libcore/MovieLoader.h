@@ -92,11 +92,11 @@ private:
         /// @param postdata
         ///   If not null POST method will be used for HTTP.
         ///
-        Request(const URL& u, const std::string& t,
+        Request(URL u, std::string t,
                 const std::string* postdata, as_object* handler)
                 :
-                _target(t),
-                _url(u),
+                _target(std::move(t)),
+                _url(std::move(u)),
                 _usePost(false),
                 _mdef(nullptr),
                 _mutex(),

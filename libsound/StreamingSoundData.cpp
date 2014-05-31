@@ -45,10 +45,10 @@ StreamingSoundData::append(std::unique_ptr<SimpleBuffer> data,
     return _buffers.size() - 1;
 }
 
-StreamingSoundData::StreamingSoundData(const media::SoundInfo& info,
+StreamingSoundData::StreamingSoundData(media::SoundInfo info,
         int nVolume)
     :
-    soundinfo(info),
+    soundinfo(std::move(info)),
     volume(nVolume)
 {
 }

@@ -58,7 +58,7 @@ public:
     //
     /// @param info encoding info
     /// @param nVolume initial volume (0..100).
-    StreamingSoundData(const media::SoundInfo& info, int nVolume);
+    StreamingSoundData(media::SoundInfo info, int nVolume);
 
     ~StreamingSoundData();
 

@@ -40,13 +40,13 @@ BitmapMovieDefinition::createMovie(Global_as& gl, DisplayObject* parent)
 
 BitmapMovieDefinition::BitmapMovieDefinition(
         std::unique_ptr<image::GnashImage> image,
-		Renderer* renderer, const std::string& url)
+		Renderer* renderer, std::string url)
 	:
 	_version(6),
 	_framesize(0, 0, image->width()*20, image->height()*20),
 	_framecount(1),
 	_framerate(12),
-	_url(url),
+	_url(std::move(url)),
 	_bytesTotal(image->size()),
 	_bitmap(renderer ? renderer->createCachedBitmap(std::move(image)) : nullptr)
 {

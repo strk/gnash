@@ -48,6 +48,7 @@
 #include "dsodefs.h"
 #include <vector>
 #include <sstream>
+#include <utility>
 
 class Arg_parser
 {
@@ -64,9 +65,9 @@ public:
     class ArgParserException : public std::exception
     {
     public:
-	ArgParserException(const std::string& s)
+	ArgParserException(std::string s)
 	    :
-	    _msg(s)
+	    _msg(std::move(s))
 	{}
 	
 	virtual ~ArgParserException() throw() {}

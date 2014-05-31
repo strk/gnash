@@ -38,12 +38,12 @@
 
 namespace gnash {
 
-StreamProvider::StreamProvider(const URL& orig, const URL& base,
+StreamProvider::StreamProvider(URL orig, URL base,
         std::unique_ptr<NamingPolicy> np)
     :
     _namingPolicy(std::move(np)),
-    _base(base),
-    _original(orig)
+    _base(std::move(base)),
+    _original(std::move(orig))
 {
 }
     

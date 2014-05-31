@@ -43,7 +43,7 @@ template<class T>
 class tree_node_ { // size: 5*4=20 bytes (on 32 bit arch), can be reduced by 8.
 	public:
 		tree_node_();
-		tree_node_(const T&);
+		tree_node_(T );
 
 		tree_node_<T> *parent;
 	   tree_node_<T> *first_child, *last_child;
@@ -58,8 +58,8 @@ tree_node_<T>::tree_node_()
 	}
 
 template<class T>
-tree_node_<T>::tree_node_(const T& val)
-	: parent(nullptr), first_child(nullptr), last_child(nullptr), prev_sibling(nullptr), next_sibling(nullptr), data(val)
+tree_node_<T>::tree_node_(const T val)
+	: parent(nullptr), first_child(nullptr), last_child(nullptr), prev_sibling(nullptr), next_sibling(nullptr), data(std::move(val))
 	{
 	}
 

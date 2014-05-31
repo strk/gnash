@@ -711,8 +711,8 @@ public:
     // Note: cmpfn must implement a strict weak ordering
     as_value_prop(ObjectURI name, as_cmp_fn cmpfn, const as_object& o)
         :
-        _comp(cmpfn),
-        _prop(name),
+        _comp(std::move(cmpfn)),
+        _prop(std::move(name)),
         _obj(o)
     {
     }

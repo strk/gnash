@@ -67,10 +67,10 @@ public:
         /// The type of function to use for initialization
 		typedef void (*InitFunc)(as_object& obj, const ObjectURI& uri);
 
-        NativeClass(InitFunc init, const ObjectURI& u, int ver)
+        NativeClass(InitFunc init, ObjectURI u, int ver)
             :
             initializer(init),
-            uri(u),
+            uri(std::move(u)),
             version(ver)
         {}
 

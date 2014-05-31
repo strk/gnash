@@ -130,7 +130,7 @@ protected:
 	
     struct Argument
 	{
-        Argument(std::uint8_t r, const ObjectURI& n) : reg(r), name(n) {}
+        Argument(std::uint8_t r, ObjectURI n) : reg(r), name(std::move(n)) {}
         std::uint8_t reg;
         ObjectURI name;
 	};

@@ -58,7 +58,7 @@ public:
 		_afterTriedOffset(cur_off + try_size + catch_size + finally_size),
 		_savedEndOffset(0),
 		_hasName(true),
-		_name(catchName),
+		_name(std::move(catchName)),
 		_registerIndex(0),
 		_tryState(TryBlock::TRY_TRY),
 		_lastThrow()

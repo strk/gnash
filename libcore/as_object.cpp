@@ -52,7 +52,7 @@ public:
         _object(top),
         _uri(uri),
         _iterations(0),
-        _condition(cmp)
+        _condition(std::move(cmp))
     {
         _visited.insert(top);
     }

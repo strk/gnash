@@ -35,7 +35,7 @@ class String_as : public Relay
 
 public:
 
-    explicit String_as(const std::string& s);
+    explicit String_as(std::string s);
 
     const std::string& value() {
         return _string;

@@ -64,10 +64,10 @@ public:
 
     bool isBuiltin() { return true; }
 
-    declare_native_function(const ClassHierarchy::NativeClass &c, as_object *g)
+    declare_native_function(ClassHierarchy::NativeClass c, as_object *g)
         :
         as_function(getGlobal(*g)),
-        _decl(c),
+        _decl(std::move(c)),
         mTarget(g)
     {
     }

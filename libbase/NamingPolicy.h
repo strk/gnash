@@ -53,7 +53,7 @@ public:
 class DSOEXPORT IncrementalRename : public NamingPolicy
 {
 public:
-    IncrementalRename(const URL& baseURL);
+    IncrementalRename(URL baseURL);
     virtual std::string operator()(const URL& url) const;
     
 private:

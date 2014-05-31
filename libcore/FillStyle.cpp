@@ -100,12 +100,12 @@ GradientFill::setFocalPoint(double d)
     _focalPoint = clamp<float>(d, -1, 1); 
 }
 
-BitmapFill::BitmapFill(Type t, const CachedBitmap* bi, const SWFMatrix& m,
+BitmapFill::BitmapFill(Type t, const CachedBitmap* bi, SWFMatrix m,
         SmoothingPolicy pol)
     :
     _type(t),
     _smoothingPolicy(pol),
-    _matrix(m),
+    _matrix(std::move(m)),
     _bitmapInfo(bi),
     _md(nullptr),
     _id(0)
@@ -113,11 +113,11 @@ BitmapFill::BitmapFill(Type t, const CachedBitmap* bi, const SWFMatrix& m,
 }
     
 BitmapFill::BitmapFill(SWF::FillType t, movie_definition* md,
-        std::uint16_t id, const SWFMatrix& m)
+        std::uint16_t id, SWFMatrix m)
     :
     _type(),
     _smoothingPolicy(),
-    _matrix(m),
+    _matrix(std::move(m)),
     _bitmapInfo(nullptr),
     _md(md),
     _id(id)

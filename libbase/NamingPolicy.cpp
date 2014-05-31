@@ -52,9 +52,9 @@ OverwriteExisting::operator()(const URL& url) const
 }
 
 
-IncrementalRename::IncrementalRename(const URL& baseURL)
+IncrementalRename::IncrementalRename(URL baseURL)
     :
-    _baseURL(baseURL)
+    _baseURL(std::move(baseURL))
 {
 }
 

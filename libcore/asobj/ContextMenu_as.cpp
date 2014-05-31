@@ -58,7 +58,7 @@ namespace {
 class CopyMenuItems
 {
 public:
-    CopyMenuItems(const ObjectURI& c, as_object& nc) : _c(c), _target(nc) {}
+    CopyMenuItems(ObjectURI c, as_object& nc) : _c(std::move(c)), _target(nc) {}
 
     void operator()(const as_value& val) {
         as_object* obj = toObject(val, getVM(_target));

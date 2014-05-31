@@ -19,6 +19,8 @@
 #ifndef GNASH_AGG_LINEAR_INTERPOLATOR_H
 #define GNASH_AGG_LINEAR_INTERPOLATOR_H
 
+#include <utility>
+
 #include <cmath>
 
 namespace gnash {
@@ -55,11 +57,11 @@ struct linear_rgb_interpolator
 public:
     typedef ColorT color_type;
 
-    linear_rgb_interpolator(const color_type& c1, const color_type& c2, 
+    linear_rgb_interpolator(color_type c1, color_type c2, 
         size_t len)
         :
-        _c1(c1),
-        _c2(c2),
+        _c1(std::move(c1)),
+        _c2(std::move(c2)),
         _len(len),
         _count(0)
     {}

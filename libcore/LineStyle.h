@@ -24,6 +24,7 @@
 
 #include "RGBA.h"
 #include "SWF.h"
+#include <utility>
 
 namespace gnash {
     class SWFStream;
@@ -66,7 +67,7 @@ public:
     /// @param endCapStyle
     /// @param joinStyle
     /// @param miterLimitFactor
-    LineStyle(std::uint16_t width, const rgba& color,
+    LineStyle(std::uint16_t width, rgba color,
             bool scaleThicknessVertically=true,
             bool scaleThicknessHorizontally=true,
             bool pixelHinting=false,
@@ -78,7 +79,7 @@ public:
         )
         :
         m_width(width),
-        m_color(color),
+        m_color(std::move(color)),
         _scaleVertically(scaleThicknessVertically),
         _scaleHorizontally(scaleThicknessHorizontally),
         _pixelHinting(pixelHinting),
