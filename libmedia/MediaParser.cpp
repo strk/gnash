@@ -138,7 +138,7 @@ MediaParser::peekNextVideoFrame() const
 #endif
 
 	if (!_videoInfo.get() || _videoFrames.empty()) return nullptr;
-	return _videoFrames.front();
+	return _videoFrames.front().get();
 }
 
 bool
@@ -207,7 +207,7 @@ MediaParser::nextVideoFrame()
 
 	std::unique_ptr<EncodedVideoFrame> ret;
 	if (_videoFrames.empty()) return ret;
-	ret.reset(_videoFrames.front());
+	ret = std::move(_videoFrames.front());
 	_videoFrames.pop_front();
 #ifdef GNASH_DEBUG_MEDIAPARSER
 	log_debug("nextVideoFrame: waking up parser (in case it was sleeping)");
@@ -230,7 +230,7 @@ MediaParser::nextAudioFrame()
 
 	std::unique_ptr<EncodedAudioFrame> ret;
 	if (_audioFrames.empty()) return ret;
-	ret.reset(_audioFrames.front());
+	ret = std::move(_audioFrames.front());
 	_audioFrames.pop_front();
 #ifdef GNASH_DEBUG_MEDIAPARSER
 	log_debug("nextAudioFrame: waking up parser (in case it was sleeping)");
@@ -264,7 +264,7 @@ MediaParser::peekNextAudioFrame() const
 	}
 #endif
 	if (!_audioInfo.get() || _audioFrames.empty()) return nullptr;
-	return _audioFrames.front();
+	return _audioFrames.front().get();
 }
 
 void
@@ -280,18 +280,6 @@ MediaParser::stopParserThread()
 MediaParser::~MediaParser()
 {
 	stopParserThread();
-
-	for (VideoFrames::iterator i=_videoFrames.begin(),
-		e=_videoFrames.end(); i!=e; ++i)
-	{
-		delete (*i);
-	}
-
-	for (AudioFrames::iterator i=_audioFrames.begin(),
-		e=_audioFrames.end(); i!=e; ++i)
-	{
-		delete (*i);
-	}
 }
 
 void
@@ -300,18 +288,6 @@ MediaParser::clearBuffers()
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	std::lock_guard<std::mutex> lock(_qMutex);
 #endif
-
-	for (VideoFrames::iterator i=_videoFrames.begin(),
-		e=_videoFrames.end(); i!=e; ++i)
-	{
-		delete (*i);
-	}
-
-	for (AudioFrames::iterator i=_audioFrames.begin(),
-		e=_audioFrames.end(); i!=e; ++i)
-	{
-		delete (*i);
-	}
 
 	_audioFrames.clear();
 	_videoFrames.clear();
@@ -350,7 +326,7 @@ MediaParser::pushEncodedAudioFrame(std::unique_ptr<EncodedAudioFrame> frame)
     }
 
 	//log_debug("Inserting audio frame with timestamp %d", frame->timestamp);
-	_audioFrames.insert(loc, frame.release());
+	_audioFrames.insert(loc, std::move(frame));
 
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	// if the push reaches a "buffer full" condition, or if we find the parsing
@@ -390,7 +366,7 @@ MediaParser::pushEncodedVideoFrame(std::unique_ptr<EncodedVideoFrame> frame)
     }
 
 	//log_debug("Pushing video frame with timestamp %d", frame->timestamp());
-	_videoFrames.insert(loc, frame.release());
+	_videoFrames.insert(loc, std::move(frame));
 
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	waitIfNeeded(lock); // if the push reaches a "buffer full" condition, wait to be waken up

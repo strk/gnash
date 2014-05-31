@@ -712,8 +712,8 @@ protected:
 
 private:
 
-	typedef std::deque<EncodedVideoFrame*> VideoFrames;
-	typedef std::deque<EncodedAudioFrame*> AudioFrames;
+	typedef std::deque<std::unique_ptr<EncodedVideoFrame>> VideoFrames;
+	typedef std::deque<std::unique_ptr<EncodedAudioFrame>> AudioFrames;
 
 	/// Return pointer to next encoded video frame in buffer
 	//
