@@ -1575,9 +1575,7 @@ public:
     agg::path_storage path; 
     agg::conv_curve<agg::path_storage> curve(path);
 
-    for (size_t pno=0, pcount=paths.size(); pno < pcount; ++pno) {
-
-      const Path& this_path = paths[pno];
+    for (const Path& this_path : paths) {
 
       path.remove_all();
       

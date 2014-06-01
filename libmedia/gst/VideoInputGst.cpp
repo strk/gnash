@@ -283,8 +283,7 @@ VideoInputGst::getNames(std::vector<std::string>& names)
     // Check for devices
     findVidDevs(cams);
     
-    for (size_t i = 0; i < cams.size(); ++i) {
-        GnashWebcam* cam = cams[i];
+    for (GnashWebcam* cam : cams) {
         if (cam) names.push_back(cam->getProductName());
     }
 }
