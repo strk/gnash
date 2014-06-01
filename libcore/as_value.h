@@ -132,6 +132,14 @@ public:
     {
     }
 
+    /// Move constructor.
+    DSOEXPORT as_value(as_value&& other)
+        : _type(other._type),
+          _value(std::move(other._value))
+    {
+        other._type = UNDEFINED;
+    }
+
     ~as_value() {}
     
     /// Construct a primitive String value 
@@ -179,6 +187,14 @@ public:
     {
         _type = v._type;
         _value = v._value;
+        return *this;
+    }
+
+    DSOEXPORT as_value& operator=(as_value&& other)
+    {
+        _type = other._type;
+        _value = std::move(other._value);
+        other._type = UNDEFINED;
         return *this;
     }
 
