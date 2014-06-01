@@ -21,7 +21,6 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
-#include <string>
 #include <iosfwd>
 #include <cstdint>
 

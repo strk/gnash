@@ -20,7 +20,6 @@
 #define GNASH_DEFINITION_TAG_H
 
 
-#include <boost/noncopyable.hpp>
 #include <cstdint>
 
 #include "ControlTag.h"

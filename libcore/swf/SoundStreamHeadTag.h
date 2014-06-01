@@ -20,8 +20,6 @@
 #define GNASH_SWF_SOUNDSTREAMHEAD_TAG_H
 
 
-#include <cstdint>
- 
 #include "SWF.h"
 
 // Forward declarations
