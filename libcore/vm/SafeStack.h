@@ -215,7 +215,7 @@ public:
 	/// Delete the allocated data. 
 	~SafeStack()
 	{
-		for (StackSize i = 0; i < _data.size(); ++i) delete [] _data[i];
+		for (auto& elem : _data) delete [] elem;
 	}
 
 private:

@@ -55,20 +55,20 @@ PathParser::run(const SWFCxForm& cx, const SWFMatrix& /*mat*/)
 
   std::vector<UniPathList> unipathvec(_num_styles);
 
-  for (size_t i = 0; i < _paths.size(); ++i) {
+  for (const Path& path : _paths) {
   
-    if (_paths[i].empty()) {
+    if (path.empty()) {
       continue;
     }
 
-    int leftfill = _paths[i].getLeftFill();
+    int leftfill = path.getLeftFill();
     if (leftfill) {
-      unipathvec[leftfill-1].emplace_front(&_paths[i], UnivocalPath::FILL_LEFT);
+      unipathvec[leftfill-1].emplace_front(&path, UnivocalPath::FILL_LEFT);
     }
 
-    int rightfill = _paths[i].getRightFill();
+    int rightfill = path.getRightFill();
     if (rightfill) {
-      unipathvec[rightfill-1].emplace_front(&_paths[i], UnivocalPath::FILL_RIGHT);
+      unipathvec[rightfill-1].emplace_front(&path, UnivocalPath::FILL_RIGHT);
     }
   }
 

@@ -451,8 +451,8 @@ public:
         
         // update ourselves with the union of the "list"
         setNull();
-        for (size_type lno=0, lcount=list.size(); lno<lcount; lno++) {
-            add(list[lno]);
+        for (auto& range : list) {
+            add(range);
         }
                             
     }

@@ -131,9 +131,8 @@ GC::runCycle()
 void
 GC::countCollectables(CollectablesCount& count) const
 {
-    for (ResList::const_iterator i = _resList.begin(), e = _resList.end();
-            i!=e; ++i) {
-        ++count[typeName(**i)];
+    for (const GcResource* resource : _resList) {
+        ++count[typeName(*resource)];
     }
 }
 

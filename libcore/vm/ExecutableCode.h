@@ -114,15 +114,14 @@ public:
     }
 
     virtual void execute() {
-        for (BufferList::iterator it = _buffers.begin(),
-            itEnd = _buffers.end(); it != itEnd; ++it) {
+        for (const action_buffer* buffer : _buffers) {
 
             // onClipEvents code are guarded by isDestroyed(),
             // still might be also guarded by unloaded()
             if (target()->isDestroyed()) break;
 
             PoolGuard guard(getVM(target()->get_environment()), nullptr);
-            ActionExec exec(*(*it), target()->get_environment(), false);
+            ActionExec exec(*buffer, target()->get_environment(), false);
             exec();
         }
     }

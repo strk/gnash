@@ -114,10 +114,9 @@ public:
     static size_t computeNumberOfEdges(const Paths& paths)
     {
         size_t count=0;
-        for (Paths::const_iterator i = paths.begin(), e = paths.end();
-                i != e; ++i) {
+        for (const Path& path : paths) {
 
-            count += i->size();
+            count += path.size();
         }
         return count;
     }
@@ -170,8 +169,7 @@ Subshape::computeBounds(int swfVersion) const
 {
     SWFRect bounds;
 
-    for (unsigned int i = 0; i < _paths.size(); i++) {
-        const Path& p = _paths[i];
+    for (const Path& p : _paths) {
 
         unsigned thickness = 0;
         if ( p.m_line ) {
@@ -668,10 +666,9 @@ operator<<(std::ostream& o, const ShapeRecord& sh)
     o << boost::format("Shape Record: bounds %1%") % sh.getBounds();
 
 
-    for (ShapeRecord::Subshapes::const_iterator it = sh.subshapes().begin(),
-         end = sh.subshapes().end(); it != end; ++it) {
+    for (const Subshape& subshape : sh.subshapes()) {
 
-        const ShapeRecord::FillStyles& fills = it->fillStyles();
+        const ShapeRecord::FillStyles& fills = subshape.fillStyles();
         std::copy(fills.begin(), fills.end(),
                 std::ostream_iterator<FillStyle>(o, ","));
 	}

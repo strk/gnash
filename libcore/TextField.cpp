@@ -747,12 +747,12 @@ TextField::mouseEvent(const event_id& ev)
 			
 			SWF::TextRecord rec;
 			
-			for (size_t i=0; i < _textRecords.size(); ++i) {
-				if 	((x_mouse >  _textRecords[i].xOffset()) && 
-					(x_mouse < _textRecords[i].xOffset()+_textRecords[i].recordWidth()) &&
-					(y_mouse > _textRecords[i].yOffset()-_textRecords[i].textHeight()) &&
-					(y_mouse < _textRecords[i].yOffset())) {
-						rec = _textRecords[i];
+			for (auto& record: _textRecords) {
+				if 	((x_mouse >  record.xOffset()) && 
+					(x_mouse < record.xOffset()+record.recordWidth()) &&
+					(y_mouse > record.yOffset()-record.textHeight()) &&
+					(y_mouse < record.yOffset())) {
+						rec = record;
 						break;
 					}
 			}
@@ -977,10 +977,10 @@ TextField::insertTab(SWF::TextRecord& rec, std::int32_t& x, float scale)
         if (!_tabStops.empty()) {
             int tab = _tabStops.back() + 1;
             
-            for (size_t i = 0; i < tabStops.size(); ++i) {        
-                if (tabStops[i] > x) {
-                    if((tabStops[i] - x) < tab) {
-                        tab = tabStops[i] - x;
+            for (auto& tabStop : tabStops) {
+                if (tabStop > x) {
+                    if((tabStop - x) < tab) {
+                        tab = tabStop - x;
                     }
 				}
 

@@ -105,10 +105,9 @@ escapeXML(std::string& text)
 {
     const Entities& ent = getEntities();
 
-    for (Entities::const_iterator i = ent.begin(), e = ent.end();
-            i != e; ++i)
+    for (const auto& entity : ent)
     {
-        boost::replace_all(text, i->second, i->first);
+        boost::replace_all(text, entity.second, entity.first);
     }
 }
 
@@ -117,9 +116,8 @@ unescapeXML(std::string& text)
 {
     const Entities& ent = getEntities();
 
-    for (Entities::const_iterator i = ent.begin(), e = ent.end();
-            i != e; ++i) {
-        boost::replace_all(text, i->first, i->second);
+    for (const auto& entity : ent) {
+        boost::replace_all(text, entity.first, entity.second);
     }
 
     // Additionally, the &nbsp; entity is unescaped (but never escaped).

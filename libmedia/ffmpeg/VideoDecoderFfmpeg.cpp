@@ -412,9 +412,8 @@ VideoDecoderFfmpeg::pop()
 {
     std::unique_ptr<image::GnashImage> ret;
 
-    for (std::vector<const EncodedVideoFrame*>::iterator it =
-             _video_frames.begin(), end = _video_frames.end(); it != end; ++it) {
-         ret = decode((*it)->data(), (*it)->dataSize());
+    for (const EncodedVideoFrame* frame : _video_frames) {
+         ret = decode(frame->data(), frame->dataSize());
     }
 
     _video_frames.clear();

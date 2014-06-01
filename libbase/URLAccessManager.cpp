@@ -160,10 +160,8 @@ local_check(const std::string& path, const URL& baseUrl)
     typedef RcInitFile::PathList PathList;
     const PathList& sandbox = rcfile.getLocalSandboxPath();
 
-    for (PathList::const_iterator i=sandbox.begin(), e=sandbox.end();
-            i!=e; ++i)
+    for (const std::string& dir : sandbox)
     {
-        const std::string& dir = *i;
         if ( pathIsUnderDir(path, dir) ) 
         {
             log_security(_("Load of file %s granted (under local sandbox %s)"),

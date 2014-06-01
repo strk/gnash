@@ -101,11 +101,8 @@ sound_handler::addSoundBlock(std::unique_ptr<SimpleBuffer> data,
 void
 sound_handler::delete_all_sounds()
 {
-    for (Sounds::iterator i = _sounds.begin(),
-                          e = _sounds.end(); i != e; ++i)
+    for (EmbedSound* sdef : _sounds)
     {
-        EmbedSound* sdef = *i;
-
         // The sound may have been deleted already.
         if (!sdef) continue;
 
@@ -116,11 +113,8 @@ sound_handler::delete_all_sounds()
     }
     _sounds.clear();
 
-    for (StreamingSounds::iterator i = _streamingSounds.begin(),
-                          e = _streamingSounds.end(); i != e; ++i)
+    for (StreamingSoundData* sdef : _streamingSounds)
     {
-        StreamingSoundData* sdef = *i;
-
         // Streaming sounds are never deleted.
         assert(sdef);
 
@@ -163,18 +157,14 @@ sound_handler::delete_sound(int handle)
 void   
 sound_handler::stop_all_sounds()
 {
-    for (Sounds::iterator i = _sounds.begin(),
-                          e = _sounds.end(); i != e; ++i)
+    for (EmbedSound* sounddata : _sounds)
     {
-        EmbedSound* sounddata = *i;
         if ( ! sounddata ) continue; // could have been deleted already
         stopEmbedSoundInstances(*sounddata);
     }
 
-    for (StreamingSounds::iterator i = _streamingSounds.begin(),
-                          e = _streamingSounds.end(); i != e; ++i)
+    for (StreamingSoundData* sounddata : _streamingSounds)
     {
-        StreamingSoundData* sounddata = *i;
         if (!sounddata) continue; 
         stopEmbedSoundInstances(*sounddata);
     }
@@ -252,9 +242,8 @@ sound_handler::stopAllEventSounds()
     log_debug("stopAllEventSounds called");
 #endif
 
-    for (Sounds::iterator i=_sounds.begin(), e=_sounds.end(); i != e; ++i)
+    for (EmbedSound* sounddata : _sounds)
     {
-        EmbedSound* sounddata = *i;
         if (!sounddata) continue; // possible ?
 
         stopEmbedSoundInstances(*sounddata);
@@ -272,8 +261,7 @@ sound_handler::stopEmbedSoundInstances(StreamingSoundData& def)
 
     // Now, for each playing InputStream, unplug it!
     // NOTE: could be optimized...
-    for (InputStreamVect::iterator i=playing.begin(), e=playing.end();
-            i!=e; ++i)
+    for (InputStream* stream : playing)
     {
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
         log_debug(" unplugging input stream %p from stopEmbedSoundInstances", *i);
@@ -282,7 +270,7 @@ sound_handler::stopEmbedSoundInstances(StreamingSoundData& def)
         // Explicitly calling the base class implementation
         // is a (dirty?) way to avoid mutex-locking overrides
         // in subclasses causing deadlocks.
-        sound_handler::unplugInputStream(*i);
+        sound_handler::unplugInputStream(stream);
     }
 
     def.clearInstances();
@@ -299,8 +287,7 @@ sound_handler::stopEmbedSoundInstances(EmbedSound& def)
 
     // Now, for each playing InputStream, unplug it!
     // NOTE: could be optimized...
-    for (InputStreamVect::iterator i=playing.begin(), e=playing.end();
-            i!=e; ++i)
+    for (InputStream* stream : playing)
     {
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
         log_debug(" unplugging input stream %p from stopEmbedSoundInstances", *i);
@@ -309,7 +296,7 @@ sound_handler::stopEmbedSoundInstances(EmbedSound& def)
         // Explicitly calling the base class implementation
         // is a (dirty?) way to avoid mutex-locking overrides
         // in subclasses causing deadlocks.
-        sound_handler::unplugInputStream(*i);
+        sound_handler::unplugInputStream(stream);
     }
 
     def.clearInstances();
@@ -573,11 +560,9 @@ sound_handler::plugInputStream(std::unique_ptr<InputStream> newStreamer)
 void
 sound_handler::unplugAllInputStreams()
 {
-    for (InputStreams::iterator it=_inputStreams.begin(),
-                                itE=_inputStreams.end();
-            it != itE; ++it)
+    for (const InputStream* stream : _inputStreams)
     {
-        delete *it;
+        delete stream;
     }
     _inputStreams.clear();
 }
@@ -602,12 +587,8 @@ sound_handler::fetchSamples(std::int16_t* to, unsigned int nSamples)
 #endif
 
         // Loop through the aux streamers sounds
-        for (InputStreams::iterator it=_inputStreams.begin(),
-                                    end=_inputStreams.end();
-                                    it != end; ++it)
+        for (InputStream* is : _inputStreams)
         {
-            InputStream* is = *it;
-
             unsigned int wrote = is->fetchSamples(buf.get(), nSamples);
             if (wrote < nSamples) {
                 // fill what wasn't written
@@ -664,9 +645,8 @@ sound_handler::streamingSound() const
 {
     if (_inputStreams.empty()) return false;
 
-    for (StreamingSounds::const_iterator it = _streamingSounds.begin(), 
-            e = _streamingSounds.end(); it != e; ++it) {
-        if ((*it)->isPlaying()) return true;
+    for (StreamingSoundData* const stream : _streamingSounds) {
+        if (stream->isPlaying()) return true;
     }
     return false;
 }

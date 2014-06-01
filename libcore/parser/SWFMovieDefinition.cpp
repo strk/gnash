@@ -195,9 +195,9 @@ SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic)
     const
 {
 
-    for (FontMap::const_iterator it=m_fonts.begin(), itEnd=m_fonts.end(); it != itEnd; ++it)
+    for (const auto& elem : m_fonts)
     {
-       Font* f = it->second.get();
+       Font* f = elem.second.get();
        if ( f->matches(name, bold, italic) ) return f;
     }
     return nullptr;
@@ -398,12 +398,11 @@ std::ostream&
 operator<<(std::ostream& o, const CharacterDictionary& cd)
 {
 
-       for (CharacterDictionary::CharacterConstIterator it = cd.begin(), 
-            endIt = cd.end(); it != endIt; ++it)
+       for (const auto& elem : cd)
        {
            o << std::endl
-             << "Character: " << it->first
-             << " at address: " << static_cast<void*>(it->second.get());
+             << "Character: " << elem.first
+             << " at address: " << static_cast<void*>(elem.second.get());
        }
        
        return o;
@@ -616,8 +615,7 @@ SWFMovieDefinition::importResources(
 
     // Mutex scope.
 
-    for (Imports::const_iterator i = imports.begin(), e = imports.end(); i != e;
-            ++i) {
+    for (const auto& import : imports) {
     
         size_t new_loading_frame = source->get_loading_frame();
         
@@ -631,8 +629,8 @@ SWFMovieDefinition::importResources(
         size_t timeout = def_timeout;
         size_t loading_frame = (size_t)-1; // used to keep track of advancements
 
-        const int id = i->first;
-        const std::string& symbolName = i->second;
+        const int id = import.first;
+        const std::string& symbolName = import.second;
 
 #ifdef DEBUG_EXPORTS
         log_debug("%s importing %s from %s", get_url(), symbolName,

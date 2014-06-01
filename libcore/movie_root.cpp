@@ -599,10 +599,8 @@ movie_root::keyEvent(key::code k, bool down)
     }
 
     LiveChars copy = _liveChars;
-    for (LiveChars::iterator iter = copy.begin(), itEnd=copy.end();
-            iter != itEnd; ++iter) {
+    for (MovieClip* const ch : copy) {
 
-        MovieClip* const ch = *iter;
         if (ch->unloaded()) continue;
 
         if (down) {
@@ -1025,8 +1023,8 @@ movie_root::display()
             frame_size.get_x_min(), frame_size.get_x_max(),
             frame_size.get_y_min(), frame_size.get_y_max());
 
-    for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i) {
-        MovieClip* movie = i->second;
+    for (auto& elem : _movies) {
+        MovieClip* movie = elem.second;
 
         movie->clear_invalidated();
 
@@ -1036,7 +1034,7 @@ movie_root::display()
         const SWFRect& sub_frame_size = movie->get_frame_size();
 
         if (sub_frame_size.is_null()) {
-            log_debug("_level%u has null frame size, skipping", i->first);
+            log_debug("_level%u has null frame size, skipping", elem.first);
             continue;
         }
 
@@ -1048,10 +1046,8 @@ bool
 movie_root::notify_mouse_listeners(const event_id& event)
 {
     LiveChars copy = _liveChars;
-    for (LiveChars::iterator iter = copy.begin(), itEnd=copy.end();
-            iter != itEnd; ++iter)
+    for (MovieClip* const ch : copy)
     {
-        MovieClip* const ch = *iter;
         if (!ch->unloaded()) {
             ch->mouseEvent(event);
         }

@@ -150,12 +150,11 @@ public:
     template <class U, class V>
     void visitValues(V& visitor, U cmp = U()) const {
 
-        for (const_iterator it = _props.begin(), ie = _props.end();
-                it != ie; ++it) {
+        for (const auto& prop : _props) {
 
-            if (!cmp(*it)) continue;
-            as_value val = it->getValue(_owner);
-            if (!visitor.accept(it->uri(), val)) return;
+            if (!cmp(prop)) continue;
+            as_value val = prop.getValue(_owner);
+            if (!visitor.accept(prop.uri(), val)) return;
         }
     }
 

@@ -1363,9 +1363,8 @@ NetStream_as::update()
 
     if (tags.empty()) return;
 
-    for (media::MediaParser::OrderedMetaTags::iterator i = tags.begin(),
-            e = tags.end(); i != e; ++i) {
-        executeTag(**i, owner());
+    for (auto& tag : tags) {
+        executeTag(*tag, owner());
     }
 #endif  // USE_MEDIA
 }

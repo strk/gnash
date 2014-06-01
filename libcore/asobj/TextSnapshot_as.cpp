@@ -233,19 +233,16 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, as_object& ri) const
 
     std::string::size_type len = end - start;
 
-    for (TextFields::const_iterator field = _textFields.begin(),
-            e = _textFields.end(); field != e; ++field) {
+    for (const auto& field : _textFields) {
 
-        const Records& rec = field->second;
-        const SWFMatrix& mat = getMatrix(*field->first);
-        const boost::dynamic_bitset<>& selected = field->first->getSelected();
+        const Records& rec = field.second;
+        const SWFMatrix& mat = getMatrix(*field.first);
+        const boost::dynamic_bitset<>& selected = field.first->getSelected();
 
         const std::string::size_type fieldStartIndex = pos;
 
-        for (Records::const_iterator j = rec.begin(), end = rec.end();
-                j != end; ++j) {
+        for (const SWF::TextRecord* tr : rec) {
         
-            const SWF::TextRecord* tr = *j;
             assert(tr);
 
             const SWF::TextRecord::Glyphs& glyphs = tr->glyphs();
@@ -260,11 +257,10 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, as_object& ri) const
             assert(font);
 
             double x = tr->xOffset();
-            for (SWF::TextRecord::Glyphs::const_iterator k = glyphs.begin(),
-                    e = glyphs.end(); k != e; ++k) {
+            for (const auto& glyph : glyphs) {
                 
                 if (pos < start) {
-                    x += k->advance;
+                    x += glyph.advance;
                     ++pos;
                     continue;
                 }
@@ -292,7 +288,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, as_object& ri) const
                 callMethod(&ri, NSV::PROP_PUSH, el);
 
                 ++pos;
-                x += k->advance;
+                x += glyph.advance;
                 if (pos - start > len) return;
             }
         }
@@ -307,23 +303,20 @@ TextSnapshot_as::makeString(std::string& to, bool newline, bool selectedOnly,
 
     std::string::size_type pos = 0;
 
-    for (TextFields::const_iterator field = _textFields.begin(),
-            e = _textFields.end(); field != e; ++field)
+    for (const auto& field: _textFields)
     {
         // When newlines are requested, insert one after each individual
         // text field is processed.
         if (newline && pos > start) to += '\n';
 
-        const Records& records = field->second;
-        const boost::dynamic_bitset<>& selected = field->first->getSelected();
+        const Records& records = field.second;
+        const boost::dynamic_bitset<>& selected = field.first->getSelected();
 
         /// Remember the position at the beginning of the StaticText.
         const std::string::size_type fieldStartIndex = pos;
 
-        for (Records::const_iterator j = records.begin(), end = records.end();
-                j != end; ++j) {
+        for (const SWF::TextRecord* tr : records) {
         
-            const SWF::TextRecord* tr = *j;
             assert(tr);
 
             const SWF::TextRecord::Glyphs& glyphs = tr->glyphs();
@@ -337,8 +330,7 @@ TextSnapshot_as::makeString(std::string& to, bool newline, bool selectedOnly,
             const Font* font = tr->getFont();
             assert(font);
 
-            for (SWF::TextRecord::Glyphs::const_iterator k = glyphs.begin(),
-                    e = glyphs.end(); k != e; ++k) {
+            for (const auto& glyph : glyphs) {
                 
                 if (pos < start) {
                     ++pos;
@@ -346,7 +338,7 @@ TextSnapshot_as::makeString(std::string& to, bool newline, bool selectedOnly,
                 }
                 
                 if (!selectedOnly || selected.test(pos - fieldStartIndex)) {
-                    to += font->codeTableLookup(k->index, true);
+                    to += font->codeTableLookup(glyph.index, true);
                 }
                 ++pos;
                 if (pos - start == len) return;

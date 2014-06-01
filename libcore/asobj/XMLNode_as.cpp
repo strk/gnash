@@ -103,9 +103,8 @@ XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
     // only clone children if in deep mode
     if (deep) {
         const Children& from=tpl._children;
-        for (Children::const_iterator it=from.begin(), itEnd=from.end();
-                        it != itEnd; ++it) {
-            _children.push_back(new XMLNode_as(*(*it), deep));
+        for (const auto& child : from) {
+            _children.push_back(new XMLNode_as(*child, deep));
         }
     }
 }
@@ -261,12 +260,11 @@ XMLNode_as::previousSibling() const
  	if (_parent->_children.size() <= 1) return nullptr;
 
     XMLNode_as *previous_node = nullptr;
-    for (Children::iterator itx = _parent->_children.begin();
-            itx != _parent->_children.end(); ++itx) {
+    for (XMLNode_as * child : _parent->_children) {
 
-        if (*itx == this) return previous_node;
+        if (child == this) return previous_node;
 		
-        previous_node = *itx;
+        previous_node = child;
     }
 
     return nullptr;
@@ -391,9 +389,7 @@ XMLNode_as::extractPrefix(std::string& prefix) const
 void
 XMLNode_as::clearChildren()
 {
-    for (Children::iterator it = _children.begin(), e = _children.end();
-            it != e; ++it) {
-        XMLNode_as* node = *it;
+    for (XMLNode_as* node : _children) {
 
         node->setParent(nullptr);
         if (!node->_object) {
@@ -431,10 +427,9 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
         enumerateAttributes(xml, attrs);
         if (!attrs.empty()) {
 
-            for (StringPairs::iterator i = 
-                    attrs.begin(), e = attrs.end(); i != e; ++i) { 
-                escapeXML(i->second);
-                xmlout << " " << i->first << "=\"" << i->second << "\"";
+            for (auto& attr : attrs) { 
+                escapeXML(attr.second);
+                xmlout << " " << attr.first << "=\"" << attr.second << "\"";
             }
         }
 
@@ -465,10 +460,9 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     }
 
     // Childs, after node as_value.
-    for (Children::const_iterator itx = xml._children.begin(); 
-            itx != xml._children.end(); ++itx) {
+    for (XMLNode_as* child : xml._children) {
 
-        (*itx)->toString(xmlout, encode);
+        child->toString(xmlout, encode);
     }
 
     if (!nodeName.empty() || type == Element) {

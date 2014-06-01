@@ -984,12 +984,11 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
     assert ( ! _customHeaders );
     _customHeaders = curl_slist_append(_customHeaders, "Expect:");
 
-    for (NetworkAdapter::RequestHeaders::const_iterator i = headers.begin(),
-	     e = headers.end(); i != e; ++i) {
+    for (const auto& header : headers) {
         // Check here to see whether header name is allowed.
-        if (!NetworkAdapter::isHeaderAllowed(i->first)) continue;
+        if (!NetworkAdapter::isHeaderAllowed(header.first)) continue;
         std::ostringstream os;
-        os << i->first << ": " << i->second;
+        os << header.first << ": " << header.second;
         _customHeaders = curl_slist_append(_customHeaders, os.str().c_str());
     }
 

@@ -1148,10 +1148,10 @@ Gui::getMovieInfo() const
     _stage->gc().countCollectables(cc);
     
     const std::string lbl = "GC managed ";
-    for (GC::CollectablesCount::iterator i=cc.begin(), e=cc.end(); i!=e; ++i) {
-        const std::string& typ = i->first;
+    for (auto& countinfo : cc) {
+        const std::string& typ = countinfo.first;
         std::ostringstream ss;
-        ss << i->second;
+        ss << countinfo.second;
         firstLevelIter = tr->append_child(topIter,
                     std::make_pair(lbl + typ, ss.str()));
     }
@@ -1240,8 +1240,8 @@ Gui::fpsCounterTick()
 void
 Gui::addFlashVars(Gui::VariableMap& from)
 {
-    for (VariableMap::iterator i=from.begin(), ie=from.end(); i!=ie; ++i) {
-        _flashVars[i->first] = i->second;
+    for (auto& variable : from) {
+        _flashVars[variable.first] = variable.second;
     }
 }
 

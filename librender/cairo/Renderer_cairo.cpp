@@ -729,8 +729,8 @@ Renderer_cairo::draw_poly(const std::vector<point>& corners,
         
     cairo_move_to(_cr, corners[0].x, corners[0].y);
     
-    for (size_t i = 0; i < corners.size(); ++i) {
-        cairo_line_to(_cr, corners[i].x, corners[i].y);
+    for (const point& corner : corners) {
+        cairo_line_to(_cr, corner.x, corner.y);
     }
     
     cairo_close_path(_cr);
@@ -806,10 +806,8 @@ Renderer_cairo::add_path(cairo_t* cr, const Path& cur_path)
     snap_to_half_pixel(cr, x, y);
     cairo_move_to(cr, x, y);
     
-    for (std::vector<Edge>::const_iterator it = cur_path.m_edges.begin(),
-         end = cur_path.m_edges.end(); it != end; ++it) {
-        const Edge& cur_edge = *it;
-      
+    for (const Edge& cur_edge : cur_path.m_edges) {
+
         if (cur_edge.straight()) {
             x = cur_edge.ap.x;
             y = cur_edge.ap.y;
@@ -920,9 +918,7 @@ Renderer_cairo::draw_outlines(const PathVec& path_vec,
                               const SWFCxForm& cx,
                               const SWFMatrix& mat)
 {
-    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
-         it != end; ++it) {
-        const Path& cur_path = *it;
+    for (const Path& cur_path : path_vec) {
 
         if (!cur_path.m_line) {
             continue;
@@ -949,10 +945,8 @@ Renderer_cairo::draw_subshape(const PathVec& path_vec, const SWFMatrix& mat,
 void
 Renderer_cairo::draw_mask(const PathVec& path_vec)
 {    
-    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
-         it != end; ++it) {
-        const Path& cur_path = *it;
-      
+    for (const Path& cur_path : path_vec) {
+
         if (cur_path.m_fill0 || cur_path.m_fill1) {
             _masks.back().push_back(cur_path);     
         }
@@ -962,10 +956,8 @@ Renderer_cairo::draw_mask(const PathVec& path_vec)
 void
 Renderer_cairo::add_paths(const PathVec& path_vec)
 {
-    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
-         it != end; ++it) {
-        const Path& cur_path = *it;
-        
+    for (const Path& cur_path : path_vec) {
+
         add_path(_cr, cur_path);
     }  
 }
@@ -987,19 +979,18 @@ Renderer_cairo::drawShape(const SWF::ShapeRecord& shape, const Transform& xform)
     
     CairoScopeMatrix mat_transformer(_cr, xform.matrix);
 
-    for (SWF::ShapeRecord::Subshapes::const_iterator it = shape.subshapes().begin(),
-         end = shape.subshapes().end(); it != end; ++it) {
+    for (const SWF::Subshape& subshape: shape.subshapes()) {
 
         if (_drawing_mask) {      
-            PathVec scaled_path_vec = it->paths();
+            PathVec scaled_path_vec = subshape.paths();
         
             apply_matrix_to_paths(scaled_path_vec, xform.matrix);
             draw_mask(scaled_path_vec); 
             continue;
         }
 
-        draw_subshape(it->paths(), xform.matrix, xform.colorTransform,
-                it->fillStyles(), it->lineStyles());
+        draw_subshape(subshape.paths(), xform.matrix, xform.colorTransform,
+                subshape.fillStyles(), subshape.lineStyles());
     }
 }
   

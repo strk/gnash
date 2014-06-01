@@ -289,8 +289,8 @@ public:
             aw.writeString("play");
             aw.writeNumber(0);
             aw.writeNull();
-            for (size_t i = 0; i < args.size(); ++i) {
-               args[i].writeAMF0(aw);
+            for (auto& arg : args) {
+               arg.writeAMF0(aw);
             }
            // TODO Use the play method and the streamId from createStream
            _rtmp.call(buf);
@@ -302,8 +302,8 @@ public:
             const size_t id = asCallback ? callNo() : 0;
             aw.writeNumber(id);
 
-            for (size_t i = 0; i < args.size(); ++i) {
-               args[i].writeAMF0(aw);
+            for (auto& arg : args) {
+               arg.writeAMF0(aw);
             }
            _rtmp.call(buf);
             if (asCallback) {

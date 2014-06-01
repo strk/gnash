@@ -65,12 +65,11 @@ DefineButtonCxformTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     }
     
     DefineButtonTag::ButtonRecords& br = ch->buttonRecords();
-    for (DefineButtonTag::ButtonRecords::iterator i = br.begin(),
-            e = br.end(); i != e; ++i)
+    for (ButtonRecord& record : br)
     {
         // This will throw a parser exception if not enough bytes are
         // left.
-        i->readRGBTransform(in);
+        record.readRGBTransform(in);
     }
 }
 

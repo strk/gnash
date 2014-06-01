@@ -182,10 +182,9 @@ public:
 
     bool pointTest(std::int32_t x, std::int32_t y,
                    const SWFMatrix& wm) const {
-        for (SWF::ShapeRecord::Subshapes::const_iterator it = _subshapes.begin(),
-             end = _subshapes.end(); it != end; ++it) {
+        for (const Subshape& subshape : _subshapes) {
 
-            if (geometry::pointTest(it->paths(), it->lineStyles(), x, y, wm)) {
+            if (geometry::pointTest(subshape.paths(), subshape.lineStyles(), x, y, wm)) {
         	    return true;
             }
         }

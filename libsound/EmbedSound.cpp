@@ -118,10 +118,9 @@ void
 EmbedSound::getPlayingInstances(std::vector<InputStream*>& to) const
 {
     std::lock_guard<std::mutex> lock(_soundInstancesMutex);
-    for (Instances::const_iterator i=_soundInstances.begin(), e=_soundInstances.end();
-            i!=e; ++i)
+    for (InputStream* stream : _soundInstances)
     {
-        to.push_back(*i);
+        to.push_back(stream);
     }
 }
 

@@ -409,11 +409,8 @@ public:
     template<typename ScanLine>
     void render(ScanLine& sl, Stroke& stroke, const rgba& color)
     {
-        for (ClipBounds::const_iterator i = _clipbounds.begin(),
-                e = _clipbounds.end(); i != e; ++i) {
+        for (const auto& bounds : _clipbounds) {
 
-            const ClipBounds::value_type& bounds = *i;
-              
             applyClipBox<Rasterizer> (_ras, bounds);
 
             // The vectorial pipeline
@@ -487,10 +484,8 @@ private:
         Rasterizer ras;
         agg::renderer_scanline_aa_solid<Renderer> ren_sl(rbase);
 
-        for (ClipBounds::const_iterator i = _clipbounds.begin(),
-            e = _clipbounds.end(); i != e; ++i)
+        for (const auto& cb : _clipbounds)
         {
-            const ClipBounds::value_type& cb = *i;
             applyClipBox<Rasterizer>(ras, cb);
             ras.add_path(path);
 
@@ -630,10 +625,8 @@ private:
             Scanline& sl, SpanGenerator& sg)
     {
         Rasterizer _ras;
-        for (ClipBounds::const_iterator i = _clipbounds.begin(),
-            e = _clipbounds.end(); i != e; ++i)
+        for (const auto& cb : _clipbounds)
         {
-            const ClipBounds::value_type& cb = *i;
             applyClipBox<Rasterizer> (_ras, cb);
 
             _ras.add_path(path);
@@ -859,10 +852,9 @@ public:
     if ( ! _clipbounds.empty() )
     {
         const agg::rgba8& col = agg::rgba8_pre(bg.m_r, bg.m_g, bg.m_b, bg.m_a);
-        for (ClipBounds::const_iterator i = _clipbounds.begin(),
-                e = _clipbounds.end(); i!= e; ++i) 
+        for (const auto& bounds : _clipbounds)
         {
-            clear_framebuffer(*i, col);
+            clear_framebuffer(bounds, col);
         }
     }
     
@@ -1004,9 +996,8 @@ public:
         _alphaMasks.push_back(new AlphaMask(xres, yres));
         AlphaMask& new_mask = _alphaMasks.back();
 
-        for (ClipBounds::const_iterator i = _clipbounds.begin(), 
-                e = _clipbounds.end(); i != e; ++i) {
-            new_mask.clear(*i);
+        for (const auto& bounds : _clipbounds ) {
+            new_mask.clear(bounds);
         }
 
     }
@@ -1091,11 +1082,10 @@ public:
     
     assert(bounds.getRange().isFinite());
     
-    const int count = _clipbounds.size();
-    for (int cno=0; cno<count; ++cno) {
-          
-      if (_clipbounds[cno].intersects(bounds.getRange())) 
-        _clipbounds_selected.push_back(&_clipbounds[cno]);
+    for (const auto& clip : _clipbounds) {
+
+      if (clip.intersects(bounds.getRange())) 
+        _clipbounds_selected.push_back(&clip);
 
     }  
   }
@@ -1107,10 +1097,9 @@ public:
     _clipbounds_selected.clear();
     _clipbounds_selected.reserve(_clipbounds.size());
     
-    for (ClipBounds::iterator i = _clipbounds.begin(),
-            e = _clipbounds.end(); i != e; ++i)
+    for (const auto& clip : _clipbounds)
     {
-      _clipbounds_selected.push_back(&(*i));
+      _clipbounds_selected.push_back(&clip);
     }
   }
 
@@ -1487,10 +1476,8 @@ public:
       rasc.filling_rule(agg::fill_non_zero);
       
     
-    for (unsigned int cno=0; cno<_clipbounds_selected.size(); ++cno) {
-    
-      const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
-      
+    for (const geometry::Range2d<int>* bounds : _clipbounds_selected) {
+
       applyClipBox<ras_type> (rasc, *bounds);
       
       // push paths to AGG
@@ -1692,10 +1679,8 @@ public:
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
       
     
-    for (unsigned int cno=0; cno<_clipbounds_selected.size(); ++cno) {
-    
-      const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
-          
+    for (const geometry::Range2d<int>* bounds : _clipbounds_selected) {
+
       applyClipBox<ras_type> (ras, *bounds);
       
       for (size_t pno=0, pcount=paths.size(); pno<pcount; ++pno) {
@@ -1821,9 +1806,8 @@ public:
     // -- render --
       
     // iterate through clipping bounds
-    for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
-    
-      const ClipBounds::value_type& bounds = _clipbounds[cno];         
+    for (const auto& bounds : _clipbounds) {
+
       applyClipBox<ras_type> (ras, bounds);     
             
       
@@ -1967,8 +1951,8 @@ public:
   
     Range2d<int> pixbounds = Renderer::world_to_pixel(bounds);
     
-    for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {  
-      if (Intersect(pixbounds, _clipbounds[cno]))
+    for (const auto& bounds : _clipbounds) {
+      if (Intersect(pixbounds, bounds))
         return true;
     }
     return false;
@@ -2026,7 +2010,7 @@ private:  // private variables
 
     /// clipping rectangle
     ClipBounds _clipbounds;
-    std::vector< geometry::Range2d<int>* > _clipbounds_selected;
+    std::vector< geometry::Range2d<int> const* > _clipbounds_selected;
 
     // this flag is set while a mask is drawn
     bool m_drawing_mask; 

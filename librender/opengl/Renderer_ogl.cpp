@@ -414,10 +414,8 @@ std::vector<oglVertex> interpolate(const std::vector<Edge>& edges,
   std::vector<oglVertex> shape_points;
   shape_points.push_back(oglVertex(anchor));
   
-  for (std::vector<Edge>::const_iterator it = edges.begin(), end = edges.end();
-        it != end; ++it) {
-      const Edge& the_edge = *it;
-      
+  for (const Edge& the_edge : edges) {
+
       point target(the_edge.ap.x, the_edge.ap.y);
 
       if (the_edge.straight()) {
@@ -497,9 +495,8 @@ Tesselator::tesselate()
 {
   gluTessEndPolygon(_tessobj);
 
-  for (std::vector<GLdouble*>::iterator it = _vertices.begin(),
-       end = _vertices.end(); it != end; ++it) {
-    delete [] *it;
+  for (Gldouble* vertex: _vertices) {
+    delete [] vertex;
   }
 
   _vertices.clear();
@@ -1070,8 +1067,8 @@ public:
     glDeleteLists(1, _render_indices.size());
     _render_indices.clear();
 
-    for (size_t i = 0; i < _render_textures.size(); i++)
-        _cached_textures.push_front(_render_textures[i]);
+    for (auto& texture : _render_textures)
+        _cached_textures.push_front(texture);
     _render_textures.clear();
   
     check_error();
@@ -1330,10 +1327,8 @@ public:
   {
     PathVec normalized;
   
-    for (PathVec::const_iterator it = paths.begin(), end = paths.end();
-         it != end; ++it) {
-      const Path& cur_path = *it;
-      
+    for (const Path& cur_path : paths) {
+
       if (cur_path.m_edges.empty()) {
         continue;
       
@@ -1481,9 +1476,7 @@ public:
   
     PathPointMap pathpoints;
     
-    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
-         it != end; ++it) {
-      const Path& cur_path = *it;
+    for (const Path& cur_path : path_vec) {
 
       if (!cur_path.m_edges.size()) {
         continue;
@@ -1512,10 +1505,8 @@ public:
                 const std::vector<LineStyle>& line_styles)
   {
   
-    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
-         it != end; ++it) {
-      const Path& cur_path = *it;
-      
+    for (const Path& cur_path : path_vec) {
+
       if (!cur_path.m_line) {
         continue;
       }
@@ -1556,9 +1547,7 @@ public:
     std::list<PathPtrVec> contours;
     
     
-    for (PathPtrVec::const_iterator it = paths.begin(), end = paths.end();
-         it != end; ++it) {
-      const Path* cur_path = *it;
+    for (const Path* cur_path : paths) {
       path_refs.push_back(cur_path);
     }
         
@@ -1600,10 +1589,8 @@ public:
   
   void draw_mask(const PathVec& path_vec)
   {    
-    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
-         it != end; ++it) {
-      const Path& cur_path = *it;
-      
+    for (const Path& cur_path : path_vec) {
+
       if (cur_path.m_fill0 || cur_path.m_fill1) {
         _masks.back().push_back(cur_path);
         _masks.back().back().m_line = 0;    
@@ -1615,10 +1602,8 @@ public:
   paths_by_style(const PathVec& path_vec, unsigned int style)
   {
     PathPtrVec paths;
-    for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
-         it != end; ++it) {
-      const Path& cur_path = *it;
-      
+    for (const Path& cur_path : path_vec) {
+
       if (cur_path.m_fill0 == style) {
         paths.push_back(&cur_path);
       }
@@ -1670,9 +1655,8 @@ public:
         
         _tesselator.beginContour();
                    
-        for (PathPtrVec::const_iterator it = refs.begin(), end = refs.end();
-             it != end; ++it) {
-          const Path& cur_path = *(*it);          
+        for (const auto& ref : refs) {
+          const Path& cur_path = *ref;
           
           assert(pathpoints.find(&cur_path) != pathpoints.end());
 
@@ -1733,9 +1717,8 @@ public:
     
     oglScopeMatrix scope_mat(xform.matrix);
 
-    for (SWF::ShapeRecord::Subshapes::const_iterator it = shape.subshapes().begin(),
-         end = shape.subshapes().end(); it != end; ++it) {
-        const PathVec& path_vec = it->paths();
+    for (const SWF::Subshape& subshape : shape.subshapes()) {
+        const PathVec& path_vec = subshape.paths();
 
         if (!path_vec.size()) {
             // No paths. Nothing to draw...
@@ -1758,8 +1741,8 @@ public:
             continue; // invisible character
         }  
 
-        draw_subshape(it->paths(), xform.matrix, xform.colorTransform,
-                      it->fillStyles(), it->lineStyles());
+        draw_subshape(path_vec, xform.matrix, xform.colorTransform,
+                      subshape.fillStyles(), subshape.lineStyles());
     }
   }
 

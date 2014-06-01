@@ -119,10 +119,7 @@ DisplayList::getNextHighestDepth() const
     testInvariant();
 
     int nexthighestdepth=0;
-    for (const_iterator it = _charsByDepth.begin(),
-            itEnd = _charsByDepth.end(); it != itEnd; ++it) {
-
-        DisplayObject* ch = *it;
+    for (DisplayObject* ch : _charsByDepth) {
 
         const int chdepth = ch->get_depth();
         if (chdepth >= nexthighestdepth) {
@@ -137,10 +134,7 @@ DisplayList::getDisplayObjectAtDepth(int depth) const
 {
     testInvariant();
 
-    for (const_iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
-        it != itEnd; ++it) {
-
-        DisplayObject* ch = *it;
+    for (DisplayObject* ch : _charsByDepth) {
 
         // Should not be there!
         if (ch->isDestroyed()) continue;

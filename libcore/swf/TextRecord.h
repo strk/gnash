@@ -140,9 +140,9 @@ public:
 
 	float recordWidth() const {
 		float width = 0.0f;
-		for (size_t i = 0; i < glyphs().size(); ++i)
+		for (const auto& glyph : glyphs())
 		{
-			width += glyphs()[i].advance;
+			width += glyph.advance;
 		}
         return width;
 	}

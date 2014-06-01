@@ -55,18 +55,17 @@ hexify(const unsigned char *p, size_t length, bool ascii)
     // For hex output, fill single-digit numbers with a leading 0.
     if (!ascii) ss << std::hex << std::setfill('0');
     
-    for (std::vector<unsigned char>::const_iterator i = bytes.begin(),
-            e = bytes.end(); i != e; ++i)
+    for (const unsigned char& byte : bytes)
         {
         if (ascii) {
-            if (std::isprint(*i) || *i == 0xd) {
-                ss << *i;
+            if (std::isprint(byte) || byte == 0xd) {
+                ss << byte;
             }
             else ss << ".";
         }
         else  {
             // Not ascii
-            ss << std::setw(2) << static_cast<int>(*i) << " ";    
+            ss << std::setw(2) << static_cast<int>(byte) << " ";    
         }
     }    
     

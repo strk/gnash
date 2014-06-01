@@ -412,14 +412,12 @@ DisplayObject::setMatrix(const SWFMatrix& m, bool updateCache)
 void
 DisplayObject::set_event_handlers(const Events& copyfrom)
 {
-    for (Events::const_iterator it=copyfrom.begin(), itE=copyfrom.end();
-            it != itE; ++it)
+    for (const auto& event : copyfrom)
     {
-        const event_id& ev = it->first;
-        const BufferList& bufs = it->second;
-        for (size_t i = 0, e = bufs.size(); i < e; ++i)
+        const event_id& ev = event.first;
+        const BufferList& bufs = event.second;
+        for (const action_buffer* buf : bufs) 
         {
-            const action_buffer* buf = bufs[i];
             assert(buf);
             add_event_handler(ev, *buf);
         }    

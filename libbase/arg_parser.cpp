@@ -154,9 +154,9 @@ Arg_parser::Arg_parser( const int argc, const char * const argv[],
     if(! _error.empty() ) {
         data.clear();
     } else {
-        for( unsigned int i = 0; i < non_options.size(); ++i ) {
+        for(auto& non_option : non_options) {
             data.push_back( Record() );
-            data.back().argument.swap( non_options[i] );
+            data.back().argument.swap( non_option );
         }
         while( argind < argc ) {
             data.push_back( Record() );

@@ -165,9 +165,7 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
     std::uint8_t* rv = new std::uint8_t[total_size];
     std::uint8_t* ptr = rv;
 
-    for (std::vector<DecodedFrame*>::iterator it = decoded_frames.begin(),
-         end = decoded_frames.end(); it != end; ++it) {
-        DecodedFrame* frame = *it;
+    for (DecodedFrame* frame : decoded_frames) {
 
         memcpy(ptr, frame->data.get(), frame->size);
 

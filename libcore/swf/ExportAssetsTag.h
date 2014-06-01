@@ -53,9 +53,8 @@ public:
     // TODO: use Movie to store the actual exports.
     virtual void executeState(MovieClip* m, DisplayList& /*l*/) const {
         Movie* mov = m->get_root();
-        for (Exports::const_iterator it = _exports.begin(), e = _exports.end();
-                it != e; ++it) {
-            const std::uint16_t id = mov->definition()->exportID(*it);
+        for (const std::string& the_export : _exports) {
+            const std::uint16_t id = mov->definition()->exportID(the_export);
 
             // We exported it, so we assume it is known.
             assert(id);

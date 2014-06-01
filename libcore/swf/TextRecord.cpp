@@ -171,12 +171,10 @@ TextRecord::displayRecords(Renderer& renderer, const Transform& xform,
     double x = 0.0;
     double y = 0.0;
 
-    for (TextRecords::const_iterator i = records.begin(), e = records.end();
-            i !=e; ++i) {
+    for (const TextRecord& rec : records) {
 
         // Draw the DisplayObjects within the current record; i.e. consecutive
         // chars that share a particular style.
-        const TextRecord& rec = *i;
 
         const Font* fnt = rec.getFont();
         if (!fnt) {
@@ -214,10 +212,7 @@ TextRecord::displayRecords(Renderer& renderer, const Transform& xform,
         // Device fonts have no transparency.
         if (!embedded) textColor.m_a = 0xff;
 
-        for (Glyphs::const_iterator j = rec.glyphs().begin(),
-                je = rec.glyphs().end(); j != je; ++j) {
-
-            const TextRecord::GlyphEntry& ge = *j;
+        for (const TextRecord::GlyphEntry& ge : rec.glyphs()) {
 
             const int index = ge.index;
                 

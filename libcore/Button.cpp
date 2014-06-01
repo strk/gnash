@@ -369,9 +369,8 @@ Button::display(Renderer& renderer, const Transform& base)
     // TODO: by keeping chars sorted by depth we'd avoid the sort on display
     std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-    for (DisplayObjects::iterator it = actChars.begin(), e = actChars.end();
-            it != e; ++it) {
-        (*it)->display(renderer, xform);
+    for (auto& actChar : actChars) {
+        actChar->display(renderer, xform);
     }
 
     clear_invalidated();
@@ -799,9 +798,9 @@ Button::construct(as_object* initObj)
     // Instantiate the hit DisplayObjects
     ActiveRecords hitChars;
     get_active_records(hitChars, MOUSESTATE_HIT);
-    for (ActiveRecords::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
+    for (const auto& hitChar : hitChars)
     {
-        const SWF::ButtonRecord& rec = _def->buttonRecords()[*i];
+        const SWF::ButtonRecord& rec = _def->buttonRecords()[hitChar];
 
         // These should not be named!
         DisplayObject* ch = rec.instantiate(this, false);
@@ -819,10 +818,8 @@ Button::construct(as_object* initObj)
     ActiveRecords upChars;
     get_active_records(upChars, MOUSESTATE_UP);
 
-    for (ActiveRecords::iterator i = upChars.begin(), e=upChars.end();
-            i != e; ++i)
+    for (auto rno : upChars)
     {
-        int rno = *i;
         const SWF::ButtonRecord& rec = _def->buttonRecords()[rno];
 
         DisplayObject* ch = rec.instantiate(this);
@@ -847,10 +844,8 @@ Button::markOwnResources() const
 {
 
     // Mark state DisplayObjects as reachable
-    for (DisplayObjects::const_iterator i = _stateCharacters.begin(),
-            e = _stateCharacters.end(); i != e; ++i)
+    for (DisplayObject* ch : _stateCharacters)
     {
-        DisplayObject* ch = *i;
         if (ch) ch->setReachable();
     }
 
@@ -867,10 +862,8 @@ Button::unloadChildren()
 
     // We need to unload all children, or the global instance list
     // will keep growing forever !
-    for (DisplayObjects::iterator i = _stateCharacters.begin(),
-            e = _stateCharacters.end(); i != e; ++i)
+    for (DisplayObject* ch : _stateCharacters)
     {
-        DisplayObject* ch = *i;
         if (!ch || ch->unloaded()) continue;
         if (ch->unload()) childsHaveUnload = true;
     }
@@ -891,9 +884,7 @@ Button::destroy()
 {
     stage().removeButton(this);
 
-    for (DisplayObjects::iterator i = _stateCharacters.begin(),
-            e=_stateCharacters.end(); i != e; ++i) {
-        DisplayObject* ch = *i;
+    for (DisplayObject* ch : _stateCharacters) {
         if (!ch || ch->isDestroyed()) continue;
         ch->destroy();
     }

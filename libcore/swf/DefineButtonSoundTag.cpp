@@ -85,9 +85,8 @@ void
 DefineButtonSoundTag::read(SWFStream& in, movie_definition& m)
 {
 
-	for (Sounds::iterator i = _sounds.begin(), e = _sounds.end(); i != e; ++i)
+	for (ButtonSound& sound : _sounds)
 	{
-		ButtonSound& sound = *i;
 		in.ensureBytes(2);
 		sound.soundID = in.read_u16();
 		if (sound.soundID)

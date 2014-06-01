@@ -128,10 +128,10 @@ PropertyList::setFlags(const ObjectURI& uri, int setFlags, int clearFlags)
 void
 PropertyList::setFlagsAll(int setFlags, int clearFlags)
 {
-    for (const_iterator it = _props.begin(); it != _props.end(); ++it) {
-        PropFlags f = it->getFlags();
+    for (const auto& prop: _props) {
+        PropFlags f = prop.getFlags();
         f.set_flags(setFlags, clearFlags);
-        it->setFlags(f);
+        prop.setFlags(f);
     }
 }
 
@@ -173,12 +173,11 @@ PropertyList::visitKeys(KeyVisitor& visitor, PropertyTracker& donelist)
     const
 {
     // We should enumerate in order of creation, not lexicographically.
-	for (const_iterator i = _props.begin(),
-            ie = _props.end(); i != ie; ++i) {
+	for (const auto& prop : _props) {
 
-		if (i->getFlags().test<PropFlags::dontEnum>()) continue;
+		if (prop.getFlags().test<PropFlags::dontEnum>()) continue;
 
-        const ObjectURI& uri = i->uri();
+        const ObjectURI& uri = prop.uri();
 
 		if (donelist.insert(uri).second) {
 			visitor(uri);
@@ -190,9 +189,8 @@ void
 PropertyList::dump()
 {
     ObjectURI::Logger l(getStringTable(_owner));
-	for (const_iterator it=_props.begin(), itEnd=_props.end();
-            it != itEnd; ++it) {
-            log_debug("  %s: %s", l(it->uri()), it->getValue(_owner));
+	for (const auto& prop : _props) {
+            log_debug("  %s: %s", l(prop.uri()), prop.getValue(_owner));
 	}
 }
 

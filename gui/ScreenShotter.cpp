@@ -47,12 +47,12 @@ typeFromFileName(const std::string& filename)
             { ".jpeg", GNASH_FILETYPE_JPEG }
         };
     
-    for (size_t i = 0; i < 3; ++i) {
-        const char* ext = matches[i].ext;
+    for (const auto& match : matches) {
+        const char* ext = match.ext;
         const std::string::size_type pos = filename.rfind(ext);
         if (pos != std::string::npos &&
                 pos + std::strlen(ext) == filename.size()) {
-            return matches[i].type;
+            return match.type;
         }
     }
     return GNASH_FILETYPE_PNG;

@@ -838,8 +838,8 @@ MovieClip::setTextFieldVariables(const ObjectURI& uri, const as_value& val)
 
     if (!etc) return false;
 
-    for (TextFields::iterator i=etc->begin(), e=etc->end(); i!=e; ++i) {
-        (*i)->updateText(val.to_string(getSWFVersion(*getObject(this))));
+    for (TextField* textfield : *etc) {
+        textfield->updateText(val.to_string(getSWFVersion(*getObject(this))));
     }
     return true;
 }
@@ -1049,15 +1049,14 @@ MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
         );
 
         // Generally tags should be executed in the order they are found in.
-        for (PlayList::const_iterator it = playlist->begin(),
-                e = playlist->end(); it != e; ++it) {
+        for (const auto& item : *playlist) {
 
             if (typeflags & SWF::ControlTag::TAG_DLIST) {
-                (*it)->executeState(this, dlist);
+                item->executeState(this, dlist);
             }
 
             if (typeflags & SWF::ControlTag::TAG_ACTION) {
-                (*it)->executeActions(this, _displayList);
+                item->executeActions(this, _displayList);
             }
         }
     }
@@ -1591,9 +1590,9 @@ MovieClip::cleanup_textfield_variables()
 
     TextFieldIndex& m = *_text_variables;
 
-    for (TextFieldIndex::iterator i=m.begin(), ie=m.end(); i!=ie; ++i)
+    for (auto& index : m)
     {
-        TextFields& v=i->second;
+        TextFields& v=index.second;
         TextFields::iterator lastValid = std::remove_if(v.begin(), v.end(),
                     std::mem_fn(&DisplayObject::unloaded));
         v.erase(lastValid, v.end());
@@ -1937,11 +1936,10 @@ void
 MovieClip::setVariables(const MovieVariables& vars)
 {
     VM& vm = getVM(*getObject(this));
-    for (MovieVariables::const_iterator it=vars.begin(), itEnd=vars.end();
-        it != itEnd; ++it) {
+    for (const auto& var : vars) {
 
-        const std::string& name = it->first;
-        const std::string& val = it->second;
+        const std::string& name = var.first;
+        const std::string& val = var.second;
         getObject(this)->set_member(getURI(vm, name), val);
     }
 }

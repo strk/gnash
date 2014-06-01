@@ -1601,9 +1601,8 @@ void foreachArray(as_object& array, int start, int end, T& pred)
 void
 pushIndices(as_object& o, const std::vector<indexed_as_value>& elems)
 {
-    for (std::vector<indexed_as_value>::const_iterator it = elems.begin();
-        it != elems.end(); ++it) {
-        callMethod(&o, NSV::PROP_PUSH, it->vec_index);
+    for (const auto& elem : elems) {
+        callMethod(&o, NSV::PROP_PUSH, elem.vec_index);
     }
 }
 

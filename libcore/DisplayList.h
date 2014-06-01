@@ -372,10 +372,8 @@ template <class V>
 void
 DisplayList::visitAll(V& visitor)
 {
-	for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
-		it != itEnd; ++it) {
-
-		visitor(*it);
+	for (DisplayObject* ch : _charsByDepth) {
+		visitor(ch);
 	}
 }
 
@@ -383,10 +381,8 @@ template <class V>
 void
 DisplayList::visitAll(V& visitor) const
 {
-	for (const_iterator it = _charsByDepth.begin(),
-            itEnd = _charsByDepth.end(); it != itEnd; ++it) {
-
-		visitor(*it);
+	for (DisplayObject* const ch : _charsByDepth) {
+		visitor(ch);
 	}
 }
 
