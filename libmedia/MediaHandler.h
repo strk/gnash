@@ -28,10 +28,11 @@
 #include <memory>
 #include <string>
 
+#include "GnashFactory.h"
+
 // Forward declarations
 namespace gnash {
     class IOChannel;
-    template<typename T, typename Init, typename Key> class GnashFactory;
     namespace media {
         class VideoDecoder;
         class AudioDecoder;
@@ -170,6 +171,13 @@ protected:
 
 
 } // gnash.media namespace 
+
+// In order for GnashFactory to work correctly, there must be only a single
+// instantiation of MediaFactory. Therefore, we declare its type as extern,
+// which we can now that its dependent types are fully specified.
+extern template class GnashFactory<media::MediaHandler,
+    media::RegisterAllHandlers, std::string>; // I.e., typedef MediaFactory.
+
 } // namespace gnash
 
 #endif 

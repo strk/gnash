@@ -35,6 +35,12 @@
 #endif
 
 namespace gnash {
+    // Instantiate MediaFactory here.
+    template class GnashFactory<media::MediaHandler, media::RegisterAllHandlers,
+        std::string>;
+}
+
+namespace gnash {
 namespace media {
 
 bool
