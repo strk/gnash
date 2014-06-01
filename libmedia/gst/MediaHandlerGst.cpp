@@ -186,12 +186,6 @@ MediaHandlerGst::cameraNames(std::vector<std::string>& names) const
     VideoInputGst::getNames(names);
 }
 
-#ifdef REGISTER_MEDIA_HANDLERS
-namespace {
-    MediaFactory::RegisterHandler<MediaHandlerGst> reg("gst");
-}
-#endif
-
 } // gnash.media.gst namespace
 } // gnash.media namespace 
 } // gnash namespace

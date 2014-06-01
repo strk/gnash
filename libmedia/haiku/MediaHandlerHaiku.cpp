@@ -148,12 +148,6 @@ MediaHandlerHaiku::cameraNames(std::vector<std::string>& /*names*/) const
 ////    return FF_INPUT_BUFFER_PADDING_SIZE;
 //}
 
-#ifdef REGISTER_MEDIA_HANDLERS
-namespace {
-    MediaFactory::RegisterHandler<MediaHandlerHaiku> reg("haiku");
-}
-#endif
-
 } // gnash.media.haiku namespace 
 } // gnash.media namespace 
 } // gnash namespace
