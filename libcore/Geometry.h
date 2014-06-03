@@ -188,9 +188,6 @@ public:
     
     /// Default constructor
     //
-    /// @param newShape
-    ///    True if this path starts a new subshape
-    ///
     Path()
     {
         reset(0, 0, 0, 0, 0);
@@ -225,9 +222,6 @@ public:
     /// @param line
     ///    Line style index for right fill (1-based).
     ///    Zero means NO style.
-    ///
-    /// @param newShape
-    ///    True if this path starts a new subshape
     Path(std::int32_t ax, std::int32_t ay,
             unsigned fill0, unsigned fill1, unsigned line)
     {
