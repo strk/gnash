@@ -22,7 +22,7 @@
 #include "dsodefs.h" // for DSOEXPORT
 
 #include <cassert>
-#include <boost/detail/atomic_count.hpp>
+#include <atomic>
 
 namespace gnash {
 
@@ -41,9 +41,7 @@ private:
 	// carefully designed for this to be effective
 	// (decrement & check in a single statement)
 	//
-	typedef boost::detail::atomic_count Counter;
-
-	mutable Counter m_ref_count;
+	mutable std::atomic<int> m_ref_count;
 	
 protected:
 
