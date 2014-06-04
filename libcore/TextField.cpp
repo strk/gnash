@@ -143,7 +143,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
 }
 
 TextField::TextField(as_object* object, DisplayObject* parent,
-        const SWFRect& bounds)
+        SWFRect bounds)
     :
     InteractiveObject(object, parent),
     _url(""),
@@ -166,7 +166,7 @@ TextField::TextField(as_object* object, DisplayObject* parent,
     _maxChars(0),
     _autoSize(AUTOSIZE_NONE),
     _type(typeDynamic),
-    _bounds(bounds),
+    _bounds(std::move(bounds)),
     _selection(0, 0),
     _leading(0),
     _indent(0), 

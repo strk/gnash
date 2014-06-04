@@ -34,13 +34,13 @@
 namespace gnash {
 
 Function::Function(const action_buffer& ab, as_environment& env,
-            size_t start, const ScopeStack& scopeStack)
+            size_t start, ScopeStack scopeStack)
     :
     UserFunction(getGlobal(env)),
     _env(env),
     _pool(getVM(env).getConstantPool()),
     _action_buffer(ab),
-    _scopeStack(scopeStack),
+    _scopeStack(std::move(scopeStack)),
     _startPC(start),
     _length(0)
 {

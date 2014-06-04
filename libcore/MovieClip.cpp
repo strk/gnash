@@ -117,10 +117,10 @@ class QueuedEvent : public ExecutableCode
 {
 public:
 
-    QueuedEvent(MovieClip* nTarget, const event_id& id)
+    QueuedEvent(MovieClip* nTarget, event_id id)
         :
         ExecutableCode(nTarget),
-        _eventId(id)
+        _eventId(std::move(id))
     {}
 
     virtual void execute() {
@@ -154,8 +154,8 @@ public:
         _highestHiddenDepth(std::numeric_limits<int>::min()),
         _m(nullptr),
         _candidates(),
-        _wp(wp),
-        _pp(pp),
+        _wp(std::move(wp)),
+        _pp(std::move(pp)),
         _checked(false)
     {}
 

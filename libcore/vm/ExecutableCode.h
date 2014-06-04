@@ -92,10 +92,10 @@ public:
         ExecutableCode(nTarget)
     {}
 
-    EventCode(DisplayObject* nTarget, const BufferList& buffers)
+    EventCode(DisplayObject* nTarget, BufferList buffers)
         :
         ExecutableCode(nTarget),
-        _buffers(buffers)
+        _buffers(std::move(buffers))
     {}
 
     /// Add an action buffer to this event handler
@@ -146,14 +146,14 @@ class DelayedFunctionCall : public ExecutableCode
 public:
 
     DelayedFunctionCall(DisplayObject* target,
-            as_object* obj, const ObjectURI& name,
-            const as_value& arg1, const as_value& arg2)
+            as_object* obj, ObjectURI name,
+            as_value arg1, as_value arg2)
         :
         ExecutableCode(target),
         _obj(obj),
-        _name(name),
-        _arg1(arg1),
-        _arg2(arg2)
+        _name(std::move(name)),
+        _arg1(std::move(arg1)),
+        _arg2(std::move(arg2))
     {}
 
     virtual void execute() {

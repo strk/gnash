@@ -119,8 +119,8 @@ struct indexed_as_value : public as_value
 {
     int vec_index;
     
-    indexed_as_value(const as_value& val, int index)
-	: as_value(val)
+    indexed_as_value(as_value val, int index)
+	: as_value(std::move(val))
 	{
 	    vec_index = index;
 	}

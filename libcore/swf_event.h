@@ -21,6 +21,7 @@
 #define GNASH_SWF_EVENT_H
 
 #include "event_id.h" // for composition
+#include <utility>
 
 namespace gnash {
     class action_buffer;
@@ -40,9 +41,9 @@ class swf_event
 {
 public:
 
-	swf_event(const event_id& ev, action_buffer& buf)
+	swf_event(event_id ev, action_buffer& buf)
 		:
-		m_event(ev),
+		m_event(std::move(ev)),
 		m_action_buffer(buf)
 	{
 	}

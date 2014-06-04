@@ -43,7 +43,7 @@ public:
             DisplayObject* parent)
         :
         DisplayObject(mr, object, parent),
-        _shape(sh)
+        _shape(std::move(sh))
     {
         assert(_shape.get());
     }

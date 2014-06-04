@@ -72,7 +72,7 @@ public:
 	/// action_buffer starting at offset 'start'
 	//
 	Function(const action_buffer& ab, as_environment& env, size_t start,
-		const ScopeStack& with_stack);
+		ScopeStack with_stack);
 
 	virtual ~Function() {}
 

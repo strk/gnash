@@ -107,7 +107,7 @@ public:
 
     SOLPropsBufSerializer(amf::Writer w, VM& vm)
         :
-        _writer(w),
+        _writer(std::move(w)),
         _vm(vm),
         _error(false),
         _count(0)
