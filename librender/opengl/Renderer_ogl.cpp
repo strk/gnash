@@ -495,7 +495,7 @@ Tesselator::tesselate()
 {
   gluTessEndPolygon(_tessobj);
 
-  for (Gldouble* vertex: _vertices) {
+  for (GLdouble* vertex: _vertices) {
     delete [] vertex;
   }
 
