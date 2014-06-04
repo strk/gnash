@@ -58,7 +58,7 @@ tree_node_<T>::tree_node_()
 	}
 
 template<class T>
-tree_node_<T>::tree_node_(const T val)
+tree_node_<T>::tree_node_(T val)
 	: parent(nullptr), first_child(nullptr), last_child(nullptr), prev_sibling(nullptr), next_sibling(nullptr), data(std::move(val))
 	{
 	}
