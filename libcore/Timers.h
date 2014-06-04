@@ -73,7 +73,7 @@ public:
     /// @param runOnce
     ///     If true the interval will run only once. False if omitted.
     Timer(as_function& method, unsigned long ms, as_object* this_ptr,
-            const fn_call::Args& args, bool runOnce = false);
+            fn_call::Args args, bool runOnce = false);
 
     /// Construct the Timer to call a late-evaluated object method, enabling it.
     //
@@ -94,8 +94,8 @@ public:
     ///
     /// @param runOnce
     ///     If true the interval will run only once. False if omitted.
-    Timer(as_object* obj, const ObjectURI& methodName, unsigned long ms,
-            const fn_call::Args& args, bool runOnce = false);
+    Timer(as_object* obj, ObjectURI methodName, unsigned long ms,
+            fn_call::Args args, bool runOnce = false);
 
     /// Clear the timer, ready for reuse
     //

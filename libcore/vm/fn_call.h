@@ -61,21 +61,31 @@ public:
     typedef std::vector<T> container_type;
     typedef T value_type;
 
-    FunctionArgs() {}
+    FunctionArgs() = default;
+    FunctionArgs(FunctionArgs&& other) = default;
 
     /// The copy constructor copies all the arguments.
-    FunctionArgs(const FunctionArgs& other)
-        :
-        _v(other._v)
-    {}
+    FunctionArgs(const FunctionArgs& other) = default;
 
-    FunctionArgs& operator+=(const T& t) {
-        _v.push_back(t);
+    FunctionArgs& operator+=(T t) {
+        _v.push_back(std::move(t));
         return *this;
     }
 
-    FunctionArgs& operator,(const T& t) {
-        _v.push_back(t);
+    FunctionArgs& operator,(T t) {
+        _v.push_back(std::move(t));
+        return *this;
+    }
+
+    template <typename U>
+    FunctionArgs& operator,(U&& u) {
+        _v.emplace_back(std::forward<U>(u));
+        return *this;
+    }
+
+    template <typename U>
+    FunctionArgs& operator+=(U&& u) {
+        _v.emplace_back(std::forward<U>(u));
         return *this;
     }
 

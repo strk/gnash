@@ -38,28 +38,28 @@ Timer::~Timer()
 }
 
 Timer::Timer(as_function& method, unsigned long ms,
-        as_object* this_ptr, const fn_call::Args& args, bool runOnce)
+        as_object* this_ptr, fn_call::Args args, bool runOnce)
     :
     _interval(ms),
     _start(std::numeric_limits<unsigned long>::max()),
     _function(&method),
     _methodName(),
     _object(this_ptr),
-    _args(args),
+    _args(std::move(args)),
     _runOnce(runOnce)
 {
     start();
 }
 
-Timer::Timer(as_object* this_ptr, const ObjectURI& methodName,
-        unsigned long ms, const fn_call::Args& args, bool runOnce)
+Timer::Timer(as_object* this_ptr, ObjectURI methodName,
+        unsigned long ms, fn_call::Args args, bool runOnce)
     :
     _interval(ms),
     _start(std::numeric_limits<unsigned long>::max()),
     _function(nullptr),
     _methodName(methodName),
     _object(this_ptr),
-    _args(args),
+    _args(std::move(args)),
     _runOnce(runOnce)
 {
     start();
