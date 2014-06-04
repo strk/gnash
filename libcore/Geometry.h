@@ -68,10 +68,10 @@ public:
         ap(from.ap)
     {}
 
-    constexpr Edge(point ncp, point nap)
+    constexpr Edge(const point& ncp, const point& nap)
         :
-        cp(std::move(ncp)),
-        ap(std::move(nap))
+        cp(ncp),
+        ap(nap)
     {}
 
     bool straight() const
