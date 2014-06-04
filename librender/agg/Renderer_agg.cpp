@@ -1115,12 +1115,11 @@ public:
             return; // no need to draw
         }
 
-        for (SWF::ShapeRecord::Subshapes::const_iterator it = shape.subshapes().begin(),
-             end = shape.subshapes().end(); it != end; ++it ) {
+        for (const SWF::Subshape& subshape : shape.subshapes()) {
 
-            const SWF::ShapeRecord::FillStyles& fillStyles = it->fillStyles();
-            const SWF::ShapeRecord::LineStyles& lineStyles = it->lineStyles();
-            const SWF::ShapeRecord::Paths& paths = it->paths();
+            const SWF::ShapeRecord::FillStyles& fillStyles = subshape.fillStyles();
+            const SWF::ShapeRecord::LineStyles& lineStyles = subshape.lineStyles();
+            const SWF::ShapeRecord::Paths& paths = subshape.paths();
 
             // select ranges
             select_clipbounds(shape.getBounds(), xform.matrix);
