@@ -318,15 +318,6 @@ public:
         _destructive(destroy)
 	{}
 
-    /// Copy constructor
-	Property(const Property& p)
-        :
-        _bound(p._bound),
-        _uri(p._uri),
-		_flags(p._flags),
-        _destructive(p._destructive)
-	{}
-
 	/// accessor to the properties flags
 	const PropFlags& getFlags() const { return _flags; }
 
