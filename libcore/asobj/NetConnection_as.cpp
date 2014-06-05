@@ -257,10 +257,10 @@ private:
     const URL _url;
 
     /// The queue of sent requests.
-    std::vector<std::shared_ptr<HTTPRequest> > _requestQueue;
+    std::vector<std::unique_ptr<HTTPRequest>> _requestQueue;
 
     /// The current request.
-    std::shared_ptr<HTTPRequest> _currentRequest;
+    std::unique_ptr<HTTPRequest> _currentRequest;
     
 };
 
@@ -567,8 +567,7 @@ NetConnection_as::close()
 
     /// Queue the current call queue if it has pending calls
     if (_currentConnection.get() && _currentConnection->hasPendingCalls()) {
-        std::shared_ptr<Connection> c(_currentConnection.release());
-        _oldConnections.push_back(c);
+        _oldConnections.emplace_back(std::move(_currentConnection));
     }
 
     /// TODO: what should actually happen here? Should an attached
@@ -1086,20 +1085,16 @@ HTTPConnection::advance()
 {
     // If there is data waiting to be sent, send it and push it
     // to the queue.
-    if (_currentRequest.get()) {
+    if (_currentRequest) {
         _currentRequest->send(_url, _nc);
-        _requestQueue.push_back(_currentRequest);
-
         // Clear the current request for the next go.
-        _currentRequest.reset();
+        _requestQueue.emplace_back(std::move(_currentRequest));
     }
 
     // Process all replies and clear finished requests.
-    for (std::vector<std::shared_ptr<HTTPRequest> >::iterator i =
-            _requestQueue.begin(); i != _requestQueue.end();) {
-        if (!(*i)->process(_nc)) i = _requestQueue.erase(i);
-        else ++i;
-    }
+    auto rm = std::remove_if(_requestQueue.begin(), _requestQueue.end(),
+        [&](std::unique_ptr<HTTPRequest>& req) { return !req->process(_nc); });
+    _requestQueue.erase(rm, _requestQueue.end());
 
     return true;
 }
@@ -1229,7 +1224,7 @@ void
 HTTPConnection::call(as_object* asCallback, const std::string& methodName,
             const std::vector<as_value>& args)
 {
-    if (!_currentRequest.get()) {
+    if (!_currentRequest) {
         _currentRequest.reset(new HTTPRequest(*this));
     }
 

@@ -224,12 +224,12 @@ public:
 
     void connect(const std::string& name);
 
-    void send(std::shared_ptr<ConnectionData> d)
+    void send(std::unique_ptr<ConnectionData> d)
     {
         assert(d.get());
         VM& vm = getVM(owner());
         d->ts = getTimestamp(vm);
-        _queue.push_back(d);
+        _queue.push_back(std::move(d));
         
         // Register callback so we can send the data on the next advance.
         movie_root& mr = getRoot(owner());
@@ -248,7 +248,7 @@ private:
 
     SharedMem _shm;
 
-    std::deque<std::shared_ptr<ConnectionData> > _queue;
+    std::deque<std::unique_ptr<ConnectionData>> _queue;
 
     // The timestamp of our last write to the shared memory.
     std::uint32_t _lastTime;
@@ -376,7 +376,7 @@ LocalConnection_as::update()
     }
 
     // Get the first buffer.
-    std::shared_ptr<ConnectionData> cd = _queue.front();
+    std::unique_ptr<ConnectionData> cd = std::move(_queue.front());
     _queue.pop_front();
 
     // If the correct listener isn't there, iterate until we find one or
@@ -387,7 +387,7 @@ LocalConnection_as::update()
             cd->ts = 0;
             break;
         }
-        cd = _queue.front();
+        cd = std::move(_queue.front());
         _queue.pop_front();
     }
 
@@ -613,7 +613,7 @@ localconnection_send(const fn_call& fn)
         return as_value(false);
     }
     
-    std::shared_ptr<ConnectionData> cd(new ConnectionData());
+    std::unique_ptr<ConnectionData> cd(new ConnectionData());
 
     SimpleBuffer& buf = cd->data;
 
@@ -633,7 +633,7 @@ localconnection_send(const fn_call& fn)
 
     cd->name = name;
 
-    relay->send(cd);
+    relay->send(std::move(cd));
 
     return as_value(true);
 }

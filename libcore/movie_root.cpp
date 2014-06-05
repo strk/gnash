@@ -819,9 +819,7 @@ movie_root::addIntervalTimer(std::unique_ptr<Timer> timer)
 
     assert(_intervalTimers.find(id) == _intervalTimers.end());
 
-    std::shared_ptr<Timer> addTimer(timer.release());
-
-    _intervalTimers.insert(std::make_pair(id, addTimer));
+    _intervalTimers.insert(std::make_pair(id, std::move(timer)));
 
     return id;
 }
@@ -1453,8 +1451,7 @@ movie_root::flushHigherPriorityActionQueues()
 void
 movie_root::addLoadableObject(as_object* obj, std::unique_ptr<IOChannel> str)
 {
-    std::shared_ptr<IOChannel> io(str.release());
-    _loadCallbacks.emplace_back(io, obj);
+    _loadCallbacks.emplace_back(std::move(str), obj);
 }
 
 void
@@ -1555,7 +1552,7 @@ movie_root::executeAdvanceCallbacks()
     // application. If it is set, we have to check the socket connection
     // for XML messages.
     if (_controlfd > 0) {
-    std::shared_ptr<ExternalInterface::invoke_t> invoke =
+    std::unique_ptr<ExternalInterface::invoke_t> invoke =
         ExternalInterface::ExternalEventCheck(_controlfd);
         if (invoke) {
             if (processInvoke(invoke.get()) == false) {
@@ -1708,7 +1705,7 @@ movie_root::executeTimers()
 
     unsigned long now = _vm.getTime();
 
-    typedef std::multimap<unsigned int, std::shared_ptr<Timer> >
+    typedef std::multimap<unsigned long, Timer*>
         ExpiredTimers;
 
     ExpiredTimers expiredTimers;
@@ -1719,7 +1716,7 @@ movie_root::executeTimers()
         TimerMap::iterator nextIterator = it;
         ++nextIterator;
 
-        std::shared_ptr<Timer> timer(it->second);
+        Timer* timer = it->second.get();
 
         if (timer->cleared()) {
             // this timer was cleared, erase it
@@ -1738,8 +1735,8 @@ movie_root::executeTimers()
     foreachSecond(expiredTimers.begin(), expiredTimers.end(),
                   &Timer::executeAndReset);
 
-    if (!expiredTimers.empty()) processActionQueue();
-
+    if (!expiredTimers.empty())
+        processActionQueue();
 }
 
 void

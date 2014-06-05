@@ -234,9 +234,7 @@ public:
         /// Takes ownership of the SWF::ShapeRecord.
         GlyphInfo(std::unique_ptr<SWF::ShapeRecord> glyph, float advance);
 
-        GlyphInfo(const GlyphInfo& o);
-
-        std::shared_ptr<SWF::ShapeRecord> glyph;
+        std::unique_ptr<SWF::ShapeRecord> glyph;
 
         float advance;
     };

@@ -59,19 +59,12 @@ Font::GlyphInfo::GlyphInfo()
     advance(0)
 {}
 
-Font::GlyphInfo::GlyphInfo(std::unique_ptr<SWF::ShapeRecord> glyph,
+Font::GlyphInfo::GlyphInfo(std::unique_ptr<SWF::ShapeRecord> the_glyph,
         float advance)
     :
-    glyph(glyph.release()),
+    glyph(std::move(the_glyph)),
     advance(advance)
 {}
-
-Font::GlyphInfo::GlyphInfo(const GlyphInfo& o)
-    :
-    glyph(o.glyph),
-    advance(o.advance)
-{}
-
 
 Font::Font(std::unique_ptr<SWF::DefineFontTag> ft)
     :

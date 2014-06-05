@@ -117,7 +117,7 @@ private:
     /// Extend the URL to be used for playing
     void addToURL(const std::string& url);
 
-    typedef std::list<std::shared_ptr<Connection> > Connections;
+    typedef std::list<std::unique_ptr<Connection> > Connections;
 
     /// Queue of call groups
     //

@@ -93,6 +93,7 @@
 #include "VM.h"
 #include "HostInterface.h"
 #include "log.h"
+#include "IOChannel.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -114,7 +115,6 @@ namespace gnash {
     class Timer;
     class MovieClip;
     class VirtualClock;
-    class IOChannel;
     class RunResources;
     class Button;
     class VM;
@@ -153,15 +153,15 @@ public:
     
     class LoadCallback {
     public:
-        LoadCallback(std::shared_ptr<IOChannel> s, as_object* o)
+        LoadCallback(std::unique_ptr<IOChannel> s, as_object* o)
             :
-            _stream(s),
+            _stream(std::move(s)),
             _obj(o)
         {}
         bool processLoad();
         void setReachable() const;
     private:
-        std::shared_ptr<IOChannel> _stream;
+        std::unique_ptr<IOChannel> _stream;
         SimpleBuffer _buf;
         as_object* _obj;
     };
@@ -999,7 +999,7 @@ private:
 
     LoadCallbacks _loadCallbacks;
     
-    typedef std::map<std::uint32_t, std::shared_ptr<Timer> > TimerMap;
+    typedef std::map<std::uint32_t, std::unique_ptr<Timer>> TimerMap;
 
     TimerMap _intervalTimers;
 
