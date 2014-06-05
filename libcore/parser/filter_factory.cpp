@@ -95,7 +95,7 @@ filter_factory::read(SWFStream& in, bool read_multiple, Filters* store)
         }
 
         // Protect against exceptions and such by storing before we read.
-        std::shared_ptr<BitmapFilter> p(the_filter);
+        std::unique_ptr<BitmapFilter> p(the_filter);
         if (!p->read(in))
         {
             IF_VERBOSE_MALFORMED_SWF(
@@ -103,7 +103,7 @@ filter_factory::read(SWFStream& in, bool read_multiple, Filters* store)
             );
             return i; // We're already broken.
         }
-        store->push_back(p);
+        store->emplace_back(std::move(p));
     }
 
     return count;

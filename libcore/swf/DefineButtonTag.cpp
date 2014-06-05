@@ -125,7 +125,7 @@ DefineButtonTag::readDefineButtonTag(SWFStream& in, movie_definition& m)
 
         // SAFETY CHECK:
         // if the ButtonRecord is corrupted, discard it
-        if (r.valid()) _buttonRecords.push_back(r);
+        if (r.valid()) _buttonRecords.push_back(std::move(r));
     }
 
     if (in.tell() >= endTagPos) {
@@ -190,7 +190,7 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
         // SAFETY CHECK:
         // if the ButtonRecord is corrupted, discard it
         if (r.valid()) {
-            _buttonRecords.push_back(r);
+            _buttonRecords.push_back(std::move(r));
         }
     }
 

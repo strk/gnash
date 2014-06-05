@@ -33,6 +33,7 @@
 #include "swf_event.h"
 #include "log.h"
 #include "SWFStream.h"
+#include "Filters.h"
 #include "filter_factory.h"
 #include "GnashAlgorithm.h"
 #include "action_buffer.h"
