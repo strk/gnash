@@ -41,15 +41,8 @@ Shape::pointInShape(std::int32_t x, std::int32_t y) const
     //       in DrawingApiTest (kind of a fill-leakage making
     //       the collision detection find you inside a self-crossing
     //       shape).
-    if (_def) {
-        if (!_def->bounds().point_test(lp.x, lp.y)) return false;
-        return _def->pointTestLocal(lp.x, lp.y, wm);
-    }
-    assert(_shape.get());
-    
-    if (!_shape->getBounds().point_test(lp.x, lp.y)) return false;
-    return _shape->pointTestLocal(lp.x, lp.y, wm);
-
+    if (!_def->bounds().point_test(lp.x, lp.y)) return false;
+    return _def->pointTestLocal(lp.x, lp.y, wm);
 }
 
 void  
@@ -57,8 +50,7 @@ Shape::display(Renderer& renderer, const Transform& base)
 {
     const Transform xform = base * transform();
 
-    if (_def) _def->display(renderer, xform);
-    else _shape->display(renderer, xform);
+    _def->display(renderer, xform);
     clear_invalidated();
 }
 

@@ -36,18 +36,7 @@ namespace gnash {
 /// SWF::DefinitionTag. A dynamic Shape object has a DynamicShape.
 class Shape : public DisplayObject
 {
-
 public:
-
-    Shape(movie_root& mr, as_object* object, std::shared_ptr<DynamicShape> sh,
-            DisplayObject* parent)
-        :
-        DisplayObject(mr, object, parent),
-        _shape(std::move(sh))
-    {
-        assert(_shape.get());
-    }
-
 	Shape(movie_root& mr, as_object* object, const SWF::DefineShapeTag* def,
             DisplayObject* parent)
 		:
@@ -60,7 +49,7 @@ public:
 	virtual void display(Renderer& renderer, const Transform& xform);
 
     virtual SWFRect getBounds() const {
-        return _def ? _def->bounds() : _shape->getBounds();
+        return _def->bounds();
     }
     
     virtual bool pointInShape(std::int32_t x, std::int32_t y) const;
@@ -68,8 +57,6 @@ public:
 private:
 	
     const boost::intrusive_ptr<const SWF::DefineShapeTag> _def;
-
-    std::shared_ptr<DynamicShape> _shape;
 
 };
 
