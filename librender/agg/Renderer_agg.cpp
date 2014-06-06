@@ -156,6 +156,7 @@ AGG resources
 #include "SWFCxForm.h"
 #include "FillStyle.h"
 #include "Transform.h"
+#include "IOChannel.h"
 
 #ifdef HAVE_VA_VA_H
 #include "GnashVaapiImage.h"
@@ -684,7 +685,7 @@ public:
         return new agg_bitmap_info(std::move(im));
     }
 
-    virtual void renderToImage(std::shared_ptr<IOChannel> io,
+    virtual void renderToImage(std::unique_ptr<IOChannel> io,
             FileType type, int quality) const
     {
         image::ImageRGBA im(xres, yres);
@@ -695,7 +696,7 @@ public:
             }
         }
         
-        image::Output::writeImageData(type, io, im, quality);
+        image::Output::writeImageData(type, std::move(io), im, quality);
     }
 
     template<typename SourceFormat, typename Matrix>
