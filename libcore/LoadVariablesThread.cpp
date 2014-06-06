@@ -61,7 +61,7 @@ LoadVariablesThread::completeLoad(IOChannel* varstream,
         } else {
             size_t dataSize = bytesRead;
             utf8::TextEncoding encoding;
-            char* ptr = utf8::stripBOM(buf.get(), dataSize,
+            const char* ptr = utf8::stripBOM(buf.get(), dataSize,
                                        encoding);
             if ( encoding != utf8::encUTF8 &&
                     encoding != utf8::encUNSPECIFIED ) {

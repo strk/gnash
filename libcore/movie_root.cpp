@@ -2448,7 +2448,8 @@ movie_root::LoadCallback::processLoad()
     size_t size = _buf.size();
 
     // NOTE: the call below will possibly change 'size' parameter
-    char* bufptr = utf8::stripBOM((char*)_buf.data(), size, encoding);
+    const char* bufptr = utf8::stripBOM(
+        reinterpret_cast<const char*>(_buf.data()), size, encoding);
     if (encoding != utf8::encUTF8 && encoding != utf8::encUNSPECIFIED) {
         log_unimpl(_("%s to UTF8 conversion in LoadableObject input parsing"),
                 utf8::textEncodingName(encoding));

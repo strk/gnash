@@ -204,14 +204,14 @@ encodeUnicodeCharacter(std::uint32_t ucs_character)
 #define ENC_UTF16BE 2
 #define ENC_UTF16LE 3
 
-char*
-stripBOM(char* in, size_t& size, TextEncoding& encoding)
+const char*
+stripBOM(const char* in, size_t& size, TextEncoding& encoding)
 {
     encoding = encUNSPECIFIED;
     if ( size > 2 )
     {
         // need *ptr to be unsigned or cast all 0xNN
-        unsigned char* ptr = reinterpret_cast<unsigned char*>(in);
+        const unsigned char* ptr = reinterpret_cast<const unsigned char*>(in);
 
         if (*ptr == 0xFF && *(ptr+1) == 0xFE) {
             // Text is UTF-16 LE
