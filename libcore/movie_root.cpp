@@ -2464,8 +2464,7 @@ movie_root::LoadCallback::processLoad()
     // providing memory release except destruction. Will be
     // destroyed as soon as we return though...
 
-    // NOTE: Another data copy here !
-    callMethod(_obj, NSV::PROP_ON_DATA, dataVal);
+    callMethod(_obj, NSV::PROP_ON_DATA, std::move(dataVal));
 
     return true;
 }
