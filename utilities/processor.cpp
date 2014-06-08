@@ -355,9 +355,7 @@ main(int argc, char *argv[])
 #endif
 
     // Play through all the movies.
-    for (std::vector<std::string>::const_iterator i = infiles.begin(), 
-            e = infiles.end(); i != e; ++i)
-    {
+    for (const std::string& file : infiles) {
 
         RunResources runResources;
 #if defined(USE_SOUND) && defined(USE_MEDIA)
@@ -368,18 +366,18 @@ main(int argc, char *argv[])
 #endif
         runResources.setTagLoaders(loaders);
         std::shared_ptr<StreamProvider> sp =
-            std::make_shared<StreamProvider>(*i, *i);
+            std::make_shared<StreamProvider>(file, file);
         runResources.setStreamProvider(sp);
 
 #ifdef RENDERER_AGG
         runResources.setRenderer(r);
 #endif
 
-	    bool success = play_movie(*i, runResources);
+	    bool success = play_movie(file, runResources);
 	    if (!success) {
 	        if (s_stop_on_errors) {
 		    // Fail.
-                std::cerr << "error playing through movie " << *i << std::endl;
+                std::cerr << "error playing through movie " << file << std::endl;
 		        return EXIT_FAILURE;
 	        }
         }
