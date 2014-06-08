@@ -150,10 +150,10 @@ public:
     {}
 
     /// Construct a primitive String value 
-    DSOEXPORT as_value(const std::string& str)
+    DSOEXPORT as_value(std::string str)
         :
         _type(STRING),
-        _value(std::string(str))
+        _value(std::move(str))
     {}
     
     /// Construct a primitive Boolean value
