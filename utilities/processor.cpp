@@ -348,13 +348,9 @@ main(int argc, char *argv[])
     addDefaultLoaders(*loaders);
 
 #ifdef RENDERER_AGG
+    unsigned char buf[8] = {};
     std::shared_ptr<Renderer_agg_base> r(create_Renderer_agg("RGBA32"));
 
-    // Yes, this leaks. On some systems (e.g. Debian Lenny) the data is
-    // evidently accessed after main() returns. Rather than bothering to
-    // work out why, we let this byte leak, as it's returned to the system on
-    // exit anyway.
-    unsigned char* buf = new unsigned char[8];
     r->init_buffer(buf, 1, 1, 1, 1);
 #endif
 
