@@ -343,7 +343,8 @@ main(int argc, char *argv[])
     soundHandler.reset(new sound::NullSoundHandler(mediaHandler.get()));
 #endif
 
-    std::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
+    std::shared_ptr<SWF::TagLoadersTable> loaders(
+        std::make_shared<SWF::TagLoadersTable>());
     addDefaultLoaders(*loaders);
 
 #ifdef RENDERER_AGG
@@ -370,7 +371,8 @@ main(int argc, char *argv[])
         runResources.setMediaHandler(mediaHandler);
 #endif
         runResources.setTagLoaders(loaders);
-        std::shared_ptr<StreamProvider> sp(new StreamProvider(*i, *i));
+        std::shared_ptr<StreamProvider> sp =
+            std::make_shared<StreamProvider>(*i, *i);
         runResources.setStreamProvider(sp);
 
 #ifdef RENDERER_AGG
