@@ -115,50 +115,63 @@ public:
         DISPLAYOBJECT,
         DISPLAYOBJECT_EXCEPT
     };
-
-    template <typename T>
-    as_value(AsType type, T&& val)
-        : _type(type),
-          _value(std::forward<T>(val))
-    {}
     
     /// Construct an undefined value
     DSOEXPORT as_value()
-        : as_value(UNDEFINED, boost::blank())
-    {}
+        :
+        _type(UNDEFINED),
+        _value(boost::blank())
+    {
+    }
     
     /// Copy constructor.
     DSOEXPORT as_value(const as_value& v)
-        : as_value(v._type, v._value)
-    {}
+        :
+        _type(v._type),
+        _value(v._value)
+    {
+    }
 
     /// Move constructor.
     DSOEXPORT as_value(as_value&& other)
-        : as_value(other._type, std::move(other._value))
+        : _type(other._type),
+          _value(std::move(other._value))
     {
         other._type = UNDEFINED;
     }
 
+    ~as_value() {}
+    
     /// Construct a primitive String value 
     DSOEXPORT as_value(const char* str)
-        : as_value(STRING, std::string(str))
+        :
+        _type(STRING),
+        _value(std::string(str))
     {}
 
     /// Construct a primitive String value 
     DSOEXPORT as_value(std::string str)
-        : as_value(STRING, std::move(str))
+        :
+        _type(STRING),
+        _value(std::move(str))
     {}
     
     /// Construct a primitive Boolean value
     template <typename T>
     as_value(T val, typename std::enable_if<std::is_same<bool, T>::value>::type*
-             = 0)
-        : as_value(BOOLEAN, val)
-    {}
+             dummy = 0)
+        :
+        _type(BOOLEAN),
+        _value(val)
+	{
+        UNUSED(dummy);
+	}
     
     /// Construct a primitive Number value
     as_value(double num)
-        : as_value(NUMBER, num)
+        :
+        _type(NUMBER),
+        _value(num)
     {}
     
     /// Construct a null, Object, or DisplayObject value
