@@ -329,6 +329,7 @@ MediaParserFfmpeg::MediaParserFfmpeg(std::unique_ptr<IOChannel> stream)
 	_videoStream(nullptr),
 	_audioStreamIndex(-1),
 	_audioStream(nullptr),
+        _avIOCxt(nullptr),
 	_lastParsedPosition(0)
 {
 	initializeParser();
@@ -505,12 +506,8 @@ MediaParserFfmpeg::~MediaParserFfmpeg()
 {
 	stopParserThread();
 
-	if ( _formatCtx )
-	{
-		// TODO: check if this is correct (should we create RIIA classes for ffmpeg stuff?)
-		//av_close_input_file(_formatCtx); // NOTE: this one triggers a mismatched free/delete on _byteIOBuffer with libavformat.so.52 !
-		av_free(_formatCtx);
-	}
+
+        avformat_close_input(&_formatCtx);
 
 	if ( _inputFmt )
 	{
@@ -518,6 +515,7 @@ MediaParserFfmpeg::~MediaParserFfmpeg()
 		//av_free(_inputFmt); // it seems this one blows up, could be due to av_free(_formatCtx) above
 	}
 
+        av_free(_avIOCxt);
 }
 
 // NOTE: as this function is used as a callback from FFMPEG, it should not
