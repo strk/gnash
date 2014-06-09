@@ -139,13 +139,7 @@ private:
 	AVStream* _audioStream;
 
 	/// ?
-#if LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(52,107,0)
-// AVIOContext was introduced a bit earlier but without version bump, so let's
-// be safe
-        ByteIOContext _byteIOCxt;
-#else
         AVIOContext* _avIOCxt;
-#endif
 
 	/// Size of the ByteIO context buffer
 	//
