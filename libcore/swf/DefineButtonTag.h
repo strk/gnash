@@ -67,6 +67,8 @@ public:
     {
     }
 
+    ButtonRecord(ButtonRecord&&) = default;
+
     /// Create a DisplayObject from a ButtonRecord.
     //
     /// @param name     Whether the created DisplayObject requires its own
