@@ -146,7 +146,7 @@ MovieTester::MovieTester(const std::string& url)
 	throw GnashException("Could not load movie from "+url);
     }
     
-    _movie_root = new movie_root(_clock, *_runResources);
+    _movie_root.reset(new movie_root(_clock, *_runResources));
     
     // Initialize viewport size with the one advertised in the header
     _width = unsigned(_movie_def->get_width_pixels());

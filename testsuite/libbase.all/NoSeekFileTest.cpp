@@ -144,14 +144,14 @@ trymain(int /*argc*/, char** /*argv*/)
 	dup2(fd, 0);
 	close(fd);
 
-	gnash::IOChannel* reader = gnash::noseek_fd_adapter::make_stream(0, cachename);
+	std::unique_ptr<gnash::IOChannel> reader(gnash::noseek_fd_adapter::make_stream(0, cachename));
 	assert(reader);
 
-	compare_reads(reader, raw, "wrapped", "raw");
+	compare_reads(reader.get(), raw, "wrapped", "raw");
 
 	lseek(raw, 0, SEEK_SET);
 	reader->seek(0);
-	compare_reads(reader, raw, "wrapped-rewind", "raw-rewind");
+	compare_reads(reader.get(), raw, "wrapped-rewind", "raw-rewind");
 
 
     FILE* f = std::fopen(cachename, "r");

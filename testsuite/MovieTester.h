@@ -355,7 +355,7 @@ private:
 	void addTestingRenderer(std::shared_ptr<Renderer> h,
             const std::string& name);
 
-	gnash::movie_root* _movie_root;
+	std::unique_ptr<gnash::movie_root> _movie_root;
 
 	boost::intrusive_ptr<gnash::movie_definition> _movie_def;
 
