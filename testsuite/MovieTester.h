@@ -114,6 +114,8 @@ public:
 	///
 	MovieTester(const std::string& filespec);
 
+	~MovieTester();
+
 	/// Advance the movie by one frame
 	//
     /// Note that the default testing behaviour does not mirror actual
@@ -355,15 +357,16 @@ private:
 	void addTestingRenderer(std::shared_ptr<Renderer> h,
             const std::string& name);
 
-	std::unique_ptr<gnash::movie_root> _movie_root;
-
-	boost::intrusive_ptr<gnash::movie_definition> _movie_def;
+    RunResources _runResources;
 
     std::shared_ptr<sound::sound_handler> _sound_handler;
 
+    boost::intrusive_ptr<gnash::movie_definition> _movie_def;
+
     std::shared_ptr<media::MediaHandler> _mediaHandler;
 
-    std::unique_ptr<RunResources> _runResources;
+    std::unique_ptr<gnash::movie_root> _movie_root;
+
 	/// Current pointer position - X ordinate
 	int _x;
 

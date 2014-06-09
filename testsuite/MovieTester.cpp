@@ -98,30 +98,29 @@ MovieTester::MovieTester(const std::string& url)
     initTestingMediaHandlers();
 #endif
     
-    _runResources.reset(new RunResources());
 #ifdef USE_SOUND
     // Initialize the sound handler(s)
     initTestingSoundHandlers();
-    _runResources->setSoundHandler(_sound_handler);
+    _runResources.setSoundHandler(_sound_handler);
 #endif
 #ifdef USE_MEDIA
-    _runResources->setMediaHandler(_mediaHandler);
+    _runResources.setMediaHandler(_mediaHandler);
 #endif
     
     std::shared_ptr<SWF::TagLoadersTable> loaders(new SWF::TagLoadersTable());
     addDefaultLoaders(*loaders);
     
-    _runResources->setTagLoaders(loaders);
+    _runResources.setTagLoaders(loaders);
     
     std::shared_ptr<StreamProvider> sp(new StreamProvider(url, url));
 
-    _runResources->setStreamProvider(sp);
+    _runResources.setStreamProvider(sp);
 
     if ( url == "-" ) {
 	std::unique_ptr<IOChannel> in (
 		noseek_fd_adapter::make_stream(fileno(stdin))
 				     );
-		_movie_def = MovieFactory::makeMovie(std::move(in), url, *_runResources, false);
+		_movie_def = MovieFactory::makeMovie(std::move(in), url, _runResources, false);
 	} else {
 	URL urlObj(url);
 	if ( urlObj.protocol() == "file" ) {
@@ -138,7 +137,7 @@ MovieTester::MovieTester(const std::string& url)
 #endif
 	}
 	// _url should be always set at this point...
-	_movie_def = MovieFactory::makeMovie(urlObj, *_runResources,
+	_movie_def = MovieFactory::makeMovie(urlObj, _runResources,
 					     NULL, false);
     }
     
@@ -146,7 +145,7 @@ MovieTester::MovieTester(const std::string& url)
 	throw GnashException("Could not load movie from "+url);
     }
     
-    _movie_root.reset(new movie_root(_clock, *_runResources));
+    _movie_root.reset(new movie_root(_clock, _runResources));
     
     // Initialize viewport size with the one advertised in the header
     _width = unsigned(_movie_def->get_width_pixels());
@@ -171,6 +170,11 @@ MovieTester::MovieTester(const std::string& url)
     // ... and render it
     render();
 }
+
+MovieTester::~MovieTester()
+{
+    MovieFactory::clear();
+}
     
 void
 MovieTester::render(std::shared_ptr<Renderer> h,
@@ -180,7 +184,7 @@ MovieTester::render(std::shared_ptr<Renderer> h,
     // This is a bit dangerous, as there isn't really support for swapping
     // renderers during runtime; though the only problem is likely to be
     // that CachedBitmaps are missing.
-    _runResources->setRenderer(h);
+    _runResources.setRenderer(h);
     
     h->set_invalidated_regions(invalidated_regions);
     
@@ -607,7 +611,7 @@ MovieTester::addTestingRenderer(std::shared_ptr<Renderer> h,
     
     // this will be needed till we allow run-time swapping of renderers,
     // see above UNTESTED message...
-    _runResources->setRenderer(_testingRenderers.back().getRenderer());
+    _runResources.setRenderer(_testingRenderers.back().getRenderer());
 }
     
 bool
