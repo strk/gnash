@@ -104,7 +104,9 @@ XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
     if (deep) {
         const Children& from=tpl._children;
         for (const auto& child : from) {
-            _children.push_back(new XMLNode_as(*child, deep));
+            XMLNode_as* copy = new XMLNode_as(*child, deep);
+            copy->setParent(this);
+            _children.push_back(copy);
         }
     }
 }
