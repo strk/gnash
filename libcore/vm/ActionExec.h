@@ -20,7 +20,7 @@
 #define GNASH_ACTIONEXEC_H
 
 #include <string>
-#include <list>
+#include <stack>
 #include <vector>
 #include <boost/noncopyable.hpp>
 
@@ -312,7 +312,7 @@ private:
 
 	int _origExecSWFVersion;
 
-	std::list<TryBlock> _tryList;
+	std::stack<TryBlock> _tryList;
 
 	bool _returning;
 

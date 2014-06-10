@@ -71,7 +71,6 @@ ActionExec::ActionExec(const Function& func, as_environment& newEnv,
     _initialStackSize(0),
     _originalTarget(nullptr),
     _origExecSWFVersion(0),
-    _tryList(),
     _returning(false),
     _abortOnUnload(false),
     pc(func.getStartPC()),
@@ -114,7 +113,6 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv,
     _initialStackSize(0),
     _originalTarget(nullptr),
     _origExecSWFVersion(0),
-    _tryList(),
     _returning(false),
     _abortOnUnload(abortOnUnloaded),
     pc(0),
@@ -197,7 +195,7 @@ ActionExec::operator()()
                 }
 
                 // If we are in a try block, check to see if we have thrown.
-                TryBlock& t = _tryList.back();
+                TryBlock& t = _tryList.top();
                 
                 if (!processExceptions(t)) break;
 
@@ -485,7 +483,7 @@ ActionExec::processExceptions(TryBlock& t)
                 log_debug("END: exception thrown in finally(%s). "
                           "Leaving on the stack", ex);
 #endif
-                _tryList.pop_back();
+                _tryList.pop();
                 return true;
             }
             else if (t._lastThrow.is_exception()) {
@@ -501,7 +499,7 @@ ActionExec::processExceptions(TryBlock& t)
                 env.push(t._lastThrow);
  
 
-                _tryList.pop_back();
+                _tryList.pop();
                 return true;
             }
 #ifdef GNASH_DEBUG_TRY
@@ -512,7 +510,7 @@ ActionExec::processExceptions(TryBlock& t)
             stop_pc = t._savedEndOffset;
             
             // Finished with this TryBlock.
-            _tryList.pop_back();
+            _tryList.pop();
             
             // Will break out of action execution.
             if (_returning) return false;
@@ -654,7 +652,7 @@ ActionExec::pushTryBlock(TryBlock t)
     t._savedEndOffset = stop_pc;
     stop_pc = t._catchOffset;
 
-    _tryList.push_back(t);
+    _tryList.push(std::move(t));
 }
 
 void
