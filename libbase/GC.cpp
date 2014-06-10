@@ -73,8 +73,7 @@ GC::cleanUnreachable()
 
     size_t deleted = 0;
 
-    for (ResList::iterator i = _resList.begin(), e = _resList.end(); i != e;) {
-        const GcResource* res = *i;
+    _resList.remove_if([&deleted](const GcResource* res) {
         if (!res->isReachable()) {
 
 #if GNASH_GC_DEBUG > 1
@@ -82,13 +81,13 @@ GC::cleanUnreachable()
 #endif
             ++deleted;
             delete res;
-            i = _resList.erase(i); // _resListSize updated at end of loop
+            return true;
         }
         else {
             res->clearReachable();
-            ++i;
+            return false;
         }
-    }
+    });
 
     _resListSize -= deleted;
 

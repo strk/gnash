@@ -29,7 +29,7 @@
 //   
 //#define GNASH_GC_DEBUG 1
 
-#include <list>
+#include <forward_list>
 #include <map>
 #include <string>
 #include <cassert>
@@ -198,7 +198,7 @@ public:
         assert(!item->isReachable());
 #endif
 
-        _resList.push_back(item); ++_resListSize;
+        _resList.emplace_front(item); ++_resListSize;
 
 #if GNASH_GC_DEBUG > 1
         log_debug(_("GC: collectable %p added, num collectables: %d"), item, 
@@ -265,7 +265,7 @@ public:
 private:
 
     /// List of collectables
-    typedef std::list<const GcResource*> ResList;
+    typedef std::forward_list<const GcResource*> ResList;
 
     /// Mark all reachable resources
     void markReachable() {
