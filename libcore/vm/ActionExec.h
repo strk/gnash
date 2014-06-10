@@ -306,15 +306,15 @@ private:
 	as_object* _this_ptr;
 
 	/// Stack size at start of execution
-	size_t _initialStackSize;
+	size_t _initialStackSize = 0;
 
-	DisplayObject* _originalTarget;
+	DisplayObject* _originalTarget = nullptr;
 
-	int _origExecSWFVersion;
+	int _origExecSWFVersion = 0;
 
 	std::stack<TryBlock> _tryList;
 
-	bool _returning;
+	bool _returning = false;
 
 	bool _abortOnUnload;
 
