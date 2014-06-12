@@ -422,4 +422,51 @@ xl2 = new XML('<t></t>');
 xl1.appendChild(xl2);
 xl2.appendChild(xl1);
 
-check_totals(182);
+check_equals(xl2.parentNode, xl1);
+check_equals(xl1.parentNode, null); // Nothing happened.
+
+doc = new XML('<t></t>');
+parent = doc.createElement("parent");
+child = doc.createElement("child");
+parent.appendChild(child);
+doc.appendChild(parent);
+
+check_equals(doc.toString(), "<t /><parent><child /></parent>");
+
+child.appendChild(parent);
+check_equals(doc.toString(), "<t /><parent><child /></parent>");
+check_equals(child.hasChildNodes(), false);
+
+sibling = doc.createElement("sibling");
+parent.insertBefore(sibling, child);
+check_equals(doc.toString(), "<t /><parent><sibling /><child /></parent>");
+doc.insertBefore(sibling, parent); // Should move sibling
+check_equals(doc.toString(), "<t /><sibling /><parent><child /></parent>");
+parent.appendChild(sibling);
+check_equals(doc.toString(), "<t /><parent><child /><sibling /></parent>");
+parent.appendChild(parent);
+check_equals(doc.toString(), "<t /><parent><child /><sibling /></parent>");
+child.appendChild(parent);
+check_equals(doc.toString(), "<t /><parent><child /><sibling /></parent>");
+grandchild = doc.createElement("grandchild");
+child.appendChild(grandchild);
+check_equals(doc.toString(), "<t /><parent><child><grandchild /></child><sibling /></parent>");
+child.appendChild(parent);
+check_equals(doc.toString(), "<t /><parent><child><grandchild /></child><sibling /></parent>");
+child.insertBefore(child, parent);
+check_equals(doc.toString(), "<t /><parent><child><grandchild /></child><sibling /></parent>");
+grandchild.appendChild(parent);
+check_equals(doc.toString(), "<t /><parent><child><grandchild /></child><sibling /></parent>");
+grandchild.insertBefore(grandchild, parent);
+check_equals(doc.toString(), "<t /><parent><child><grandchild /></child><sibling /></parent>");
+grandchild.insertBefore(grandchild, child);
+check_equals(doc.toString(), "<t /><parent><child><grandchild /></child><sibling /></parent>");
+
+doc1 = new XML("<t />");
+doc1.appendChild(parent);
+check_equals(doc1.toString(), "<t /><parent><child><grandchild /></child><sibling /></parent>");
+check_equals(doc.toString(), "<t />");
+doc1.appendChild(child);
+check_equals(doc1.toString(), "<t /><parent><sibling /></parent><child><grandchild /></child>");
+
+check_totals(201);

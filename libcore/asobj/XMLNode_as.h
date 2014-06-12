@@ -113,6 +113,9 @@ public:
         return _namespaceURI;
     }
 
+    /// Returns true if 'this' descends from the specified node.
+    bool descendsFrom(XMLNode_as* node) const;
+
     ///  Returns true if the specified node has child nodes; otherwise,
     ///  returns false.
     bool hasChildNodes() const;

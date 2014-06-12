@@ -229,6 +229,20 @@ XMLNode_as::appendChild(XMLNode_as* node)
     updateChildNodes();
 }
 
+bool
+XMLNode_as::descendsFrom(XMLNode_as* node) const
+{
+    if (node == this) {
+        return true;
+    }
+    XMLNode_as* parent = getParent();
+    if (parent) {
+        return parent->descendsFrom(node);
+    }
+
+    return false;
+}
+
 void
 XMLNode_as::insertBefore(XMLNode_as* newnode, XMLNode_as* pos)
 {
@@ -624,6 +638,14 @@ xmlnode_appendChild(const fn_call& fn)
 		return as_value();
 	}
 
+    if (ptr->descendsFrom(node)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("XMLNode.appendChild(): attempted to move a node to "
+            "among its own descendants."));
+        );
+        return as_value();
+    }
+
     XMLNode_as* parent = node->getParent();
     if (parent) {
         parent->removeChild(node);
@@ -683,6 +705,14 @@ xmlnode_insertBefore(const fn_call& fn)
 		);
 		return as_value();
 	}
+
+    if (pos->descendsFrom(newnode)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("XMLNode.insertBefore(): attempted to move a node to "
+            "among its own descendants."));
+        );
+        return as_value();
+    }
 
     ptr->insertBefore(newnode, pos);
     return as_value();
