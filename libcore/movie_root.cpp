@@ -638,10 +638,10 @@ movie_root::keyEvent(key::code k, bool down)
         // However, the previous attempt to fix caused real-life failures:
         // see bug #33889.
         ButtonListeners copy = _buttonListeners;
-        for (ButtonListeners::const_iterator it = copy.begin(), e = copy.end();
-                it != e; ++it) {
-            if ((*it)->unloaded()) continue;
-            (*it)->keyPress(k);
+        for (Button* button : copy) {
+            if (!button->unloaded()) {
+                button->keyPress(k);
+            }
         }
 
         // If we're focused on an editable text field, finally the text
@@ -1939,8 +1939,7 @@ movie_root::callExternalCallback(const std::string &name,
 void
 movie_root::removeButton(Button* listener)
 {
-    _buttonListeners.remove_if(
-            std::bind2nd(std::equal_to<Button*>(), listener));
+    _buttonListeners.remove(listener);
 }
 
 void
