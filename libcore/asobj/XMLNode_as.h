@@ -268,26 +268,6 @@ private:
 
     static void stringify(const XMLNode_as& xml, std::ostream& xmlout,
             bool encode);
-
-    /// Is GC mark scan in progress ? 
-    //
-    /// Used to guard against infinite loops
-    ///
-    bool _gcMarkInProgress;
-
-    /// Class to prevent infinite loops
-    //
-    /// could probably be replaced with a templated class taking an
-    /// object and two values to toggle between.
-    /// See also FrameGuard, TargetGuard and PoolGuard
-    class GCMarkGuard {
-        XMLNode_as* _x;
-    public:
-        GCMarkGuard(XMLNode_as* x): _x(x) { _x->_gcMarkInProgress = true; }
-        ~GCMarkGuard() { _x->_gcMarkInProgress = false; }
-    };
-    friend class GCMarkGuard;
-
 };
 
 // Initialize the global XMLNode class
