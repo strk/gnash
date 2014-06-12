@@ -1760,7 +1760,6 @@ movie_root::markReachableResources() const
 
     std::for_each(_objectCallbacks.begin(), _objectCallbacks.end(),
             std::mem_fun(&ActiveRelay::setReachable));
-
     std::for_each(_loadCallbacks.begin(), _loadCallbacks.end(),
             std::mem_fun_ref(&movie_root::LoadCallback::setReachable));
 
@@ -1955,7 +1954,7 @@ movie_root::registerButton(Button* listener)
 void
 movie_root::cleanupDisplayList()
 {
-#define GNASH_DEBUG_INSTANCE_LIST 1
+//#define GNASH_DEBUG_INSTANCE_LIST 1
 
 #ifdef GNASH_DEBUG_INSTANCE_LIST
     static size_t maxLiveChars = 0;
@@ -2001,9 +2000,7 @@ movie_root::cleanupDisplayList()
         needScan=false;
 
         // Remove unloaded MovieClips from the _liveChars list
-        for (LiveChars::iterator i = _liveChars.begin(), e = _liveChars.end();
-                i != e;) {
-            MovieClip* ch = *i;
+        _liveChars.remove_if([&](MovieClip* ch) {
             if (ch->unloaded()) {
                 // the sprite might have been destroyed already
                 // by effect of an unload() call with no onUnload
@@ -2027,14 +2024,13 @@ movie_root::cleanupDisplayList()
                 }
 #endif
 
-                i = _liveChars.erase(i);
-
 #ifdef GNASH_DEBUG_DLIST_CLEANUP
                 cleaned++;
 #endif
+                return true;
             }
-            else ++i; 
-        }
+            return false;
+        });
 
 #ifdef GNASH_DEBUG_DLIST_CLEANUP
         cout << " Scan " << scansCount << " cleaned " << cleaned <<
@@ -2043,8 +2039,9 @@ movie_root::cleanupDisplayList()
     } while (needScan);
 
 #ifdef GNASH_DEBUG_INSTANCE_LIST
-    if (_liveChars.size() > maxLiveChars) {
-        maxLiveChars = _liveChars.size();
+    size_t count = std::distance(begin(_liveChars), end(_liveChars));
+    if (count > maxLiveChars) {
+        maxLiveChars = count;
         log_debug("Global instance list grew to %d entries", maxLiveChars);
     }
 #endif
@@ -2060,11 +2057,11 @@ movie_root::advanceLiveChars()
 
     // Advance all characters, then notify them.
     LiveChars::iterator it;
-    for (it=_liveChars.begin(); it != _liveChars.end(); ++it) {
-        advanceLiveChar(*it);
+    for (MovieClip* liveChar : _liveChars) {
+        advanceLiveChar(liveChar);
     }
-    for (it=_liveChars.begin(); it != _liveChars.end(); ++it) {
-        notifyLoad(*it);
+    for (MovieClip* liveChar : _liveChars) {
+        notifyLoad(liveChar);
     }
 }
 
@@ -2319,7 +2316,7 @@ movie_root::getCharacterTree(InfoTree& tr, InfoTree::iterator it)
 
     /// Stage: number of live MovieClips.
     std::ostringstream os;
-    os << _liveChars.size();
+    os << std::distance(begin(_liveChars), end(_liveChars));
     localIter = tr.append_child(it, std::make_pair(_("Live MovieClips"),
                 os.str()));
 

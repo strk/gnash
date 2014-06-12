@@ -71,7 +71,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <list>
+#include <forward_list>
 #include <set>
 #include <bitset>
 #include <array>
@@ -165,7 +165,7 @@ public:
         SimpleBuffer _buf;
         as_object* _obj;
     };
-    typedef std::list<LoadCallback> LoadCallbacks;        
+    typedef std::list<LoadCallback> LoadCallbacks;
 
     typedef std::bitset<key::KEYCOUNT> Keys;
 
@@ -948,7 +948,7 @@ private:
 
     void handleActionLimitHit(const std::string& ref);
 
-    typedef std::list<Button*> ButtonListeners;
+    typedef std::forward_list<Button*> ButtonListeners;
     ButtonListeners _buttonListeners;
 
     GC _gc;
@@ -971,7 +971,7 @@ private:
     /// ::advance of each element to insert new DisplayObjects before
     /// the start w/out invalidating iterators scanning the
     /// list forward for proper movie advancement
-    typedef std::list<MovieClip*> LiveChars;
+    typedef std::forward_list<MovieClip*> LiveChars;
 
     /// The list of advanceable DisplayObject, in placement order
     LiveChars _liveChars;
