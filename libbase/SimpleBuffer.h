@@ -57,37 +57,13 @@ public:
 		}
 	}
 
-	/// Copy constructor
-	//
-	/// The copy ctor will set capacity to be
-	/// as small as required to hold the size of the
-	/// model buffer.
-	///
-	SimpleBuffer(const SimpleBuffer& b)
-		:
-		_size(b._size),
-		_capacity(b._size)
-	{
-		if ( _size )
-		{
-			_data.reset(new std::uint8_t[_size]);
-			std::copy(b.data(), b.data()+b.size(), _data.get());
-		}
-	}
+        /// Move constructor.
+        SimpleBuffer(SimpleBuffer&& b) = default;
 
-	/// Assignment operator
-	//
-	/// The assignment op will not reset capacity
-	///
-	SimpleBuffer& operator= (const SimpleBuffer& b)
-	{
-		if ( this != &b )  // don't waste time on self-assignment
-		{
-			resize(0); // shouldn't deallocate memory
-			append(b);
-		}
-		return *this;
-	}
+        /// Copy (construction) not allowed.
+        SimpleBuffer(const SimpleBuffer& b) = delete;
+        SimpleBuffer& operator= (const SimpleBuffer& b) = delete;
+
 
 	/// Return true if buffer is empty
 	bool empty() const { return _size==0; }
