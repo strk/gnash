@@ -104,10 +104,10 @@ StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     const size_t padding = mh ? mh->getInputPaddingSize() : 0;
 
     // Reserve padding too.
-    std::unique_ptr<SimpleBuffer> buf(new SimpleBuffer(dataLength + padding));
-    buf->resize(dataLength);
+    SimpleBuffer buf(dataLength + padding);
+    buf.resize(dataLength);
 
-    const unsigned int bytesRead = in.read((char*)buf->data(), dataLength);
+    const unsigned int bytesRead = in.read((char*)buf.data(), dataLength);
     
     if (bytesRead < dataLength) {
         throw ParserException(_("Tag boundary reported past end of stream!"));

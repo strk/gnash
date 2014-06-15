@@ -25,7 +25,6 @@
 #include <list>
 #include <memory>
 #include <mutex>
-#include <boost/ptr_container/ptr_vector.hpp>
 
 #include "SoundInfo.h" 
 
@@ -68,7 +67,7 @@ public:
     ///                      padded (see MediaHandler::getInputPaddingBytes())
     /// @param sampleCount   The number of samples when decoded.
     /// @param seekSamples   Where to start playing from at a particular frame.
-    size_t append(std::unique_ptr<SimpleBuffer> data, size_t sampleCount,
+    size_t append(SimpleBuffer data, size_t sampleCount,
             int seekSamples);
 
     /// Do we have any data?
@@ -183,7 +182,7 @@ private:
     /// Mutex protecting access to _soundInstances
     mutable std::mutex _soundInstancesMutex;
 
-    boost::ptr_vector<SimpleBuffer> _buffers;
+    std::vector<SimpleBuffer> _buffers;
 
     std::vector<BlockData> _blockData;
 };

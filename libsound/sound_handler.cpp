@@ -76,7 +76,7 @@ ensurePadding(SimpleBuffer& data, media::MediaHandler* m)
 } // anonymous namespace
 
 sound_handler::StreamBlockId
-sound_handler::addSoundBlock(std::unique_ptr<SimpleBuffer> data,
+sound_handler::addSoundBlock(SimpleBuffer data,
         size_t sampleCount, int seekSamples, int handle)
 {
     if (!validHandle(_streamingSounds, handle)) {
@@ -92,8 +92,7 @@ sound_handler::addSoundBlock(std::unique_ptr<SimpleBuffer> data,
         return -1;
     }
 
-    assert(data.get());
-    ensurePadding(*data, _mediaHandler);
+    ensurePadding(data, _mediaHandler);
 
     return sounddata->append(std::move(data), sampleCount, seekSamples);
 }

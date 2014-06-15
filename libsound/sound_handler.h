@@ -234,7 +234,7 @@ public:
     ///
     /// Gnash's parser calls this to fill up soundstreams data.
     ///
-    /// @param data         The sound data to be stored. May not be null.
+    /// @param data         The sound data to be stored.
     ///                     This should be appropriately padded (@see
     ///                     MediaHandler::getInputPaddingBytes()), or a
     ///                     reallocation will take place here.
@@ -244,7 +244,7 @@ public:
     ///                     to add data to
     /// @return             a handler for the new block for use in playStream()
     /// @throw              SoundException on error
-    virtual StreamBlockId addSoundBlock(std::unique_ptr<SimpleBuffer> data,
+    virtual StreamBlockId addSoundBlock(SimpleBuffer data,
                size_t sampleCount, int seekSamples, int streamId);
 
     /// Returns a SoundInfo object for the sound with the given id.

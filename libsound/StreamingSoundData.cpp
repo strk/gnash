@@ -35,11 +35,10 @@ namespace sound {
 
 
 size_t
-StreamingSoundData::append(std::unique_ptr<SimpleBuffer> data,
+StreamingSoundData::append(SimpleBuffer data,
         size_t sampleCount, int seekSamples)
 {
-    assert(data.get());
-    _buffers.push_back(data.release());
+    _buffers.push_back(std::move(data));
     _blockData.emplace_back(sampleCount, seekSamples);
     assert(_blockData.size() == _buffers.size());
     return _buffers.size() - 1;

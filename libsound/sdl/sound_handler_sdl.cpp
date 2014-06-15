@@ -148,7 +148,7 @@ SDL_sound_handler::create_sound(std::unique_ptr<SimpleBuffer> data,
 }
 
 sound_handler::StreamBlockId
-SDL_sound_handler::addSoundBlock(std::unique_ptr<SimpleBuffer> buf,
+SDL_sound_handler::addSoundBlock(SimpleBuffer buf,
         size_t sampleCount, int seekSamples, int handle)
 {
 
