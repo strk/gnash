@@ -234,7 +234,7 @@ public:
     //
     /// @param nc   The NetConnection AS object to send status/error events to
     /// @param url  URL to post calls to
-    HTTPConnection(NetConnection_as& nc, const URL url)
+    HTTPConnection(NetConnection_as& nc, URL url)
         :
         Connection(nc),
         _url(std::move(url))
