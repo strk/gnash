@@ -121,7 +121,7 @@ public:
     /// @return number of bytes previously copied by calls to copy().
     std::uint64_t consumed() const
     {
-        return std::max(_consumed, _in_point);
+        return std::max<uint64_t>(_consumed, _in_point);
     }
 
 private:
