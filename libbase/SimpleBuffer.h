@@ -69,11 +69,14 @@ public:
         }
 
         /// Move constructor.
-        SimpleBuffer(SimpleBuffer&& b) = default;
+        SimpleBuffer(SimpleBuffer&&) = default;
 
         /// Copy (construction) not allowed.
         SimpleBuffer(const SimpleBuffer& b) = delete;
         SimpleBuffer& operator= (const SimpleBuffer& b) = delete;
+
+        /// Move assignment is okay.
+        SimpleBuffer& operator= (SimpleBuffer&&) = default;
 
 
 	/// Return true if buffer is empty
