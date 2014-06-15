@@ -33,9 +33,8 @@ namespace sound {
 LiveSound::LiveSound(media::MediaHandler& mh, const media::SoundInfo& info,
         size_t inPoint)
     :
-    _inPoint(inPoint * 4),
-    _playbackPosition(_inPoint),
-    _samplesFetched(0)
+    _samplesFetched(0),
+    _decodedBuffers(inPoint * 4)
 {
     createDecoder(mh, info);
 }
@@ -59,26 +58,16 @@ LiveSound::fetchSamples(std::int16_t* to, unsigned int nSamples)
         unsigned int availableSamples = decodedSamplesAhead();
 
         if (availableSamples) {
-            const std::int16_t* data = getDecodedData(_playbackPosition);
+            size_t bytesCopied = _decodedBuffers.copy(
+                reinterpret_cast<std::uint8_t*>(to), nSamples * 2);
+
+            fetchedSamples += bytesCopied / 2;
 
             if (availableSamples >= nSamples) {
-                std::copy(data, data + nSamples, to);
-                fetchedSamples += nSamples;
-
-                // Update playback position (samples are 16bit)
-                _playbackPosition += nSamples * 2;
-
                 break; // fetched all
-            }
-            else {
+            } else {
                 // not enough decoded samples available:
                 // copy what we have and go on
-                std::copy(data, data + availableSamples, to);
-                fetchedSamples += availableSamples;
-
-                // Update playback position (samples are 16bit)
-                _playbackPosition += availableSamples * 2;
-
                 to += availableSamples;
                 nSamples -= availableSamples;
                 assert(nSamples);
