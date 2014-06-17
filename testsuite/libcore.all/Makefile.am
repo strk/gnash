@@ -92,9 +92,6 @@ StreamTest_LDADD = $(LDADD)
 MatrixTest_SOURCES = MatrixTest.cpp
 MatrixTest_LDADD = $(LDADD)
 
-PointTest_SOURCES = PointTest.cpp
-PointTest_LDADD = $(LDADD)
-
 EdgeTest_SOURCES = EdgeTest.cpp
 EdgeTest_LDADD = $(LDADD)
 
