@@ -85,9 +85,10 @@ public:
     /// Only usable with output iterators.
     template<typename Iterator>
     void
-    listKeys(Iterator i, typename std::enable_if<
-        std::is_same<typename std::iterator_traits<Iterator>::iterator_category,
-           std::output_iterator_tag>::value>::type* = 0) {
+    listKeys(Iterator i) {
+        typedef typename std::iterator_traits<Iterator>::iterator_category cat;
+        static_assert(std::is_same<cat, std::output_iterator_tag>::value,
+            "i must be an output iterator.");
         Init();
         std::transform(_handlers.begin(), _handlers.end(), i,
                 std::bind(&Handlers::value_type::first, std::placeholders::_1));

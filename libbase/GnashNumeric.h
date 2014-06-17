@@ -58,9 +58,11 @@ isFinite(double d)
 
 template <typename T>
 inline
-typename std::enable_if<std::is_floating_point<T>::value, bool>::type
+bool
 isNaN(const T& num)
 {
+    static_assert(std::is_floating_point<T>::value,
+        "isNaN() is only meaningful for floating point types.");
     return num != num;
 }
 
