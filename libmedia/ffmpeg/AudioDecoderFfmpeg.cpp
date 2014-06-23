@@ -470,23 +470,9 @@ std::uint8_t*
 AudioDecoderFfmpeg::decodeFrame(const std::uint8_t* input,
         std::uint32_t inputSize, std::uint32_t& outputSize)
 {
-    //GNASH_REPORT_FUNCTION;
-
     assert(inputSize);
 
-    size_t outSize = MAX_AUDIO_FRAME_SIZE;
-
-    // TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
-    std::unique_ptr<std::int16_t, decltype(av_free)*> output(
-        reinterpret_cast<std::int16_t*>(av_malloc(outSize)), av_free );
-    if (!output.get()) {
-        log_error(_("failed to allocate audio buffer."));
-        outputSize = 0;
-        return nullptr;
-    }
-
-    std::int16_t* outPtr = output.get();
-
+    outputSize = 0;
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
     log_debug("AudioDecoderFfmpeg: about to decode %d bytes; "
@@ -496,7 +482,6 @@ AudioDecoderFfmpeg::decodeFrame(const std::uint8_t* input,
 
     // older ffmpeg versions didn't accept a const input..
     AVPacket pkt;
-    int got_frm = 0;
     av_init_packet(&pkt);
     pkt.data = const_cast<uint8_t*>(input);
     pkt.size = inputSize;
@@ -505,7 +490,28 @@ AudioDecoderFfmpeg::decodeFrame(const std::uint8_t* input,
         log_error(_("failed to allocate frame."));
         return nullptr;
     }
-    int tmp = avcodec_decode_audio4(_audioCodecCtx, frm.get(), &got_frm, &pkt);
+
+    int got_frm = 0;
+    int bytesRead = avcodec_decode_audio4(_audioCodecCtx, frm.get(), &got_frm, &pkt);
+
+    // FIXME: "[Some] decoders ... decode the first frame and the return value
+    // would be less than the packet size. In this case, avcodec_decode_audio4
+    // has to be called again with an AVPacket containing the remaining data in
+    // order to decode the second frame, etc... Even if no frames are returned,
+    // the packet needs to be fed to the decoder with remaining data until it
+    // is completely consumed or an error occurs."
+
+    if (bytesRead < 0) {
+        log_error(_("avcodec_decode_audio4() returned error code %d."), bytesRead);
+        return nullptr;
+    }
+    if (!got_frm) {
+        // FIXME: "Note that this field being set to zero does not mean that an
+        // error has occurred. For decoders with CODEC_CAP_DELAY set, no given
+        // decode call is guaranteed to produce a frame."
+        log_error(_("avcodec_decode_audio4() didn't produce a frame."));
+        return nullptr;
+    }
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
     const char* fmtname = av_get_sample_fmt_name(_audioCodecCtx->sample_fmt);
@@ -513,118 +519,26 @@ AudioDecoderFfmpeg::decodeFrame(const std::uint8_t* input,
         "returned %d | inputSize: %d",
         frm->nb_samples, got_frm, tmp, inputSize);
 #endif
+    bool resamplingNeeded = _resampler.init(_audioCodecCtx);
 
-    int plane_size;
-    if (tmp >= 0 && got_frm) {
-        int data_size = av_samples_get_buffer_size( &plane_size,
-            _audioCodecCtx->channels, frm->nb_samples,
-            _audioCodecCtx->sample_fmt, 1);
-        if (static_cast<int>(outSize) < data_size) {
-            log_error(_("output buffer size is too small for the current frame "
-                "(%d < %d)"), outSize, data_size);
-            return nullptr;
-        }
+    int plane_size = 0;
+    int frameSize = av_samples_get_buffer_size(&plane_size, 2 /* channels */,
+        frm->nb_samples, AV_SAMPLE_FMT_S16, 0 /* default alignment */);
 
-        memcpy(outPtr, frm->extended_data[0], plane_size);
-
-#if !(defined(HAVE_SWRESAMPLE_H) || defined(HAVE_AVRESAMPLE_H))
-        int planar = av_sample_fmt_is_planar(_audioCodecCtx->sample_fmt);
-        if (planar && _audioCodecCtx->channels > 1) {
-            uint8_t *out = ((uint8_t *)outPtr) + plane_size;
-            for (int ch = 1; ch < _audioCodecCtx->channels; ch++) {
-                memcpy(out, frm->extended_data[ch], plane_size);
-                out += plane_size;
-            }
-        }
-#endif
-
-        outSize = data_size;
-#ifdef GNASH_DEBUG_AUDIO_DECODING
-        log_debug(" decodeFrame | fmt: %d | fmt_name: %s | planar: %d | "
-            "plane_size: %d | outSize: %d",
-            _audioCodecCtx->sample_fmt, fmtname, planar, plane_size, outSize);
-#endif
+    // TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
+    std::unique_ptr<uint8_t[]> output(new std::uint8_t[frameSize]);
+    outputSize = frameSize;
+    if (!resamplingNeeded) {
+        memcpy(output.get(), frm->extended_data[0], frameSize);
     } else {
-        if (tmp < 0)
-            log_error(_("avcodec_decode_audio returned %d."), tmp);
-        if (outSize < 2)
-            log_error(_("outputSize:%d after decoding %d bytes of input audio "
-                "data."), outputSize, inputSize);
-        log_error(_("Upgrading ffmpeg/libavcodec might fix this issue."));
-        outputSize = 0;
-        return nullptr;
-    }
-
-    // Resampling is needed.
-    if (_resampler.init(_audioCodecCtx)) {
-        // Resampling is needed.
-
-        // Compute new size based on frame_size and
-        // resampling configuration
-        double resampleFactor = (44100.0/_audioCodecCtx->sample_rate) * (2.0/_audioCodecCtx->channels);
-        bool stereo = _audioCodecCtx->channels > 1 ? true : false;
-        int inSamples = stereo ? outSize >> 2 : outSize >> 1;
-
-        int expectedMaxOutSamples = std::ceil(inSamples*resampleFactor);
-
-        // *channels *sampleSize 
-        int resampledFrameSize = expectedMaxOutSamples*2*2;
-
-        // Allocate just the required amount of bytes
-        std::uint8_t* resampledOutput = new std::uint8_t[resampledFrameSize];
-
-#ifdef GNASH_DEBUG_AUDIO_DECODING
-        log_debug(" decodeFrame | Calling the resampler, resampleFactor: %d | "
-            "in %d hz %d ch %d bytes %d samples, %s fmt", resampleFactor,
-            _audioCodecCtx->sample_rate, _audioCodecCtx->channels, outSize,
-            inSamples, fmtname);
-        log_debug(" decodeFrame | out 44100 hz 2 ch %d bytes",
-            resampledFrameSize);
-#endif
-
+        std::uint8_t* outPtr = output.get();
         int outSamples = _resampler.resample(frm->extended_data, // input
             plane_size, // input
             frm->nb_samples, // input
-            &resampledOutput); // output
-
-        // make sure to set outPtr *after* we use it as input to the resampler
-        outPtr = reinterpret_cast<std::int16_t*>(resampledOutput);
-
-#ifdef GNASH_DEBUG_AUDIO_DECODING
-        log_debug("resampler returned %d samples ", outSamples);
-#endif
-
-        if (expectedMaxOutSamples < outSamples) {
-            log_error(_(" --- Computation of resampled samples (%d) < then the actual returned samples (%d)"),
-                expectedMaxOutSamples, outSamples);
-
-            log_debug(" input frame size: %d", outSize);
-            log_debug(" input sample rate: %d", _audioCodecCtx->sample_rate);
-            log_debug(" input channels: %d", _audioCodecCtx->channels);
-            log_debug(" input samples: %d", inSamples);
-
-            log_debug(" output sample rate (assuming): %d", 44100);
-            log_debug(" output channels (assuming): %d", 2);
-            log_debug(" output samples: %d", outSamples);
-
-            /// Memory errors...
-            abort();
-        }
-
-        // Use the actual number of samples returned, multiplied
-        // to get size in bytes (not two-byte samples) and for 
-        // stereo?
-        outSize = outSamples * 2 * 2;
-
-    }
-    else {
-        std::uint8_t* newOutput = new std::uint8_t[outSize];
-        std::memcpy(newOutput, outPtr, outSize);
-        outPtr = reinterpret_cast<std::int16_t*>(newOutput);
+            &outPtr);
     }
 
-    outputSize = outSize;
-    return reinterpret_cast<uint8_t*>(outPtr);
+    return output.release();
 }
 
 int
