@@ -78,10 +78,6 @@ AudioDecoderFfmpeg::~AudioDecoderFfmpeg()
 
 void AudioDecoderFfmpeg::setup(SoundInfo& info)
 {
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(52,6,2)
-    // Starting from this version avcodec_register calls avcodec_init
-    avcodec_init();
-#endif
     avcodec_register_all();// change this to only register need codec?
 
     enum CODECID codec_id;
@@ -127,20 +123,12 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
         }
     }
 
-#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(53,8,0)
     _audioCodecCtx = avcodec_alloc_context3(_audioCodec);
-#else
-    _audioCodecCtx = avcodec_alloc_context();
-#endif
     if (!_audioCodecCtx) {
         throw MediaException(_("libavcodec couldn't allocate context"));
     }
 
-#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(53,8,0)
     int ret = avcodec_open2(_audioCodecCtx, _audioCodec, nullptr);
-#else
-    int ret = avcodec_open(_audioCodecCtx, _audioCodec);
-#endif
     if (ret < 0) {
         av_free(_audioCodecCtx);
         _audioCodecCtx=nullptr;
@@ -177,10 +165,6 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 {
     // Init the avdecoder-decoder
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(52,6,2)
-    // Starting from this version avcodec_register calls avcodec_init
-    avcodec_init();
-#endif
     avcodec_register_all();// change this to only register need codec?
 
     enum CODECID codec_id = AV_CODEC_ID_NONE;
@@ -261,11 +245,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
     _needsParsing = (_parser != nullptr);
 
     // Create an audioCodecCtx from the ffmpeg parser if exists/possible
-#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(53,8,0)
     _audioCodecCtx = avcodec_alloc_context3(_audioCodec);
-#else
-    _audioCodecCtx = avcodec_alloc_context();
-#endif
     if (!_audioCodecCtx) {
         throw MediaException(_("AudioDecoderFfmpeg: libavcodec couldn't "
                     "allocate context"));
@@ -316,11 +296,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 #ifdef GNASH_DEBUG_AUDIO_DECODING
     log_debug("  Opening codec");
 #endif // GNASH_DEBUG_AUDIO_DECODING
-#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(53,8,0)
     int ret = avcodec_open2(_audioCodecCtx, _audioCodec, nullptr);
-#else
-    int ret = avcodec_open(_audioCodecCtx, _audioCodec);
-#endif
     if (ret < 0) {
         //avcodec_close(_audioCodecCtx);
         av_free(_audioCodecCtx);
@@ -548,21 +524,13 @@ AudioDecoderFfmpeg::parseInput(const std::uint8_t* input,
 {
     if ( _needsParsing )
     {
-#if LIBAVCODEC_VERSION_MAJOR >= 53
         return av_parser_parse2(_parser, _audioCodecCtx,
-#else
-        return av_parser_parse(_parser, _audioCodecCtx,
-#endif
                     // as of 2008-10-28 SVN, ffmpeg doesn't
                     // accept a pointer to pointer to const..
                     const_cast<std::uint8_t**>(outFrame),
                     outFrameSize,
                     input, inputSize,
-#if LIBAVCODEC_VERSION_MAJOR >= 53
                     0, 0, AV_NOPTS_VALUE); // pts, dts, pos
-#else
-                    0, 0); // pts & dts
-#endif
     }
     else
     {
