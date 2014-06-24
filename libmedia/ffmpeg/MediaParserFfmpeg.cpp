@@ -168,10 +168,9 @@ MediaParserFfmpeg::parseVideoFrame(AVPacket& packet)
 	// flags, for keyframe
 	//bool isKeyFrame = packet.flags&PKT_FLAG_KEY;
 
-	// TODO: FIXME: *2 is an hack to avoid libavcodec reading past end of allocated space
-	//       we might do proper padding or (better) avoid the copy as a whole by making
-	//       EncodedVideoFrame virtual.
-	size_t allocSize = packet.size*2;
+	// TODO: We might avoid the copy as a whole by making EncodedVideoFrame
+	//       virtual.
+	size_t allocSize = packet.size + FF_INPUT_BUFFER_PADDING_SIZE;
 	std::uint8_t* data = new std::uint8_t[allocSize];
 	std::copy(packet.data, packet.data+packet.size, data);
 	std::unique_ptr<EncodedVideoFrame> frame(new EncodedVideoFrame(data, packet.size, 0, timestamp));
@@ -217,10 +216,9 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 
 	std::unique_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 
-	// TODO: FIXME: *2 is an hack to avoid libavcodec reading past end of allocated space
-	//       we might do proper padding or (better) avoid the copy as a whole by making
-	//       EncodedVideoFrame virtual.
-	size_t allocSize = packet.size*2;
+	// TODO: We might avoid the copy as a whole by making EncodedAudioFrame
+	//       virtual.
+	size_t allocSize = packet.size + FF_INPUT_BUFFER_PADDING_SIZE;
 	std::uint8_t* data = new std::uint8_t[allocSize];
 	std::copy(packet.data, packet.data+packet.size, data);
 
