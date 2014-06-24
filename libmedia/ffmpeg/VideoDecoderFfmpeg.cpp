@@ -382,7 +382,6 @@ VideoDecoderFfmpeg::decode(const std::uint8_t* input,
 
     ret = frameToImage(_videoCodecCtx->getContext(), *frame);
 
-    // FIXME: av_free doesn't free frame->data!
     av_free(frame);
     return ret;
 }
