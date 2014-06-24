@@ -186,11 +186,7 @@ VideoDecoderFfmpeg::init(enum CODECID codecId, int /*width*/, int /*height*/,
         throw MediaException(_("libavcodec can't decode this video format"));
     }
 
-#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(53,8,0)
     _videoCodecCtx.reset(new CodecContextWrapper(avcodec_alloc_context3(_videoCodec)));
-#else
-    _videoCodecCtx.reset(new CodecContextWrapper(avcodec_alloc_context()));
-#endif
     if (!_videoCodecCtx->getContext()) {
         throw MediaException(_("libavcodec couldn't allocate context"));
     }
@@ -217,11 +213,7 @@ VideoDecoderFfmpeg::init(enum CODECID codecId, int /*width*/, int /*height*/,
     }
 #endif
 
-#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(53,8,0)
     int ret = avcodec_open2(ctx, _videoCodec, nullptr);
-#else
-    int ret = avcodec_open(ctx, _videoCodec);
-#endif
     if (ret < 0) {
         boost::format msg = boost::format(_("libavcodec "
                             "failed to initialize FFMPEG "
@@ -375,17 +367,12 @@ VideoDecoderFfmpeg::decode(const std::uint8_t* input,
 
     int bytes = 0;    
     // no idea why avcodec_decode_video wants a non-const input...
-#if LIBAVCODEC_VERSION_MAJOR >= 53
     AVPacket pkt;
     av_init_packet(&pkt);
     pkt.data = const_cast<uint8_t*>(input);
     pkt.size = input_size;
     avcodec_decode_video2(_videoCodecCtx->getContext(), frame, &bytes,
             &pkt);
-#else
-    avcodec_decode_video(_videoCodecCtx->getContext(), frame, &bytes,
-            input, input_size);
-#endif
     
     if (!bytes) {
         log_error(_("Decoding of a video frame failed"));
