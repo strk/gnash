@@ -68,7 +68,6 @@ TEST_SSH = test_ssh
 endif
 check_PROGRAMS = \
 	Dejagnu \
-	Dejagnu.swf \
 	$(TEST_SSL) \
 	$(TEST_SSH) \
 	$(NULL)

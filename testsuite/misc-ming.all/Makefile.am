@@ -119,7 +119,6 @@ check_PROGRAMS = \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2 \
 	Dejagnu \
-	Dejagnu.swf \
 	RemoveObject2Test \
 	RollOverOutTest \
 	RollOverOutTest-Runner \
