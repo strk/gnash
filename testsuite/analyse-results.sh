@@ -94,13 +94,14 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 
 	rc=1
 	timing=$(dirname $0)/timingissues
-	> ${timing}.tmp
+	> ${timing}.tmp || have_tmpfile=false # distcheck builddir is read-only
 
 	if test ${total_fail} -gt 0; then
 		echo "Unexpected failures follow:"
 		for s in ${suitefail}; do
 			echo " --=[ ${s} ]=-- "
-			grep -w FAIL ${s}/testrun.sum | tee -a ${timing}.tmp
+			grep -w FAIL ${s}/testrun.sum | \
+				($have_tmpfile && tee -a ${timing}.tmp)
 		done
 		echo
 	fi
@@ -112,6 +113,10 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 			grep -w XPASS ${s}/testrun.sum
 		done
 		echo
+	fi
+
+	if test "$have_tmpfile" = "false"; then
+		exit $rc
 	fi
 
 	if test `grep -cf $timing ${timing}.tmp` -gt 0; then
