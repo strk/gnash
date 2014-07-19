@@ -100,8 +100,7 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 		echo "Unexpected failures follow:"
 		for s in ${suitefail}; do
 			echo " --=[ ${s} ]=-- "
-			grep -w FAIL ${s}/testrun.sum | \
-				($have_tmpfile && tee -a ${timing}.tmp)
+			grep -w FAIL ${s}/testrun.sum | tee -a ${timing}.tmp
 		done
 		echo
 	fi
