@@ -94,13 +94,16 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 
 	rc=1
 	timing=$(dirname $0)/timingissues
-	> ${timing}.tmp || have_tmpfile=false # distcheck builddir is read-only
+	for t in ${suitefail}; do
+		testruns="${testruns} ${t}/testrun.sum"
+	done
+	failures="grep -hw FAIL ${testruns}"
 
 	if test ${total_fail} -gt 0; then
 		echo "Unexpected failures follow:"
 		for s in ${suitefail}; do
 			echo " --=[ ${s} ]=-- "
-			grep -w FAIL ${s}/testrun.sum | tee -a ${timing}.tmp
+			grep -w FAIL ${s}/testrun.sum
 		done
 		echo
 	fi
@@ -114,24 +117,20 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 		echo
 	fi
 
-	if test "$have_tmpfile" = "false"; then
-		exit $rc
-	fi
-
-	if test `grep -cf $timing ${timing}.tmp` -gt 0; then
-		if test `grep -cvf $timing ${timing}.tmp` -eq 0; then
+	if test `$failures | grep -cf $timing` -gt 0; then
+		if test `$failures | grep -cvf $timing` -eq 0; then
 			echo "All failures are time-related. Exiting 0."
 			echo "See http://wiki.gnashdev.org/PredictableLoading"
 			echo
 			rc=0
 		else
 			echo "Time-related failures follow:"
-			grep -f $timing ${timing}.tmp
+			$failures | grep -f $timing
 			echo
 			echo "See http://wiki.gnashdev.org/PredictableLoading"
 			echo
 			echo "Non time-related failures follow:"
-			grep -vf $timing ${timing}.tmp
+			$failures | grep -vf $timing
 			echo
 		fi
 	fi
@@ -140,7 +139,7 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 		if test ${total_fail} -gt 0; then
 			echo "Verbose mode enabled. Displaying following files:"
 			echo
-			swfdecfail=$(sed -n 's/^.*in \(.*.trace-gnash\).*in \(.*.log\).*$/\1\n\2/p' ${timing}.tmp)
+			swfdecfail=$($failures | sed -n 's/^.*in \(.*.trace-gnash\).*in \(.*.log\).*$/\1\n\2/p')
 			for log in $swfdecfail; do
 				echo " testsuite/swfdec/$log"
 				logfiles="${logfiles} testsuite/swfdec/$log"
@@ -159,7 +158,6 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 		fi
 	fi
 
-	rm -f ${timing}.tmp
 	exit $rc
 else
 	exit 0
