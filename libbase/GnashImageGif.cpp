@@ -118,10 +118,18 @@ GifInput::GifInput(boost::shared_ptr<IOChannel> in)
 {
 }
 
+int
 GifInput::~GifInput()
 {
     // Clean up allocated data.
-    DGifCloseFile(_gif);
+#if GIFLIB_MAJOR==5 && GIFLIB_MINOR==1    
+	int errorCode;
+	DGifCloseFile(_gif, &errorCode);
+	return errorCode;
+#else
+	DGifCloseFile(_gif);
+	return 0;
+#endif
 }
 
 size_t
