@@ -19,7 +19,7 @@ Improvements since 0.8.10 release are:
  * Improved NetStream ActionScript class support.
  * Add support for IPv6 [TODO: affects Socket/XML, and what else?].
  * Fix build against recent Boost, FFMPEG and libav.
- * Fix support for GIFLIB-5.0 (#39482)
+ * Fix support for GIFLIB-5.0 (#39482) and GIFLIB-5.1 (#42574)
  * Fix regression in dynamic sound loading (#33760).
  * Fix infinite loop in GC mark phase for XML object (#40440)
  * Fix segfault on exit when using XML (#40439)
