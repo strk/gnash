@@ -86,7 +86,10 @@ MediaParserFfmpeg::probeStream()
 	probe_data.filename = "";
 	probe_data.buf = buffer.get();
     probe_data.buf_size = actuallyRead;
-	
+#if LIBAVFORMAT_VERSION_MAJOR > 55
+    probe_data.mime_type = nullptr;
+#endif
+
     AVInputFormat* ret = av_probe_input_format(&probe_data, 1);
 	return ret;
 }
