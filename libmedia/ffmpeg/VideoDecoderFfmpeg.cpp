@@ -375,7 +375,7 @@ VideoDecoderFfmpeg::decode(const std::uint8_t* input,
                                               frame.get(), &got_frame, &pkt);
     
     if (bytesConsumed < 0) {
-        log_error(_("Decoding of a video frame failed: %1%", bytesConsumed));
+        log_error(_("Decoding of a video frame failed: %1%"), bytesConsumed);
         return ret;
     }
     if (bytesConsumed < input_size) {
