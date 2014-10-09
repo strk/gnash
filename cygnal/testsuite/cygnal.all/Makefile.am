@@ -19,7 +19,7 @@
 
 ## Process this file with automake to generate Makefile.in
 
-AUTOMAKE_OPTIONS = dejagnu
+AUTOMAKE_OPTIONS = dejagnu subdir-objects
 
 noinst_LTLIBRARIES = libcygnal.la
 libcygnal_la_SOURCES = \

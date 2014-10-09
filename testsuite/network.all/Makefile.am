@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AUTOMAKE_OPTIONS = dejagnu -Wno-portability
+AUTOMAKE_OPTIONS = dejagnu -Wno-portability subdir-objects
 
 abs_top_builddir=$(shell cd $(top_builddir); pwd)
 abs_builddir=$(shell cd $(top_builddir)/testsuite/network.all; pwd)
