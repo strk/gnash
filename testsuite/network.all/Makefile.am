@@ -84,8 +84,8 @@ check_SCRIPTS = \
 
 check_LTLIBRARIES = libgnashmingutils.la 
 libgnashmingutils_la_SOURCES = \
-	$(top_srcdir)/testsuite/misc-ming.all/ming_utils.h \
-	$(top_srcdir)/testsuite/misc-ming.all/ming_utils.c
+	../misc-ming.all/ming_utils.h \
+	../misc-ming.all/ming_utils.c
 libgnashmingutils_la_LIBADD = $(MING_LIBS)
 
 http.swf: $(srcdir)/http.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
