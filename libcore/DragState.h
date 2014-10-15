@@ -62,7 +62,7 @@ public:
     std::int32_t yOffset() const { return _yoffset; }
 
     bool hasBounds() const {
-        return (0 != _bounds);
+        return (_bounds);
     }
 
     /// \brief
