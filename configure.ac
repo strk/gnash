@@ -220,7 +220,7 @@ BUILDDATE="`date +%Y%m%d`"
 AC_SUBST(BUILDDATE)
 
 dnl These are required by automake
-AM_INIT_AUTOMAKE([subdir-objects])
+AM_INIT_AUTOMAKE
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET

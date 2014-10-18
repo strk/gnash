@@ -72,15 +72,15 @@ inst_HEADERS = gnash-view.h
 
 RENDERER_GLUE =
 if BUILD_OGL_RENDERER
-RENDERER_GLUE += ../gtk/gtk_glue_gtkglext.cpp
+RENDERER_GLUE += $(top_srcdir)/gui/gtk/gtk_glue_gtkglext.cpp
 AM_CPPFLAGS += $(GLEXT_CFLAGS)
 gnash_la_LIBADD += $(GLEXT_LIBS)
 endif
 if BUILD_AGG_RENDERER
-RENDERER_GLUE += ../gtk/gtk_glue_agg.cpp
+RENDERER_GLUE += $(top_srcdir)/gui/gtk/gtk_glue_agg.cpp
 endif
 if BUILD_CAIRO_RENDERER
-RENDERER_GLUE += ../gtk/gtk_glue_cairo.cpp
+RENDERER_GLUE += $(top_srcdir)/gui/gtk/gtk_glue_cairo.cpp
 endif
 
 if USE_PYTHON
@@ -94,7 +94,7 @@ gnash_la_CPPFLAGS = $(AM_CPPFLAGS) $(GNASH_INCLUDES)
 gnash_la_SOURCES = \
 	gnashmodule.c \
 	gnash-view.cpp \
-	../gtk/gtk_canvas.cpp \
+	$(top_srcdir)/gui/gtk/gtk_canvas.cpp \
 	$(RENDERER_GLUE)
 
 gnash.c: gnash.defs gnash.override
