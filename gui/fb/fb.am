@@ -62,6 +62,10 @@ fb_gnash_CPPFLAGS += \
 fb_gnash_LDADD += $(GLES1_LIBS) $(EGL_LIBS)
 endif	# BUILD_OVG_RENDERER
 
+if BUILD_EGL_DEVICE
+fb_gnash_LDADD += $(EGL_LIBS)
+endif   # BUILD_EGL_DEVICE
+
 if ANDROID
 fb_gnash_LDADD +=  -lui -llog
 endif	# ANDROID
