@@ -132,7 +132,7 @@ unsigned SWFStream::read_uint(unsigned short bitcount)
         //std::cerr << "BytesToRead: " << bytesToRead << " spareBits: " << spareBits << " unusedBits: " << (int)m_unused_bits << std::endl;
 
         assert (bytesToRead <= 4);
-        byte cache[4]; // at most 4 bytes in the cache
+        byte cache[5]; // at most 4 bytes in the cache + eventual spare bits
 
         if ( spareBits ) m_input->read(&cache, bytesToRead+1);
         else m_input->read(&cache, bytesToRead);
