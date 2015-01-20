@@ -2926,8 +2926,8 @@ AC_SUBST(HWACCEL_CONFIG)
 
 dnl check for missing libraries and disable them.
 if test x"$BOOST_LIBS" != x; then
-  if test x"${cygnal_missing_libs}" != x; then
-    for i in ${cygnal_missing_libs}; do
+  if test x"${missing_cygnal_libs}" != x; then
+    for i in ${missing_cygnal_libs}; do
       if test $i = serialization; then
         AC_DEFINE([BOOST_MULTI_INDEX_DISABLE_SERIALIZATION], ["1"], [if the library is missing, don't use it.])
       fi
@@ -3819,13 +3819,25 @@ if test x"$BOOST_LIBS" != x; then
   fi
 
   if test x"${cygnal}" = x"yes"; then
-    if test x"${cygnal_missing_libs}" != x; then
-      for i in ${cygnal_missing_libs}; do
+    if test x"${missing_cygnal_libs}" != x; then
+      for i in ${missing_cygnal_libs}; do
         PKG_ERR([No Boost $i package installed])
         PKG_SUGGEST([Install it from http://www.boost.org])
         debtmppkg="libboost-`echo ${i} | sed 's/_/-/g'`-dev"
         DEB_INSTALL([$debtmppkg])
         PKG_ALTERNATIVE([or configure with --disable-cygnal])
+      done
+    fi
+  fi
+
+  if test x"${npapi}" = x"yes"; then
+    if test x"${missing_plugin_libs}" != x; then
+      for i in ${missing_plugin_libs}; do
+        PKG_ERR([No Boost $i package installed])
+        PKG_SUGGEST([Install it from http://www.boost.org])
+        debtmppkg="libboost-`echo ${i} | sed 's/_/-/g'`-dev"
+        DEB_INSTALL([$debtmppkg])
+        PKG_ALTERNATIVE([or configure with --disable-npapi])
       done
     fi
   fi

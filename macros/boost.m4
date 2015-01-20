@@ -168,7 +168,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
     done
   fi
 
-  if test x"${missing_libs}" != x ; then
+  if test x"${missing_libs}" != x -o x"${missing_plugin_libs}" != x -o x"${missing_cygnal_libs}" != x; then
     AC_MSG_WARN([Libraries ${missing_libs} ${missing_plugin_libs} ${missing_cygnal_libs} aren't installed ])
   fi
   AC_MSG_RESULT(${ac_cv_path_boost_lib})
