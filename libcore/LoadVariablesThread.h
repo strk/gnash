@@ -23,9 +23,10 @@
 
 #include <string>
 #include <map>
-#include <future>
 #include <atomic>
-
+#include <cassert>
+#include <memory>
+#include <thread>
 
 namespace gnash {
     class StreamProvider;
@@ -48,6 +49,8 @@ class LoadVariablesThread
 {
 public:
 	typedef std::map<std::string, std::string> ValuesMap;
+
+	enum class Status : std::int8_t { STARTED = 0, FINISHED, CANCEL_REQUESTED };
 
 	/// Construct a LoadVariablesThread opening a stream for the given URL
 	//
@@ -79,12 +82,13 @@ public:
 	/// Return the name,value map parsed out of the loaded stream
 	ValuesMap getValues()
 	{
-		return _vals.get();
+		assert(completed());
+		return _vals;
 	}
 
 	bool completed()
 	{
-                return _canceled;
+		return static_cast<Status>(_status.load()) == Status::FINISHED;
 	}
 
 private:
@@ -99,15 +103,13 @@ private:
 	//
 	/// This function should be run by a separate thread.
 	///
-	static ValuesMap completeLoad(IOChannel* stream,
-                                      std::atomic<bool>& canceled);
+	static ValuesMap completeLoad(std::unique_ptr<IOChannel> stream,
+				      const std::atomic<int8_t>& status);
 
-        std::future<ValuesMap> _vals;
+	ValuesMap _vals;
 
-	/// Indicates either whether cancellation was requested, or whether the
-	/// thread has finished executing code, from the perspective of the
-	/// variables loading thread thread and the main thread respectively.
-	std::atomic<bool> _canceled;
+	std::thread _thread;
+	std::atomic<int8_t> _status; // enum class Status; int for compatibility.
 };
 
 } // namespace gnash

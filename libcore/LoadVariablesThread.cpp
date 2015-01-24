@@ -32,10 +32,9 @@ namespace gnash {
 
 // static
 LoadVariablesThread::ValuesMap
-LoadVariablesThread::completeLoad(IOChannel* varstream,
-                                  std::atomic<bool>& canceled)
+LoadVariablesThread::completeLoad(std::unique_ptr<IOChannel> stream,
+                                  const std::atomic<int8_t>& status)
 {
-    std::unique_ptr<IOChannel> stream(varstream);
 #ifdef DEBUG_LOAD_VARIABLES
     log_debug("completeLoad called");
 #endif
@@ -100,7 +99,7 @@ LoadVariablesThread::completeLoad(IOChannel* varstream,
             break;
         }
 
-        if ( canceled.load() ) {
+        if ( static_cast<Status>(status.load()) == Status::CANCEL_REQUESTED ) {
             log_debug("Cancelling LoadVariables download thread...");
             stream.reset();
             return parseResult;
@@ -125,21 +124,18 @@ LoadVariablesThread::completeLoad(IOChannel* varstream,
     }
 
     //dispatchLoadEvent();
-    canceled = true;
 
     return parseResult;
 }
 
 LoadVariablesThread::LoadVariablesThread(const StreamProvider& sp,
         const URL& url, const std::string& postdata)
-    : _canceled(false)
 {
     startThread(sp.getStream(url, postdata));
 }
 
 LoadVariablesThread::LoadVariablesThread(const StreamProvider& sp,
         const URL& url)
-    : _canceled(false)
 {
     startThread(sp.getStream(url));
 }
@@ -151,17 +147,18 @@ LoadVariablesThread::startThread(std::unique_ptr<IOChannel> stream)
         throw NetworkException();
     }
 
-    // Passing IOStream* rather than unique_ptr serves to appease GCC 4.6,
-    // which insists the arguments are CopyConstructible rather than Movable.
-    _vals = std::async(std::launch::async, completeLoad, stream.release(),
-                       std::ref(_canceled));
+    _thread = std::thread(
+    [&] (IOChannel* varstream) {
+        _vals = completeLoad(std::unique_ptr<IOChannel>(varstream), _status);
+        _status = static_cast<int8_t>(Status::FINISHED);
+    }, stream.release());
 }
 
 LoadVariablesThread::~LoadVariablesThread()
 {
-    if ( _vals.valid() ) {
-        _canceled = true;
-        _vals.wait();
+    if (_thread.joinable()) {
+        _status = static_cast<int8_t>(Status::CANCEL_REQUESTED);
+        _thread.join();
     }
 }
 
