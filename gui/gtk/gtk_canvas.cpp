@@ -76,10 +76,6 @@ static gboolean gnash_canvas_configure_event(GtkWidget *widget, GdkEventConfigur
 static void gnash_canvas_realize(GtkWidget *widget);
 static void gnash_canvas_after_realize(GtkWidget *widget);
 
-namespace {
-    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-}
-
 GtkWidget *
 gnash_canvas_new ()
 {
