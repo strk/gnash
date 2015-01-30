@@ -2897,18 +2897,23 @@ AC_ARG_ENABLE([harden],
   [harden=yes]
 )
 
-if test x"$harden" = x"yes" -a x"${host_cpu}" != x"mips" -a x"${android}" != x"yes" -a x"$GCC" = x"yes"; then
-    CPPFLAGS="${CPPFLAGS} -D_FORTIFY_SOURCE=2"
-    CFLAGS="${CFLAGS} -fPIE -fstack-protector --param ssp-buffer-size=4 -Wformat -Werror=format-security"
-    CXXFLAGS="${CXXFLAGS} -fPIE -fstack-protector --param ssp-buffer-size=4 -Wformat -Werror=format-security"
+AC_DEFUN([ADD_HARDENING_FLAGS],[
+   AX_APPEND_COMPILE_FLAGS([-fpie -fPIE -Wformat -Werror=format-security])
 
-    if test x"$with_gnu_ld" = x"yes"; then
-      LDFLAGS="${LDFLAGS} -fPIE -pie -Wl,-z,relro -Wl,-z,now"
-    elif test x"$darwin" = x"yes"; then
-      LDFLAGS="${LDFLAGS} -fPIE -pie"
-    else
-      LDFLAGS="${LDFLAGS}"
-    fi
+   AX_CHECK_COMPILE_FLAG([-fstack-protector-strong],
+     [AX_APPEND_FLAG([-fstack-protector-strong])],
+     [AX_APPEND_COMPILE_FLAGS(["-fstack-protector --param ssp-buffer-size=4"])])
+])
+
+if test x"$harden" = x"yes"; then
+  CPPFLAGS="${CPPFLAGS} -D_FORTIFY_SOURCE=2"
+
+  ADD_HARDENING_FLAGS
+  AC_LANG_PUSH(C++)
+  ADD_HARDENING_FLAGS
+  AC_LANG_POP(C++)
+
+  AX_APPEND_LINK_FLAGS([-fPIE -pie -Wl,-z,relro -Wl,-z,now])
 fi
 
 dnl Define convenience constants so Gnash can print out the
