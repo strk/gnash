@@ -230,6 +230,7 @@ dumpconfig:
 	@uname -a
 	$(CXX) -v
 	@echo "CXXFLAGS: $(CXXFLAGS)"
+	@echo "CFLAGS: $(CFLAGS)"
 	@echo "LDFLAGS: $(LDFLAGS)"
 	@echo ""
 	@echo "Image decoding support..."
