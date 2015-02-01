@@ -22,7 +22,6 @@ dnl regex, serialization, signals, unit test, thead, and wave.
 AC_DEFUN([GNASH_PATH_BOOST],
 [
   dnl start variables with a known value
-  gnash_boost_version=""
   gnash_boost_topdir=""
   gnash_boost_libdir=""
   missing_headers=""
@@ -53,26 +52,12 @@ AC_DEFUN([GNASH_PATH_BOOST],
   AC_ARG_WITH(boost_incl, AC_HELP_STRING([--with-boost-incl], [directory where boost headers are]), with_boost_incl=${withval})
   if test x"${with_boost_incl}" != x ; then
     gnash_boost_topdir="`(cd ${with_boost_incl}; pwd)`"
-    gnash_boost_version="`echo ${gnash_boost_topdir} | sed -e 's:.*boost-::'`"
     newlist=${gnash_boost_topdir}
   fi
 
   dnl munge the GCC version number, which Boost uses to label it's libraries.
   if test x"${GXX}" = xyes; then
   	gcc_version="`${CXX} --version | head -1 | cut -d ' ' -f 3 | cut -d '.' -f 1-2 | tr -d '.'`"
-  fi
-
-  if test x"${gnash_boost_topdir}" = x; then
-    dnl Attempt to find the top level directory, which unfortunately has a
-    dnl version number attached. At least on Debian based systems, this
-    dnl doesn't seem to get a directory that is unversioned.
-    if test x$cross_compiling = xno; then
-      if test x"$PKG_CONFIG" != x; then
-        AC_MSG_CHECKING([for the Boost Version])
-        $PKG_CONFIG --exists boost && gnash_boost_version="`$PKG_CONFIG --modversion boost | cut -d "." -f 1 | awk '{print $'0'".0"}'`"
-        AC_MSG_RESULT(${gnash_boost_version})
-      fi
-    fi
   fi
 
   AC_MSG_CHECKING([for boost header])
@@ -83,7 +68,6 @@ AC_DEFUN([GNASH_PATH_BOOST],
       if test -n "$u" -a -d "$u" -a x"$u" != x"/usr/include/boost"; then
         gnash_boost_topdir="`(cd $u; pwd)`"
         gnash_boost_subdir="`dirname ${gnash_boost_topdir}`"
-        gnash_boost_version="`echo ${gnash_boost_topdir} | sed -e 's:.*boost-::'`"
         dnl Fix for packaging systems not adding extra fluff to the path-name.
         for k in ${boost_headers}; do
           if test ! -f ${gnash_boost_topdir}/boost/$k; then
