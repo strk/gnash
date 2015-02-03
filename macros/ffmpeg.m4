@@ -609,9 +609,10 @@ dnl | libav  | 0.8 (53.35.0)   S16 | 9   (54.35.0)   FLTP |
           AC_CHECK_LIB(gsm, gsm_destroy, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"])
         fi
       fi
+    else
+      AC_MSG_RESULT(${libgsm})
     fi
 
-    AC_MSG_RESULT(${libgsm})
     ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libgsm}"
     dnl End of GSM library looking }
     

@@ -69,7 +69,9 @@ dnl     fi
         if ${PKG_CONFIG} --exists QtOpenGL; then
           ac_cv_path_qt4_incl="`$PKG_CONFIG --cflags-only-I QtCore QtGui QtOpenGL`"
         else
-          ac_cv_path_qt4_incl="`$PKG_CONFIG --cflags-only-I QtCore QtGui`"
+          if ${PKG_CONFIG} --exists QtCore QtGui; then
+            ac_cv_path_qt4_incl="`$PKG_CONFIG --cflags-only-I QtCore QtGui`"
+          fi
         fi
 	gnash_qt4_topdir=`echo "${ac_cv_path_qt4_incl}"`
       fi
