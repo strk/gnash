@@ -476,7 +476,7 @@ AudioDecoderFfmpeg::decodeFrame(const std::uint8_t* input,
     av_init_packet(&pkt);
     pkt.data = const_cast<uint8_t*>(input);
     pkt.size = inputSize;
-    std::unique_ptr<AVFrame, decltype(av_free)*> frm ( FRAMEALLOC(), av_free );
+    std::unique_ptr<AVFrame, FrameDeleter> frm(FRAMEALLOC(), FrameDeleter());
     if (!frm.get()) {
         log_error(_("failed to allocate frame."));
         return nullptr;

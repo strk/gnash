@@ -114,8 +114,22 @@ extern "C" {
 
 #define avg_frame_rate r_frame_rate
 #define FRAMEALLOC avcodec_alloc_frame
+struct FrameDeleter
+{
+    void operator()(AVFrame* frame)
+    {
+        av_free(frame);
+    }
+};
 #else
 #define FRAMEALLOC av_frame_alloc
+struct FrameDeleter
+{
+    void operator()(AVFrame* frame)
+    {
+        av_frame_free(&frame);
+    }
+};
 #endif
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(55,18,102)
