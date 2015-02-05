@@ -26,7 +26,6 @@
 #include <type_traits>
 #include <cstdint>
 
-#include "utility.h" // for UNUSED
 #include "dsodefs.h" // for DSOTEXPORT
 #include "CharacterProxy.h"
 #include "GnashNumeric.h" // for isNaN
@@ -157,16 +156,14 @@ public:
     {}
     
     /// Construct a primitive Boolean value
-    template <typename T>
-    as_value(T val, typename std::enable_if<std::is_same<bool, T>::value>::type*
-             dummy = 0)
+    template <typename T, typename U =
+        typename std::enable_if<std::is_same<bool, T>::value>::type>
+    as_value(T val)
         :
         _type(BOOLEAN),
         _value(val)
-	{
-        UNUSED(dummy);
-	}
-    
+    {}
+
     /// Construct a primitive Number value
     as_value(double num)
         :
