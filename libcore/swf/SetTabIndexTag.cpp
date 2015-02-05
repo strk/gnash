@@ -24,6 +24,7 @@
 #include "MovieClip.h"
 #include "GnashNumeric.h"
 #include "RunResources.h"
+#include "utility.h" // UNUSED
 
 namespace gnash {
 namespace SWF {
