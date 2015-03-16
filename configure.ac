@@ -248,7 +248,7 @@ AC_ARG_WITH(sysroot,
   with_top_level=${withval};
   cross_compiling=yes)
 
-if test x"${cross_compiling}" != x; then
+if test x"${cross_compiling}" = xyes; then
   dnl Check if /usr isn't part of the specified path
   if test -d ${with_top_level}/usr; then
     with_top_level=${withval}/usr
