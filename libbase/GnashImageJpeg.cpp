@@ -113,7 +113,7 @@ public:
             if (src->m_start_of_file) {
                 // Treat this as a fatal error.
                 log_error(_("JPEG: Empty jpeg source stream."));
-                return false;
+                return FALSE;
             }
 
             // Insert a fake EOI marker.
@@ -139,7 +139,7 @@ public:
         src->m_pub.bytes_in_buffer = bytes_read;
         src->m_start_of_file = false;
 
-        return true;
+        return TRUE;
     }
 
     // Called by client when it wants to advance past some
@@ -517,13 +517,13 @@ public:
                 != IO_BUF_SIZE) {
             // Error.
             log_error(_("rw_dest_IOChannel couldn't write data."));
-            return false;
+            return FALSE;
         }
 
         dest->m_pub.next_output_byte = dest->m_buffer;
         dest->m_pub.free_in_buffer = IO_BUF_SIZE;
 
-        return true;
+        return TRUE;
     }
 
     /// Terminate the destination. 
