@@ -33,7 +33,7 @@
 namespace gnash {
 
 VaapiGlobalContext::VaapiGlobalContext(std::unique_ptr<VaapiDisplay> display)
-    : _display(display)
+    : _display(std::move(display))
 {
     GNASH_REPORT_FUNCTION;
 
@@ -145,7 +145,7 @@ VaapiGlobalContext *VaapiGlobalContext::get()
             if (!dpy.get()) {
                 return NULL;
             }
-            vaapi_global_context.reset(new VaapiGlobalContext(dpy));
+            vaapi_global_context.reset(new VaapiGlobalContext(std::move(dpy)));
         }
         catch (...) {
             vaapi_set_is_enabled(false);

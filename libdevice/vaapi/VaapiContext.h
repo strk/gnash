@@ -84,7 +84,7 @@ public:
     void releaseSurface(std::shared_ptr<VaapiSurface> surface);
 
     /// Set user data
-    void setData(std::unique_ptr<VaapiContextData> user_data) { _user_data = user_data; }
+    void setData(std::unique_ptr<VaapiContextData> user_data) { _user_data = std::move(user_data); }
 
     /// Get user data
     VaapiContextData *getData() const { return _user_data.get(); }
