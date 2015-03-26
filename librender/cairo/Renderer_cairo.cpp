@@ -111,7 +111,6 @@ class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
         _data(data),
         _width(width),
         _height(height),
-        _bytes_per_pixel(bpp),
         _format(format),
         _surface(cairo_image_surface_create_for_data(_data.get(),
                  format, width, height, width * bpp)),
@@ -210,7 +209,6 @@ class bitmap_info_cairo : public CachedBitmap, boost::noncopyable
     std::unique_ptr<std::uint8_t[]> _data;
     int _width;
     int _height;
-    size_t _bytes_per_pixel;
     cairo_format_t _format;
     cairo_surface_t* _surface;
     cairo_pattern_t* _pattern;
