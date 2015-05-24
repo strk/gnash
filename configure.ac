@@ -3767,7 +3767,7 @@ else
   PKG_REC([If you install the Speex DSP library, Gnash will be able to resample Speex encoded audio in FLV files.])
   PKG_SUGGEST([Install libspeexdsp from http://speex.org])
   DEB_INSTALL([libspeexdsp-dev])
-  RPM_INSTALL([speex-devel])
+  RPM_INSTALL([speexdsp-devel])
 fi
 
 if test x"$ext_dbus" = xyes; then
