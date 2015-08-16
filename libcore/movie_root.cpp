@@ -1823,12 +1823,19 @@ movie_root::findDropTarget(std::int32_t x, std::int32_t y,
 }
 
 /// This should store a callback object in movie_root.
-//
-/// TODO: currently it doesn't.
 void
 movie_root::addExternalCallback(const std::string& name, as_object* callback)
 {
-    UNUSED(callback);
+    // Store registered callback for later use by callExternalCallback()
+    if(_externalCallbackMethods.count(name)>0) {
+        _externalCallbackMethods.erase(name);
+    }
+    _externalCallbackMethods.insert(
+        std::pair<std::string, as_object*>(name,callback)
+    );
+
+    // Set callback as reachable (avoid garbage collection)
+    if (callback!=NULL) callback->setReachable();
 
     // When an external callback is added, we have to notify the plugin
     // that this method is available.
@@ -1889,29 +1896,31 @@ std::string
 movie_root::callExternalCallback(const std::string &name, 
                  const std::vector<as_value> &fnargs)
 {
+    ExternalCallbackMethods::iterator method_iterator;
     MovieClip *mc = getLevel(0);
-    as_object *obj = getObject(mc);
-
-    const ObjectURI& key = getURI(getVM(), name);
-    // FIXME: there has got to be a better way of handling the variable
-    // length arg list
+    as_object *method;
+    as_object *instance = getObject(mc);
+    fn_call::Args args;
     as_value val;
-    switch (fnargs.size()) {
-      case 0:
-          val = callMethod(obj, key);
-          break;
-      case 1:
-          val = callMethod(obj, key, fnargs[0]);
-          break;
-      case 2:
-          val = callMethod(obj, key, fnargs[0], fnargs[1]);
-          break;
-      case 3:
-          val = callMethod(obj, key, fnargs[0], fnargs[1], fnargs[2]);
-          break;
-      default:
-          val = callMethod(obj, key);
-          break;
+
+    // Look up for ActionScript function registered as callback
+    method_iterator = _externalCallbackMethods.find(name);
+    if (method_iterator == _externalCallbackMethods.end()) {
+        val.set_undefined();
+    } else {
+        method = method_iterator->second;
+
+        // Populate function call arguments
+        for (std::vector<as_value>::const_iterator args_iterator
+                 = fnargs.begin();
+             args_iterator != fnargs.end();
+             args_iterator ++)
+        {
+            args += *args_iterator;
+        }
+
+        // Call the registered callback
+        val=invoke(as_value(method), as_environment(getVM()), instance, args);
     }
 
     std::string result;
