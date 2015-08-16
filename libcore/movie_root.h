@@ -786,14 +786,20 @@ public:
     const RunResources& runResources() const { return _runResources; }
 
     typedef std::map<std::string, as_object*> ExternalCallbackMethods;
+    typedef std::map<std::string, as_object*> ExternalCallbackInstances;
     ExternalCallbackMethods _externalCallbackMethods;
+    ExternalCallbackInstances _externalCallbackInstances;
 
     /// Add an ExternalInterface callback object with an associated name.
     //
     /// @param name     Callback name, exposed to host container.
     /// @param callback ActionScript function to be invoked if the callback
     ///                 is called.
-    void addExternalCallback(const std::string& name, as_object* callback);
+    /// @param instance ActionScript Object to be used as "this" instance
+    ///                 inside the callback. ActionScript null value is
+    ///                 allowed.
+    void addExternalCallback(const std::string& name, as_object* callback,
+                             as_object* instance);
 
     bool processInvoke(ExternalInterface::invoke_t *);
 

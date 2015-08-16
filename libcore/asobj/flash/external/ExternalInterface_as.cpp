@@ -239,8 +239,6 @@ attachExternalInterfaceStaticInterface(as_object& o)
 }
 
 /// This adds a function that can be called from javascript.
-//
-/// TODO: addCallback takes three arguments; only two are handled here.
 as_value
 externalinterface_addCallback(const fn_call& fn)
 {
@@ -253,6 +251,7 @@ externalinterface_addCallback(const fn_call& fn)
 
     if (fn.nargs >= 3) {
         const as_value& name_as = fn.arg(0);
+        const as_value& instance_as = fn.arg(1);
         const as_value& method_as = fn.arg(2);
         std::string name = name_as.to_string();
 
@@ -262,8 +261,9 @@ externalinterface_addCallback(const fn_call& fn)
         }
 
         log_debug("adding callback %s", name);
+        as_object* asInstance = toObject(instance_as, getVM(fn));
         as_object* asCallback = toObject(method_as, getVM(fn));
-        mr.addExternalCallback(name, asCallback);
+        mr.addExternalCallback(name, asCallback, asInstance);
     } else {
         // Invalid addCallback call
         return as_value(false);

@@ -1824,18 +1824,25 @@ movie_root::findDropTarget(std::int32_t x, std::int32_t y,
 
 /// This should store a callback object in movie_root.
 void
-movie_root::addExternalCallback(const std::string& name, as_object* callback)
+movie_root::addExternalCallback(const std::string& name, as_object* callback,
+                                as_object* instance)
 {
-    // Store registered callback for later use by callExternalCallback()
+    // Store registered callback and instance reference for later use
+    // by callExternalCallback()
     if(_externalCallbackMethods.count(name)>0) {
         _externalCallbackMethods.erase(name);
+        _externalCallbackInstances.erase(name);
     }
     _externalCallbackMethods.insert(
         std::pair<std::string, as_object*>(name,callback)
     );
+    _externalCallbackInstances.insert(
+        std::pair<std::string, as_object*>(name,instance)
+    );
 
-    // Set callback as reachable (avoid garbage collection)
+    // Set callback and instance as reachable (avoid garbage collection)
     if (callback!=NULL) callback->setReachable();
+    if (instance!=NULL) instance->setReachable();
 
     // When an external callback is added, we have to notify the plugin
     // that this method is available.
@@ -1897,9 +1904,9 @@ movie_root::callExternalCallback(const std::string &name,
                  const std::vector<as_value> &fnargs)
 {
     ExternalCallbackMethods::iterator method_iterator;
-    MovieClip *mc = getLevel(0);
+    ExternalCallbackInstances::iterator instance_iterator;
     as_object *method;
-    as_object *instance = getObject(mc);
+    as_object *instance;
     fn_call::Args args;
     as_value val;
 
@@ -1909,6 +1916,13 @@ movie_root::callExternalCallback(const std::string &name,
         val.set_undefined();
     } else {
         method = method_iterator->second;
+
+        // Look up for Object instance to use as "this" in the callback
+        instance_iterator = _externalCallbackInstances.find(name);
+        if (instance_iterator == _externalCallbackInstances.end()) {
+            instance = as_value((as_object*)NULL).to_object(getVM());
+        }
+        instance = instance_iterator->second;
 
         // Populate function call arguments
         for (std::vector<as_value>::const_iterator args_iterator
