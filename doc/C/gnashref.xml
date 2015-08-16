@@ -103,6 +103,7 @@
 <!-- This chapter includes all the other sections used to document the
      internals of how Gnash works. -->
   &internals;
+  &newasclass;
   &bugreport;
   &extensions;
 
