@@ -1,0 +1,11 @@
+<sect1 id="audience">
+  <title>Audience</title>
+  
+  <para>
+    This manual is primarily focused on users interested in how to get
+    Gnash installed from a package, and basic usage as a web browser
+    plugin. For more technical details, please refer to the Gnash
+    Reference manual.
+  </para>
+  
+</sect1>    

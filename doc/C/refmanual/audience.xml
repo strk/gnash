@@ -1,0 +1,12 @@
+<sect1 id="audience">
+  <title>Audience</title>
+
+  <para>
+    This manual is focused on users interested in more technical
+    details, such as Gnash Extensions. It's also a good starting point
+    for developers that feel like contributing to the project. For
+    installation instructions from a package and basic usage, please
+    refer to the Gnash User Manual.
+  </para>
+
+</sect1>
