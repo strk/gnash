@@ -1922,7 +1922,7 @@ movie_root::callExternalCallback(const std::string &name,
         if (instance_iterator == _externalCallbackInstances.end()) {
             instance = as_value((as_object*)NULL).to_object(getVM());
         }
-        instance = instance_iterator->second;
+        else instance = instance_iterator->second;
 
         // Populate function call arguments
         for (std::vector<as_value>::const_iterator args_iterator
