@@ -563,6 +563,8 @@ public:
     /// - The original root movie (_rootMovie)
     /// - Mouse entities (m_mouse_button_state)
     /// - Timer targets (_intervalTimers)
+    /// - ExternalInterace callbacks (_externalCallbackMethods and
+    ///   _externalCallbackInstances)
     /// - Resources reachable by ActionQueue code (_actionQueue)
     /// - Any DisplayObject being dragged 
     void markReachableResources() const;

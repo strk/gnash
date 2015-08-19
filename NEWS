@@ -2,6 +2,7 @@ Gnash 0.8.11
 YYYY/MM/DD
 
 Caveats:
+
 * The in-tree copy of jemalloc has been removed in preference to linking
   the system-installed jemalloc library.
 * The minimum required version of FFMPEG/libavcodec (if available) is

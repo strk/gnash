@@ -1766,6 +1766,26 @@ movie_root::markReachableResources() const
     // Mark LoadMovieRequest handlers as reachable
     _movieLoader.setReachable();
 
+    // Mark ExternalInterface callbacks and instances as reachable
+    for (std::map<std::string, as_object*>::const_iterator method_iterator
+             = _externalCallbackMethods.begin();
+         method_iterator != _externalCallbackMethods.end();
+         method_iterator++)
+    {
+        if (method_iterator->second != NULL) {
+            method_iterator->second->setReachable();
+        }
+    }
+    for (std::map<std::string, as_object*>::const_iterator instance_iterator
+             = _externalCallbackInstances.begin();
+         instance_iterator != _externalCallbackInstances.end();
+         instance_iterator++)
+    {
+        if (instance_iterator->second != NULL) {
+            instance_iterator->second->setReachable();
+        }
+    }
+
     // Mark resources reachable by queued action code
     for (size_t lvl = 0; lvl < PRIORITY_SIZE; ++lvl)
     {
@@ -1839,10 +1859,6 @@ movie_root::addExternalCallback(const std::string& name, as_object* callback,
     _externalCallbackInstances.insert(
         std::pair<std::string, as_object*>(name,instance)
     );
-
-    // Set callback and instance as reachable (avoid garbage collection)
-    if (callback!=NULL) callback->setReachable();
-    if (instance!=NULL) instance->setReachable();
 
     // When an external callback is added, we have to notify the plugin
     // that this method is available.
