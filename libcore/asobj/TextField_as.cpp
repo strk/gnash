@@ -591,9 +591,6 @@ textfield_getDepth(const fn_call& fn)
 as_value
 textfield_getFontList(const fn_call& fn)
 {
-    TextField* text = ensure<IsDisplayObject<TextField> >(fn);
-    UNUSED(text);
-
     LOG_ONCE(log_unimpl(_("TextField.getFontList()")));
 
     return as_value();
