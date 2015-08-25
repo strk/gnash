@@ -113,8 +113,16 @@ xcheck( !TextField.prototype.hasOwnProperty('wordWrap') );
 
 // this is a static method
 check_equals(typeof(TextField.getFontList), 'function');
-
 check_equals(typeof(TextField.prototype.getFontList), 'undefined');
+
+tfGetFontList = TextField.getFontList;
+tfGetFontListObj = new Object();
+tfGetFontListObj.f = tfGetFontList;
+check_equals(TextField.getFontList() instanceof Array, true);
+check_equals(tfGetFontList() instanceof Array, true);
+check_equals(tfGetFontListObj.f() instanceof Array, true);
+check_equals(tfGetFontList.call(null) instanceof Array, true);
+check_equals(tfGetFontList.call(undefined) instanceof Array, true);
 
 check(TextField.prototype.hasOwnProperty('replaceText'));
 #if OUTPUT_VERSION > 6
@@ -1299,11 +1307,11 @@ o = new CTF();
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
-     check_totals(526);
+     check_totals(531);
 #elif OUTPUT_VERSION == 7
- check_totals(550);
+ check_totals(555);
 #elif OUTPUT_VERSION == 8
- check_totals(551);
+ check_totals(556);
 #endif
 
 #endif

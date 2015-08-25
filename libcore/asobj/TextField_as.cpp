@@ -593,7 +593,10 @@ textfield_getFontList(const fn_call& fn)
 {
     LOG_ONCE(log_unimpl(_("TextField.getFontList()")));
 
-    return as_value();
+    Global_as& gl = getGlobal(fn);
+    as_object* fontlist = gl.createArray();
+
+    return as_value(fontlist);
 }
 
 as_value
