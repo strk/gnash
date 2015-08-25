@@ -4,6 +4,7 @@
     <style type="text/css" media="screen">
         body, * {font-family:sans-serif;}
         h1 {text-align:center;}
+        #extiface_test{background-color:red;}
         #content {}
         #test-actions {
             list-style-type: none;
@@ -41,25 +42,29 @@
    web page. But for now, this gives us a resident player that we
    can bounce XML messages off of.
 
-   To make this work for you, copy testsuite/Dejagnu.swf and
-   testsuite/actionsctiona.all/EsternalInterfce-v8.swf from your build
-   tree to your source tree in plugin/npapi/. You can then attach GDB
+   To make this work for you, copy or symlink testsuite/Dejagnu.swf and
+   testsuite/actionscript.all/ExternalInterface-v8.swf from your build
+   tree to your source tree in plugin/npapi/ and add the absolute
+   path of this dir to your 'localSandboxPath' variable in
+   ~/.gnashpluginrc (for example:
+   "append localSandboxPath /usr/src/gnash/b/plugin/npapi).
+
+   You can then attach GDB
    to the PID of gnash running, letting you debug the processing of
    XML messages to and from the browser. For this to work the swf
    files must be in the same directory as the html file.
    
-<param name="allowScriptAccess" value="sameDomain" />
 -->
 <div>
-<object>
-<param name="movie" value="ExternalInterface-v8.swf"
-<param name="allowScriptAccess" value="always" />
-<embed
-src="ExternalInterface-v8.swf"
-quality="high" wmode="transparent" width="640" height="100"
-   type="application/x-shockwave-flash"
-   pluginspage="http://www.getgnash.org">
-</embed>
+<object id="extiface_test" data="ExternalInterface-v8.swf"
+width="100" height="20" BORDER="1"
+type="application/x-shockwave-flash"
+pluginspage="http://www.getgnash.org"
+>
+<param name="movie" value="ExternalInterface-v8.swf">
+<param name="AllowScriptAccess" value="always">
+</object>
+
 </div>
 
 <!--
@@ -90,7 +95,7 @@ quality="high" wmode="transparent" width="640" height="100"
 
       <script type="text/javascript">
           var val = 0; // used for setVariable
-          var embed = document.embeds[0];
+          var embed = document.getElementById("extiface_test");
           function clearLog() {
               var log = document.getElementById("log");
               log.innerHTML = '<h2>Log <a href="#" onclick="clearLog(); return false;">Clear</a></h2>';
