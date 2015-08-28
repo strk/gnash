@@ -2346,10 +2346,11 @@ ActionVar(ActionExec& thread)
         declareLocal(vm.currentCall(), name);
     }
     else {
-       IF_VERBOSE_ASCODING_ERRORS(
-           log_aserror(_("The 'var whatever' syntax in timeline context is a "
-                   "no-op."));
-       );
+        // See https://savannah.gnu.org/patch/?8721
+        as_object* this_ptr = thread.getThisPointer();
+        if (!hasOwnProperty(*this_ptr, name)) {
+            this_ptr->set_member(name, as_value());
+        }
     }
     env.drop(1);
 }

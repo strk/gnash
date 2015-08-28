@@ -100,6 +100,8 @@ asm {
 	getvariable
         setvariable
 };
+// WARNING: this fails in all versions from 5 to 8 with LNX 11,2,202,310
+//          it results undefined instead
 check_equals(checkpoint, 5.4);
 
 //---------------------------------------------------------------------
@@ -683,6 +685,13 @@ asm {
 };
 check_equals(checkpoint, 4);
 
+// Check declaration (hasOwnProperty only exists since SWF6)
+// See https://savannah.gnu.org/bugs/?45840
+#if OUTPUT_VERSION > 5
+var undefined_timeline_declared;
+check(this.hasOwnProperty('undefined_timeline_declared'));
+#endif
+
 //-----------------------------------------------------------------------
 // TODO: try use of 'with' stack
 //-----------------------------------------------------------------------
@@ -690,7 +699,7 @@ check_equals(checkpoint, 4);
 #if OUTPUT_VERSION < 6
  check_totals(52); // gnash runs +2 tests ?!
 #else
- check_totals(57); // gnash runs +2 tests ?!
+ check_totals(58); // gnash runs +2 tests ?!
 #endif
 
 #else // ndef MING_SUPPORT_ASM
