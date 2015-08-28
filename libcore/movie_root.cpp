@@ -1598,9 +1598,15 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         VM &vm = getVM();
         std::string var = invoke->args[0].to_string();
         as_value val;
-        obj->get_member(getURI(vm, var), &val);
-        // GetVariable sends the value of the variable
-        ss << ExternalInterface::toXML(val);
+        if (obj->get_member(getURI(vm, var), &val)) {
+            // If the variable exists, GetVariable returns a string
+            // representation of its value. Variable with undefined
+            // or null value counts as exist too.
+            ss << ExternalInterface::toXML(val.to_string());
+        } else {
+            // If the variable does not exist, GetVariable sends null value
+            ss << ExternalInterface::toXML(as_value((as_object*)NULL));
+        }
     } else if (invoke->name == "GotoFrame") {
         log_unimpl(_("ExternalInterface::GotoFrame()"));
         // GotoFrame doesn't send a response
