@@ -113,7 +113,7 @@ WAVWriter::write_wave_header(std::ofstream& outfile)
     
   wav.pcm_header_len = 16;
   wav.wFormatTag = 1;
-  wav.rLen = sizeof(WAV_HDR) + sizeof(CHUNK_HDR);
+  wav.rLen = sizeof(WAV_HDR) - 8 + sizeof(CHUNK_HDR);
   wav.nBlockAlign = 2 * wav.nBitsPerSample / 8;
 
   // setup chunk header
