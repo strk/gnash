@@ -64,6 +64,9 @@ private:
     ///
     std::ofstream file_stream;
 
+    /// Current audio data size
+    uint32_t data_size;
+
     // write a .WAV file header
     void write_wave_header(std::ofstream& outfile);
 

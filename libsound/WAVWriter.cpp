@@ -66,6 +66,7 @@ WAVWriter::WAVWriter(const std::string& wavefile)
             throw SoundException(fmt.str());
         } 
         else {
+            data_size = 0;
             write_wave_header(file_stream);
             std::cout << "# Created 44100 16Mhz stereo wave file:\n" <<
                     "AUDIOFILE=" << wavefile << std::endl;
@@ -75,7 +76,19 @@ WAVWriter::WAVWriter(const std::string& wavefile)
 /* public */
 WAVWriter::~WAVWriter()
 {
-    if (file_stream) file_stream.close();
+    if (file_stream) {
+        // attempt to flush metadata
+        file_stream.seekp(0);
+        if (file_stream.fail()) {
+            log_error("WAVWriter: Failed to flush audio dump metadata, resulting file would be incomplete");
+        }
+        else {
+            write_wave_header(file_stream);
+        }
+
+        // close the stream
+        file_stream.close();
+    }
 }
 
 /* public */
@@ -86,7 +99,7 @@ WAVWriter::pushSamples(std::int16_t* from, unsigned int nSamples)
         std::uint8_t* stream = reinterpret_cast<std::uint8_t*>(from);
         unsigned int len = nSamples*2;
         file_stream.write((char*) stream, len);
-
+        data_size += len;
 }
 
 /* private */
@@ -104,22 +117,23 @@ WAVWriter::write_wave_header(std::ofstream& outfile)
   std::memcpy(wav.wID, "WAVE", 4);
   std::memcpy(wav.fId, "fmt ", 4);
  
+  wav.wFormatTag = 1;
   wav.nBitsPerSample = 16;
   wav.nSamplesPerSec = 44100;
   wav.nAvgBytesPerSec = 44100;
   wav.nAvgBytesPerSec *= wav.nBitsPerSample / 8;
   wav.nAvgBytesPerSec *= 2;
   wav.nChannels = 2;
-    
-  wav.pcm_header_len = 16;
-  wav.wFormatTag = 1;
-  wav.rLen = sizeof(WAV_HDR) - 8 + sizeof(CHUNK_HDR);
   wav.nBlockAlign = 2 * wav.nBitsPerSample / 8;
 
-  // setup chunk header
+  // setup data chunk header
   std::memcpy(chk.dId, "data", 4);
-  chk.dLen = 0;
+  chk.dLen = data_size;
  
+  // setup wav header's size field
+  wav.pcm_header_len = 16;
+  wav.rLen = sizeof(WAV_HDR) - 8 + sizeof(CHUNK_HDR) + chk.dLen;
+
   /* write riff/wav header */
   outfile.write((char *)&wav, sizeof(WAV_HDR));
  
