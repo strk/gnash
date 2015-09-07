@@ -1773,22 +1773,14 @@ movie_root::markReachableResources() const
     _movieLoader.setReachable();
 
     // Mark ExternalInterface callbacks and instances as reachable
-    for (std::map<std::string, as_object*>::const_iterator method_iterator
-             = _externalCallbackMethods.begin();
-         method_iterator != _externalCallbackMethods.end();
-         method_iterator++)
-    {
-        if (method_iterator->second != NULL) {
-            method_iterator->second->setReachable();
+    for (const auto& method : _externalCallbackMethods) {
+        if (method.second) {
+            method.second->setReachable();
         }
     }
-    for (std::map<std::string, as_object*>::const_iterator instance_iterator
-             = _externalCallbackInstances.begin();
-         instance_iterator != _externalCallbackInstances.end();
-         instance_iterator++)
-    {
-        if (instance_iterator->second != NULL) {
-            instance_iterator->second->setReachable();
+    for (const auto& instance : _externalCallbackInstances) {
+        if (instance.second) {
+            instance.second->setReachable();
         }
     }
 
