@@ -66,7 +66,7 @@ private:
 
 // This is an InputDevice class to cover the various touchscreens, Mice, or
 // keyboards supported.
-class InputDevice
+class DSOEXPORT InputDevice
 {
 public:
     typedef struct {

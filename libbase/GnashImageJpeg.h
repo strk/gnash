@@ -46,7 +46,7 @@ namespace image {
 /// Class for reading JPEG image data. 
 //
 /// This uses the IJG jpeglib to implement the Input interface.
-class JpegInput : public Input
+class DSOEXPORT JpegInput : public Input
 {
 
 private:

@@ -158,7 +158,7 @@ private:
 /// Functions (as_function), Super objects (as_super) and AS3 Class types
 /// (as_class) have a static type, that is, they are not convertible to each
 /// other once created.
-class as_object : public GcResource, boost::noncopyable
+class DSOEXPORT as_object : public GcResource, boost::noncopyable
 {
 
 public:

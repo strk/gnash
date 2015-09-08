@@ -435,7 +435,7 @@ public:
 ///
 /// Input is received from a IOChannel object.
 ///
-class MediaParser
+class DSOEXPORT MediaParser
 {
 public:
 

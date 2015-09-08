@@ -44,7 +44,7 @@ namespace SWF {
 //
 /// TODO: rename this class so it's not the same as the SWF spec. It doesn't
 /// exactly correspond to the DefinitionTag defined there.
-class DefinitionTag : public ControlTag
+class DSOEXPORT DefinitionTag : public ControlTag
 {
 public:
 
