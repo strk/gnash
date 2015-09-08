@@ -77,7 +77,8 @@ WAVWriter::WAVWriter(const std::string& wavefile)
 WAVWriter::~WAVWriter()
 {
     if (file_stream) {
-        // attempt to flush metadata
+        // Seeking back to the beginning, in order to rewrite the header with
+        // information accumulated during writing.
         file_stream.seekp(0);
         if (file_stream.fail()) {
             log_error("WAVWriter: Failed to flush audio dump metadata, resulting file would be incomplete");
