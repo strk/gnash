@@ -68,8 +68,8 @@ WAVWriter::WAVWriter(const std::string& wavefile)
         else {
             data_size = 0;
             write_wave_header(file_stream);
-            std::cout << "# Created 44100 16Mhz stereo wave file:\n" <<
-                    "AUDIOFILE=" << wavefile << std::endl;
+            log_debug("Created 44100 Hz 16-bit stereo wave file: %s",
+                      wavefile);
         }
 }
 
