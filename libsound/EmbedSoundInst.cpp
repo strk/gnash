@@ -96,7 +96,7 @@ EmbedSoundInst::decodeNextBlock()
     // to decode not to bother further streamlining it
     // See https://savannah.gnu.org/bugs/?25456 for a testcase
     // showing the benefit of chunked decoding.
-    const std::uint32_t chunkSize = 65535;
+    const std::uint32_t chunkSize = 65536;
 
     std::uint32_t inputSize = _soundDef.size() - decodingPosition;
     if ( inputSize > chunkSize ) inputSize = chunkSize;
