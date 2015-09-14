@@ -390,7 +390,7 @@ AudioDecoderSimple::decode(const std::uint8_t* input, std::uint32_t inputSize,
 			// Convert 8-bit signed to 16-bit range
 			// Allocate as many shorts as there are samples
 			u8_expand(decodedData, input, inputSize);
-			outsize = inputSize * (_stereo ? 4 : 2);
+			outsize = inputSize * 2;
 		}
 		break;
 	case AUDIO_CODEC_UNCOMPRESSED:
