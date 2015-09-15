@@ -143,7 +143,7 @@
 	  </row>
 	  <row>
 	    <entry>
-	      <option>-A</option> <replaceable>&lt;file&gt;</replaceable>
+	      <option>-A, --audio-dump</option> <replaceable>&lt;file&gt;</replaceable>
 	    </entry>
 	    <entry>
               Write the audio output to a wave format file.

@@ -125,6 +125,7 @@ gnash [option]... [URL]
 
   <varlistentry>
     <term>-A file</term>
+    <term>--audio-dump file</term>
     <listitem>
       <para>
         Audio dump file (wave format).
