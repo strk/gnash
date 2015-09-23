@@ -283,8 +283,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
                 break;
 
             case AV_CODEC_ID_PCM_U8:
-                // Either FFMPEG or the parser are getting this wrong.
-                _audioCodecCtx->sample_rate = info.sampleRate / 2;
+                _audioCodecCtx->sample_rate = info.sampleRate;
                 _audioCodecCtx->channels = (info.stereo ? 2 : 1);
                 break;
             case AV_CODEC_ID_PCM_S16LE:
