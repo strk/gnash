@@ -181,9 +181,17 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
             case AUDIO_CODEC_UNCOMPRESSED:
             case AUDIO_CODEC_RAW:
                 if (info.sampleSize == 2) {
+                    // Flash's 16-bit UNCOMPRESSED and RAW audio comes as
+                    // a signed PCM format. UNCOMPRESSED audio always use
+                    // little-endian byte order. RAW audio uses encoder's
+                    // native byte order; as majority of encoders run
+                    // on little-endian machine, we use little-endian for it.
                     codec_id = AV_CODEC_ID_PCM_S16LE;
                 } else {
-                    codec_id = AV_CODEC_ID_PCM_S8;
+                    // Flash's 8-bit UNCOMPRESSED and RAW audio comes as an
+                    // unsigned PCM format. No difference between
+                    // UNCOMPRESSED and RAW.
+                    codec_id = AV_CODEC_ID_PCM_U8;
                 }
                 break;
 
@@ -274,7 +282,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
             case AV_CODEC_ID_MP3:
                 break;
 
-            case AV_CODEC_ID_PCM_S8:
+            case AV_CODEC_ID_PCM_U8:
                 // Either FFMPEG or the parser are getting this wrong.
                 _audioCodecCtx->sample_rate = info.sampleRate / 2;
                 _audioCodecCtx->channels = (info.stereo ? 2 : 1);
