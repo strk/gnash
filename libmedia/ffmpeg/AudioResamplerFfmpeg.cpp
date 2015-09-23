@@ -61,7 +61,7 @@ AudioResamplerFfmpeg::init(AVCodecContext* ctx) {
 #else
             _context = av_audio_resample_init(2, ctx->channels,
                 44100, ctx->sample_rate,
-                AV_SAMPLE_FMT_S16, AV_SAMPLE_FMT_S16,
+                AV_SAMPLE_FMT_S16, ctx->sample_fmt,
                 16, 10, 0, 0.8);
 #endif
 #if defined(HAVE_SWRESAMPLE_H) || defined(HAVE_AVRESAMPLE_H)
