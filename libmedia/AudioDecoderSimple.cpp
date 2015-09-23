@@ -387,7 +387,7 @@ AudioDecoderSimple::decode(const std::uint8_t* input, std::uint32_t inputSize,
 			memcpy(decodedData, input, inputSize);
 			outsize = inputSize;
 		} else {
-			// Convert 8-bit signed to 16-bit range
+			// Convert 8-bit unsigned to 16-bit signed range
 			// Allocate as many shorts as there are samples
 			u8_expand(decodedData, input, inputSize);
 			outsize = inputSize * 2;
@@ -398,7 +398,7 @@ AudioDecoderSimple::decode(const std::uint8_t* input, std::uint32_t inputSize,
 		// Convert to 16-bit host-endian.
 		if (!_is16bit)
 		{
-			// Convert 8-bit signed to 16-bit range
+			// Convert 8-bit unsigned to 16-bit signed range
 			// Allocate as many shorts as there are 8-bit samples
 			u8_expand(decodedData, input, inputSize);
 			outsize = inputSize * 2;
