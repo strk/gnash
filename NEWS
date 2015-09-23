@@ -12,7 +12,7 @@ Caveats:
 
 Improvements since 0.8.10 release are:
 
- * Fix loud screech after playing PCM audio with GST backend (#45722)
+ * Fix screeches and crashes playing PCM audio (#45722)
  * Fix corrupted WAV file on --audio-dump (#45887)
  * Fix callback registration issue in ExternalInterface (#37223)
  * Fix possible out-of-bound read in parser (#43865)
