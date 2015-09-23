@@ -240,7 +240,10 @@ Player::init_logfile()
 
     dbglogfile.setLogFilename(rcfile.getDebugLog());
 
-    if (rcfile.verbosityLevel() > 0) {
+    // If logging verbosity was already assigned (from command line) to a
+    // non-zero level, leave it intact. Otherwise, use verbosity level from
+    // configuration file (or default one).
+    if (dbglogfile.getVerbosity() == 0) {
         dbglogfile.setVerbosity(rcfile.verbosityLevel());
     }
     
