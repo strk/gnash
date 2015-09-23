@@ -544,13 +544,26 @@ AudioDecoderFfmpeg::decodeFrame(const std::uint8_t* input,
 
         // Compute new size based on frame_size and
         // resampling configuration
-        double resampleFactor = (44100.0/_audioCodecCtx->sample_rate) * (2.0/_audioCodecCtx->channels);
-        bool stereo = _audioCodecCtx->channels > 1 ? true : false;
-        int inSamples = stereo ? outSize >> 2 : outSize >> 1;
 
+        // Find out the needed sample rate scaling
+        double resampleFactor = 44100.0/_audioCodecCtx->sample_rate;
+
+        // Compute total number of input samples
+        int inSamples = outSize;
+        bool stereo = _audioCodecCtx->channels > 1 ? true : false;
+
+        if (stereo) inSamples = inSamples >> 1;
+        if (_audioCodecCtx->sample_fmt == AV_SAMPLE_FMT_S16 ||
+            _audioCodecCtx->sample_fmt == AV_SAMPLE_FMT_S16P) {
+            inSamples = inSamples >> 1;
+        }
+
+        // Compute total number of output samples
         int expectedMaxOutSamples = std::ceil(inSamples*resampleFactor);
 
-        // *channels *sampleSize 
+        // Compute output buffer size (in bytes); by multiplying
+        // output samples count with output sample format's frame size,
+        // which is number of bytes per sample (2) times channels (2).
         int resampledFrameSize = expectedMaxOutSamples*2*2;
 
         // Allocate just the required amount of bytes
