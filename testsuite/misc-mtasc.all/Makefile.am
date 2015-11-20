@@ -34,8 +34,12 @@ SANE_ASTESTS = \
 # These ones are the ones for which consistency check fail 
 BOGUS_ASTESTS = \
 	$(NULL)
+# This one is host container communication (ExternalInterface) test
+EXTCOMM_ASTESTS = \
+	extcomm.as \
+	$(NULL)
 
-ASTESTS = $(SANE_ASTESTS) $(BOGUS_ASTESTS)
+ASTESTS = $(SANE_ASTESTS) $(BOGUS_ASTESTS) $(EXTCOMM_ASTESTS)
 
 
 # These will get compiled to SWFs just as above, but will not be executed as a test
@@ -49,11 +53,13 @@ AUXMOVIES = \
 EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as Dejagnu.as check.as Derived1.as Base1.as  implementsOp/BExtendingImplementation.as  implementsOp/ImplementationA.as  implementsOp/ImplementationB.as implementsOp/SimpleInterface.as
 
 MTASC_FLAGS = -version 6 -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
+MTASCV8_FLAGS = -version 8 -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
 MTASC_CPP = $(CPP) -x c -P -I$(srcdir)
 
 SANE_ASTESTS_OUT = $(SANE_ASTESTS:.as=.swf)
 BOGUS_ASTESTS_OUT = $(BOGUS_ASTESTS:.as=.swf)
-ASTESTS_OUT = $(SANE_ASTESTS_OUT) $(BOGUS_ASTESTS_OUT)
+EXTCOMM_ASTESTS_OUT = $(EXTCOMM_ASTESTS:.as=.swf)
+ASTESTS_OUT = $(SANE_ASTESTS_OUT) $(BOGUS_ASTESTS_OUT) $(EXTCOMM_ASTESTS_OUT)
 
 AUXMOVIES_OUT = $(AUXMOVIES:.as=.swf)
 
@@ -64,6 +70,7 @@ TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	sanetests-runner \
 	bogustests-runner \
+	extcommtests-runner \
 	$(NULL)
 
 sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_ASTESTS_OUT) $(AUXMOVIES_OUT) Makefile
@@ -73,6 +80,14 @@ sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_ASTESTS_OUT) $(AUXMO
 bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGUS_ASTESTS_OUT) $(AUXMOVIES_OUT) Makefile
 	sh $(srcdir)/../generic-testrunner.sh -C __END_OF_TEST__ -r 50 $(top_builddir) $(BOGUS_ASTESTS_OUT) > $@
 	chmod 755 $@
+
+extcommtests-runner: $(srcdir)/extcommtests-runner.sh $(EXTCOMM_ASTESTS_OUT) Makefile
+	sh $(srcdir)/extcommtests-runner.sh $(top_builddir) $(top_srcdir) $(EXTCOMM_ASTESTS_OUT) > $@
+	chmod 755 $@
+
+extcomm.swf: extcomm.as
+	$(MTASC_CPP) $< > $(@:%.swf=pp_%.as)
+	$(MTASC) $(MTASCV8_FLAGS) -swf $@ -main $(@:%.swf=pp_%.as)
 
 .as.swf: 
 	$(MTASC_CPP) $< > $(@:%.swf=pp_%.as) 
