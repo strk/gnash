@@ -307,7 +307,7 @@ sound_handler::unplugInputStream(InputStream* id)
     // WARNING: erasing would break any iteration in the set
     InputStreams::iterator it2=_inputStreams.find(id);
     if (it2 == _inputStreams.end()) {
-        log_error(_("SDL_sound_handler::unplugInputStream: "
+        log_error(_("sound_handler::unplugInputStream: "
                     "Aux streamer %p not found. "),
                 id);
         return; // we won't delete it, as it's likely deleted already
