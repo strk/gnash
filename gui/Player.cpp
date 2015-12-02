@@ -275,6 +275,8 @@ void
 Player::init_sound()
 {
 
+#ifndef GUI_DUMP
+    // Dump gui will initialize the sound handler itself
     if (_doSound) {
         try {
 #ifdef SOUND_SDL
@@ -296,6 +298,7 @@ Player::init_sound()
                 " Will continue without sound."), ex.what());
         }
     }
+#endif // ndef GUI_DUMP
 }
 
 void
