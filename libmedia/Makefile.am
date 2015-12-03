@@ -14,7 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AUTOMAKE_OPTIONS = foreign subdir-objects
+AUTOMAKE_OPTIONS = foreign
 
 AM_CXXFLAGS = $(CROSS_CXXFLAGS) -DREGISTER_MEDIA_HANDLERS
 AM_LDFLAGS = $(CROSS_LDFLAGS)
