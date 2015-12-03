@@ -25,7 +25,6 @@ Improvements since 0.8.10 release are:
  * Add support for IPv6 [TODO: affects Socket/XML, and what else?].
  * Fix build against recent Boost, FFMPEG and libav.
  * Fix support for GIFLIB-5.0 (#39482) and GIFLIB-5.1 (#42574)
- * Fix regression in dynamic sound loading (#33760).
  * Fix infinite loop in GC mark phase for XML object (#40440)
  * Fix segfault on exit when using XML (#40439)
  * Incremental decoding of embedded sounds (#24638, #25456)
@@ -33,7 +32,7 @@ Improvements since 0.8.10 release are:
  * Add support for RTMP streaming (patch #8086).
  * Portability fixes for Debian GNU/kOpenSolaris and ARM.
  * TextFormat.getTextExtent has been much improved.
- * Fix playback of some dynamic sounds (#33760).
+ * Fix regression in dynamic sound loading (#33760).
 
 Gnash 0.8.10
 2012/02/04
