@@ -21,7 +21,7 @@
 # haiku-gnash and dump-gnash
 #
 
-AUTOMAKE_OPTIONS = -Wno-portability
+AUTOMAKE_OPTIONS = -Wno-portability subdir-objects
 
 SUBDIRS = .
 

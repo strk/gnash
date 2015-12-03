@@ -19,7 +19,7 @@
 
 ## Process this file with automake to generate Makefile.in
 
-AUTOMAKE_OPTIONS =
+AUTOMAKE_OPTIONS = subdir-objects
 
 # this is where Gnash plugins get installed
 pluginsdir = $(libdir)/gnash/plugins
