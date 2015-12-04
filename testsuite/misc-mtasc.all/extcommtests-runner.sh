@@ -140,7 +140,7 @@ check_error \$? "Failed to open a named pipe: \$PIPE2CONTAINER"
 
 # Open host-to-player pipe
 exec 4<> "\$PIPE2PLAYER"
-check_error \$? "Failed to open a named pipe: \$PIPE2CONTAINER"
+check_error \$? "Failed to open a named pipe: \$PIPE2PLAYER"
 
 # Start player
 "${top_builddir}/gui/gnash" -r 0 -t ${timeout} -vv -F 3:4 "${swf}" > "\$LOGFILE" 2>&1 &
