@@ -148,7 +148,7 @@ EmbedSoundInst::decodeNextBlock()
 
 
     // decodedData ownership transferred here
-    appendDecodedData(SimpleBuffer(decodedDataSize, decodedData));
+    appendDecodedData(decodedData, decodedDataSize);
 }
 
 void

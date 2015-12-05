@@ -99,7 +99,7 @@ StreamingSound::decodeNextBlock()
         }
 
         // decodedData ownership transferred here
-        appendDecodedData(SimpleBuffer(decodedDataSize, decodedData));
+        appendDecodedData(decodedData, decodedDataSize);
     }
 
     // Check if the entire block was consumed.

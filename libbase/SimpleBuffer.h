@@ -57,17 +57,6 @@ public:
 		}
 	}
 
-        /// Construct a SimpleBuffer by taking ownership of an existing buffer.
-        //
-        /// @param size the size of the buffer.
-        /// @param buffer a pointer a a new[]-allocated buffer.
-        SimpleBuffer(size_t size, std::uint8_t* buffer)
-            : _size(size),
-              _capacity(size),
-              _data(buffer)
-        {
-        }
-
         /// Move constructor.
         SimpleBuffer(SimpleBuffer&&) = default;
 

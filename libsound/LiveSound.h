@@ -23,7 +23,6 @@
 #include <memory>
 #include <cassert>
 #include <cstdint> // For C99 int types
-#include <iostream>
 
 #include "InputStream.h" 
 #include "AudioDecoder.h" 
@@ -39,121 +38,6 @@ namespace gnash {
 
 namespace gnash {
 namespace sound {
-
-
-/// Maintains a collection of SimpleBuffers, providing stateful sequential
-/// read access to the data contained therein.
-//
-// TODO: this shares some functionality with CursoredBuffer, and the two
-// classes might be merged.
-class Buffers {
-public:
-    Buffers(size_t in_point)
-    : _buffers(),
-      _index(0),
-      _pos(0),
-      _consumed(0),
-      _in_point(in_point)
-    {}
-
-    Buffers(const Buffers&) = delete;
-    Buffers& operator=(const Buffers&) = delete;
-
-    /// Append a buffer of data to be read by the consumer later.
-    void append(SimpleBuffer buf) {
-        _buffers.push_back(std::move(buf));
-        consumeInPoint();
-    }
-
-    void restart()
-    {
-        _index = 0;
-        _consumed = 0;
-        consumeInPoint();
-    }
-
-    /// Copy up to the given number of bytes to the given buffer.
-    //
-    /// @to points to a buffer to be written to.
-    /// @bytes number of bytes to be written.
-    /// @return number of bytes actually written.
-    size_t copy(std::uint8_t* to, size_t bytes) {
-        assert(_consumed >= _in_point);
-
-        size_t bytes_remaining = bytes;
-
-        for (; _index < _buffers.size(); ++_index) {
-            const SimpleBuffer& buffer = _buffers[_index];
-
-            size_t to_copy = std::min(bytes_remaining, buffer.size() - _pos);
-
-            std::copy(buffer.data() + _pos, buffer.data() + _pos + to_copy, to);
-            to += to_copy;
-            bytes_remaining -= to_copy;
-            _pos += to_copy;
-
-            if (_pos == buffer.size()) {
-                ++_index;
-                _pos = 0;
-                break;
-            }
-
-            if (bytes_remaining == 0) {
-                break;
-            }
-        }
-
-        size_t written = bytes - bytes_remaining;
-        _consumed += written;
-        return written;
-    }
-
-    /// @return total number of bytes contained.
-    std::uint64_t countBytes() const
-    {
-        std::uint64_t bytes = 0;
-        for (const SimpleBuffer& buffer : _buffers) {
-            bytes += buffer.size();
-        }
-        return bytes;
-    }
-
-    /// @return number of bytes previously copied by calls to copy().
-    std::uint64_t consumed() const
-    {
-        return std::max<uint64_t>(_consumed, _in_point);
-    }
-
-private:
-    void consumeInPoint() {
-        if (_consumed >= _in_point) {
-            return;
-        }
-        size_t inPoint = _in_point;
-
-        for (const SimpleBuffer& buffer : _buffers) {
-            size_t advance = std::min(inPoint, buffer.size());
-            if (advance == buffer.size()) {
-                ++_index;
-                inPoint -= advance;
-            } else {
-                _pos = advance;
-                break;
-            }
-        }
-        _consumed = _in_point;
-    }
-
-    std::vector<SimpleBuffer> _buffers;
-    /// Zero-based index of the buffer currently being indicated.
-    size_t _index;
-    /// Current position inside the current buffer.
-    size_t _pos;
-    /// Total bytes consumed by calls to copy().
-    std::uint64_t _consumed;
-    /// Number of bytes to skip from the input.
-    size_t _in_point;
-};
 
 /// Instance of a defined %sound (LiveSoundData)
 //
@@ -173,6 +57,13 @@ protected:
     LiveSound(media::MediaHandler& mh, const media::SoundInfo& info,
             size_t inPoint);
 
+    // Pointer handling and checking functions
+    const std::int16_t* getDecodedData(unsigned long int pos) const {
+        assert(pos < _decodedData.size());
+        return reinterpret_cast<const std::int16_t*>(
+                _decodedData.data() + pos);
+    }
+
     /// Called when more decoded sound data is required.
     //
     /// This will be called whenever no more decoded data is available
@@ -186,8 +77,8 @@ protected:
 
     /// Start from the beginning again.
     void restart() {
+        _playbackPosition = _inPoint;
         _samplesFetched = 0;
-        _decodedBuffers.restart();
     }
 
     /// How many samples have been fetched since the beginning
@@ -197,27 +88,28 @@ protected:
         return _samplesFetched;
     }
 
-    std::uint64_t playbackPosition() const {
-        return _decodedBuffers.consumed();
+    size_t playbackPosition() const {
+        return _playbackPosition;
     }
 
     media::AudioDecoder& decoder() const {
         return *_decoder;
     }
 
-    void appendDecodedData(SimpleBuffer data) {
-        _decodedBuffers.append(std::move(data));
+    void appendDecodedData(std::uint8_t* data, unsigned int size) {
+        _decodedData.append(data, size);
+        delete [] data;
     }
 
     /// Return number of already-decoded samples available
     /// from playback position on
     unsigned int decodedSamplesAhead() const {
 
-        const unsigned int dds = _decodedBuffers.countBytes();
-        if (dds <= playbackPosition()) return 0;
+        const unsigned int dds = _decodedData.size();
+        if (dds <= _playbackPosition) return 0; 
 
-        size_t bytesAhead = dds - playbackPosition();
-        bytesAhead = checkEarlierEnd(bytesAhead, playbackPosition());
+        size_t bytesAhead = dds - _playbackPosition;
+        bytesAhead = checkEarlierEnd(bytesAhead, _playbackPosition);
 
         assert(!(bytesAhead % 2));
 
@@ -243,13 +135,18 @@ private:
 
     virtual bool decodingCompleted() const = 0;
 
+    const size_t _inPoint;
+
+    /// Current playback position in the decoded stream
+    size_t _playbackPosition;
+
     /// Number of samples fetched so far.
     unsigned long _samplesFetched;
 
     std::unique_ptr<media::AudioDecoder> _decoder;
 
-    /// The decoded buffers
-    Buffers _decodedBuffers;
+    /// The decoded buffer
+    SimpleBuffer _decodedData;
 
 };
 
