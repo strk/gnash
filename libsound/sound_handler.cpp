@@ -263,7 +263,7 @@ sound_handler::stopEmbedSoundInstances(StreamingSoundData& def)
     for (InputStream* stream : playing)
     {
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-        log_debug(" unplugging input stream %p from stopEmbedSoundInstances", *i);
+        log_debug(" unplugging input stream %p from stopEmbedSoundInstances", stream);
 #endif
 
         // Explicitly calling the base class implementation
@@ -289,7 +289,7 @@ sound_handler::stopEmbedSoundInstances(EmbedSound& def)
     for (InputStream* stream : playing)
     {
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-        log_debug(" unplugging input stream %p from stopEmbedSoundInstances", *i);
+        log_debug(" unplugging input stream %p from stopEmbedSoundInstances", stream);
 #endif
 
         // Explicitly calling the base class implementation
