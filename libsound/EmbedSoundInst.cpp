@@ -32,7 +32,8 @@
 // Debug sound decoding
 //#define GNASH_DEBUG_SOUNDS_DECODING
 
-//#define GNASH_DEBUG_SOUNDS_MANAGEMENT
+// Debug sound mixing
+//#define GNASH_DEBUG_MIXING
 
 namespace gnash {
 namespace sound {
@@ -127,7 +128,7 @@ EmbedSoundInst::decodeNextBlock()
 
 #ifdef GNASH_DEBUG_MIXING
     log_debug("  applying volume/envelope to %d bytes (%d samples)"
-            "of decoded data", decodedDataSize, nSamples);
+              " of decoded data", decodedDataSize, nSamples);
 #endif
 
     // Adjust volume
