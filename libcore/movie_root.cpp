@@ -1603,9 +1603,11 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
             // representation of its value. Variable with undefined
             // or null value counts as exist too.
             ss << ExternalInterface::toXML(val.to_string());
+            ss << std::endl;
         } else {
             // If the variable does not exist, GetVariable sends null value
             ss << ExternalInterface::toXML(as_value((as_object*)NULL));
+            ss << std::endl;
         }
     } else if (invoke->name == "GotoFrame") {
         log_unimpl(_("ExternalInterface::GotoFrame()"));
@@ -1614,7 +1616,8 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         const bool result = 
             callInterface<bool>(HostMessage(HostMessage::EXTERNALINTERFACE_ISPLAYING));
         as_value val(result);
-        ss << ExternalInterface::toXML(val);    
+        ss << ExternalInterface::toXML(val);
+        ss << std::endl;
     } else if (invoke->name == "LoadMovie") {
     log_unimpl(_("ExternalInterface::LoadMovie()"));
     // LoadMovie doesn't send a response
@@ -1638,7 +1641,8 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         }
         as_value val(percent);
         // PercentLoaded sends the percentage
-        ss << ExternalInterface::toXML(val);    
+        ss << ExternalInterface::toXML(val);
+        ss << std::endl;
     } else if (invoke->name == "Play") {
         callInterface(HostMessage(HostMessage::EXTERNALINTERFACE_PLAY));
     // Play doesn't send a response
@@ -1667,8 +1671,9 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
     } else if (invoke->name == "TotalFrames") {
         MovieClip *mc = getLevel(0);
         as_value val(mc->get_loaded_frames());
-    // TotalFrames sends the number of frames in the movie
+        // TotalFrames sends the number of frames in the movie
         ss << ExternalInterface::toXML(val);
+        ss << std::endl;
     } else {
         std::string result = callExternalCallback(invoke->name, invoke->args);
         if (result == ExternalInterface::makeString("Error")) {
@@ -1962,8 +1967,13 @@ movie_root::callExternalCallback(const std::string &name,
     // If the browser is connected, we send an Invoke message to the
     // browser.
     if (_hostfd >= 0) {
-        const size_t ret = ExternalInterface::writeBrowser(_hostfd, result);
-        if (ret != result.size()) {
+        std::stringstream ss;
+        size_t ret;
+
+        ss << result;
+        ss << std::endl;
+        ret = ExternalInterface::writeBrowser(_hostfd, ss.str());
+        if (ret != ss.str().size()) {
             log_error(_("Could not write to browser fd #%d: %s"),
                       _hostfd, std::strerror(errno));
         }
