@@ -336,13 +336,32 @@ std::string
 ExternalInterface::readBrowser(int fd)
 {
     std::string empty;
-    // Wait for some data from the player
+    fd_set fdset;
+    struct timeval timeout;
+    int fdstatus;
     int bytes = 0;
 
-    ioctlSocket(fd, FIONREAD, &bytes);
+    // Wait for some data from the player
+    FD_ZERO(&fdset);
+    FD_SET(fd, &fdset);
+    timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+    fdstatus = select(fd + 1, &fdset, nullptr, nullptr, &timeout);
+    if (fdstatus == 0) {
+        // Timed out, return no data
+        log_error("Host container communication timed out\n");
+        return empty;
+    } else if(fdstatus < 0) {
+        // select() failed, return no data
+        log_error("select failed on host container communication: %s",
+                  std::strerror(errno));
+        return empty;
+    }
 
-    // No data yet
+    // Check for the size of available data
+    ioctlSocket(fd, FIONREAD, &bytes);
     if (bytes == 0) {
+        // No more data to read (end of stream, or stream error)
         return empty;
     }
 
