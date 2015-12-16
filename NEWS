@@ -12,7 +12,6 @@ Caveats:
 
 Improvements since 0.8.10 release are:
 
- * Avoid initialization of SDL audio when using dump-gnash
  * Fix screeches and crashes playing PCM audio (#45722)
  * Fix corrupted WAV file on --audio-dump (#45887)
  * Fix callback registration issue in ExternalInterface (#37223)
