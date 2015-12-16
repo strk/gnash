@@ -51,9 +51,7 @@ public:
     {
         if ( _mixer ) _mixer->mix(outSamples, inSamples, nSamples, volume);
         else {
-            // cheating, just copy input to output, which in NO WAY
-            // can be considered "mixing"
-            std::copy(outSamples, outSamples+nSamples, inSamples);
+            sound_handler::mix(outSamples, inSamples, nSamples, volume);
         }
     }
 

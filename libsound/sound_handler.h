@@ -441,7 +441,7 @@ public:
     ///       with number of channels, at each fetching.
     ///
     virtual void mix(std::int16_t* outSamples, std::int16_t* inSamples,
-                unsigned int nSamples, float volume) = 0;
+                unsigned int nSamples, float volume);
 
     /// Request to dump audio to the given filename
     //

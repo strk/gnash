@@ -73,6 +73,46 @@ ensurePadding(SimpleBuffer& data, media::MediaHandler* m)
     }
 }
 
+/* The volume ranges from 0 - 128 */
+#define MIX_MAXVOLUME 128
+#define ADJUST_VOLUME(s, v)	(s = (s*v)/MIX_MAXVOLUME)
+#define ADJUST_VOLUME_U8(s, v)	(s = (((s-128)*v)/MIX_MAXVOLUME)+128)
+
+void 
+mixAudio(std::uint8_t *dst, const std::uint8_t *src, std::uint32_t len, int volume)
+{
+	if ( volume == 0 ) return;
+
+  std::int16_t src1, src2;
+  int dst_sample;
+  const int max_audioval = ((1<<(16-1))-1);
+  const int min_audioval = -(1<<(16-1));
+
+  len /= 2;
+  while ( len-- ) 
+  {
+    src1 = ((src[0])<<8|src[1]);
+    ADJUST_VOLUME(src1, volume);
+    src2 = ((dst[0])<<8|dst[1]);
+    src += 2;
+    dst_sample = src1+src2;
+    if ( dst_sample > max_audioval ) 
+    {
+      dst_sample = max_audioval;
+    } 
+    else
+    if ( dst_sample < min_audioval ) 
+    {
+      dst_sample = min_audioval;
+    }
+    dst[1] = dst_sample & 0xFF;
+    dst_sample >>= 8;
+    dst[0] = dst_sample & 0xFF;
+    dst += 2;
+  }
+	
+}
+
 } // anonymous namespace
 
 sound_handler::StreamBlockId
@@ -759,6 +799,17 @@ sound_handler::~sound_handler()
 {
     delete_all_sounds();
     unplugAllInputStreams();
+}
+
+void
+sound_handler::mix(std::int16_t* outSamples, std::int16_t* inSamples, unsigned int nSamples, float volume)
+{
+  unsigned int nBytes = nSamples*2;
+
+  std::uint8_t *out = reinterpret_cast<std::uint8_t*>(outSamples);
+  std::uint8_t* in = reinterpret_cast<std::uint8_t*>(inSamples);
+
+  mixAudio(out, in, nBytes, static_cast<int>(MIX_MAXVOLUME*volume));
 }
 
 } // gnash.sound namespace 

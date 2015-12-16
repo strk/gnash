@@ -275,6 +275,7 @@ void
 Player::init_sound()
 {
 
+#ifndef GUI_DUMP
     if (_doSound) {
         try {
 #ifdef SOUND_SDL
@@ -296,6 +297,7 @@ Player::init_sound()
                 " Will continue without sound."), ex.what());
         }
     }
+#endif
 }
 
 void
