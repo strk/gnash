@@ -37,12 +37,6 @@
 // Mixing and decoding debugging
 //#define GNASH_DEBUG_MIXING
 
-/* The volume ranges from 0 - 128 */
-#define MIX_MAXVOLUME 128
-#define ADJUST_VOLUME(s, v)    (s = (s*v)/MIX_MAXVOLUME)
-#define ADJUST_VOLUME_U8(s, v)    (s = (((s-128)*v)/MIX_MAXVOLUME)+128)
-
-
 namespace gnash {
 namespace sound {
 
@@ -226,70 +220,6 @@ Mkit_sound_handler::tell(int soundHandle)
 {
     std::lock_guard<std::mutex> lock(_mutex);
     return sound_handler::tell(soundHandle);
-}
-
-void 
-Mkit_sound_handler::MixAudio (std::uint8_t *dst, const std::uint8_t *src, std::uint32_t len, int volume)
-{
-    //std::uint16_t format;
-
-    if ( volume == 0 ) 
-    {
-        return;
-    }
-
-    //format = AHIST_S16S;
-
-    /* Actually we have a fixed audio format */
-    //switch (format) 
-    {
-        //case AHIST_S16S:
-        {
-            std::int16_t src1, src2;
-            int dst_sample;
-            const int max_audioval = ((1<<(16-1))-1);
-            const int min_audioval = -(1<<(16-1));
-
-            len /= 2;
-            while ( len-- ) 
-            {
-                src1 = ((src[0])<<8|src[1]);
-                ADJUST_VOLUME(src1, volume);
-                src2 = ((dst[0])<<8|dst[1]);
-                src += 2;
-                dst_sample = src1+src2;
-                if ( dst_sample > max_audioval ) 
-                {
-                    dst_sample = max_audioval;
-                } 
-                else
-                if ( dst_sample < min_audioval ) 
-                {
-                    dst_sample = min_audioval;
-                }
-                dst[1] = dst_sample & 0xFF;
-                dst_sample >>= 8;
-                dst[0] = dst_sample & 0xFF;
-                dst += 2;
-            }
-        }
-        //break;
-    }
-    
-}
-
-void
-Mkit_sound_handler::mix(std::int16_t* outSamples, std::int16_t* inSamples, unsigned int nSamples, float volume)
-{
-    //if (!_closing)
-    {
-        unsigned int nBytes = nSamples*2;
-
-        std::uint8_t *out = reinterpret_cast<std::uint8_t*>(outSamples);
-        std::uint8_t* in = reinterpret_cast<std::uint8_t*>(inSamples);
-
-        MixAudio(out, in, nBytes, MIX_MAXVOLUME*volume);
-    }
 }
 
 void

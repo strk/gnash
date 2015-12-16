@@ -57,12 +57,6 @@ class Mkit_sound_handler : public sound_handler
     /// Mutex for making sure threads doesn't mess things up
     std::mutex _mutex;
 
-    // See dox in sound_handler.h
-    void mix(std::int16_t* outSamples, std::int16_t* inSamples,
-                unsigned int nSamples, float volume);
-
-    void MixAudio (std::uint8_t *dst, const std::uint8_t *src, std::uint32_t len, int volume);
-
 public:
     Mkit_sound_handler(media::MediaHandler* m);
 

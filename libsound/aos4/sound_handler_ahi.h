@@ -92,8 +92,6 @@ private:
     void mix(std::int16_t* outSamples, std::int16_t* inSamples,
                 unsigned int nSamples, float volume);
 
-	void MixAudio (std::uint8_t *dst, const std::uint8_t *src, std::uint32_t len, int volume);
-
 public:
 
     AOS4_sound_handler(media::MediaHandler* m);
