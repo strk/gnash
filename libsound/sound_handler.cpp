@@ -82,36 +82,30 @@ mixAudio(std::uint8_t *dst, const std::uint8_t *src, std::uint32_t len, int volu
 {
   if ( volume == 0 ) return;
 
-  // Assume AUDIO_S16MSB
-
+  // AUDIO_S16LSB
   std::int16_t src1, src2;
   int dst_sample;
   const int max_audioval = ((1<<(16-1))-1);
   const int min_audioval = -(1<<(16-1));
 
   len /= 2;
-  while ( len-- ) 
-  {
-    src1 = ((src[0])<<8|src[1]);
+  while ( len-- ) {
+    src1 = ((src[1])<<8|src[0]);
     ADJUST_VOLUME(src1, volume);
-    src2 = ((dst[0])<<8|dst[1]);
+    src2 = ((dst[1])<<8|dst[0]);
     src += 2;
     dst_sample = src1+src2;
-    if ( dst_sample > max_audioval ) 
-    {
+    if ( dst_sample > max_audioval ) {
       dst_sample = max_audioval;
-    } 
-    else
-    if ( dst_sample < min_audioval ) 
-    {
+    } else
+    if ( dst_sample < min_audioval ) {
       dst_sample = min_audioval;
     }
-    dst[1] = dst_sample & 0xFF;
+    dst[0] = dst_sample&0xFF;
     dst_sample >>= 8;
-    dst[0] = dst_sample & 0xFF;
+    dst[1] = dst_sample&0xFF;
     dst += 2;
   }
-	
 }
 
 } // anonymous namespace
