@@ -76,12 +76,13 @@ ensurePadding(SimpleBuffer& data, media::MediaHandler* m)
 /* The volume ranges from 0 - 128 */
 #define MIX_MAXVOLUME 128
 #define ADJUST_VOLUME(s, v)	(s = (s*v)/MIX_MAXVOLUME)
-#define ADJUST_VOLUME_U8(s, v)	(s = (((s-128)*v)/MIX_MAXVOLUME)+128)
 
 void 
 mixAudio(std::uint8_t *dst, const std::uint8_t *src, std::uint32_t len, int volume)
 {
-	if ( volume == 0 ) return;
+  if ( volume == 0 ) return;
+
+  // Assume AUDIO_S16MSB
 
   std::int16_t src1, src2;
   int dst_sample;
