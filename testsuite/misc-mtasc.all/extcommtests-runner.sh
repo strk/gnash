@@ -69,9 +69,9 @@ timeout=10
 cat << EOF
 
 # Filenames and constants
-LOGFILE=${top_builddir}/testoutlog.\$$
-PIPE2CONTAINER=${top_builddir}/tocontainer.\$$
-PIPE2PLAYER=${top_builddir}/toplayer.\$$
+LOGFILE=${top_builddir}/testoutlog.\$\$
+PIPE2CONTAINER=${top_builddir}/tocontainer.\$\$
+PIPE2PLAYER=${top_builddir}/toplayer.\$\$
 READTIMEOUT=5
 
 # Test counts
