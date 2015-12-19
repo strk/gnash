@@ -135,6 +135,7 @@ testsuite/misc-ming.all/spritehier
 testsuite/misc-ming.all/static_vs_dynamic1
 testsuite/misc-ming.all/static_vs_dynamic2
 testsuite/misc-ming.all/*.swf
+testsuite/misc-ming.all/extgetvariable_testrunner_v*
 testsuite/misc-ming.all/XMLSocketTester
 testsuite/misc-ming.all/sound/*.swf
 testsuite/misc-mtasc.all/pp_*.as

@@ -29,7 +29,9 @@ CLEANFILES =  \
 	testrun.sum \
 	testrun.log
 
-DISTCLEANFILES = XMLSocketTester
+DISTCLEANFILES = XMLSocketTester extgetvariable_testrunner_v5 \
+                 extgetvariable_testrunner_v6 extgetvariable_testrunner_v7 \
+                 extgetvariable_testrunner_v8
 
 SUBDIRS = . loop loading displaylist_depths action_order register_class \
           init_action
@@ -50,6 +52,7 @@ EXTRA_DIST = \
 	StageConfigTest.as \
 	VarAndCharClashTest.as \
 	XMLSocketTest.as \
+	extgetvariable.as \
 	attachExtImported.as \
 	attachImported.as \
 	Version4Loader.as \
@@ -70,7 +73,8 @@ EXTRA_DIST = \
 	SharedObjectTestRunner.sh \
 	SharedObjectTest.sol/sol1.sol \
 	SharedObjectTest.sol/README \
-	XMLSocketTester.sh
+	XMLSocketTester.sh \
+	extgetvariable_testrunner.sh
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
@@ -224,6 +228,10 @@ check_SCRIPTS = \
 	EmbeddedFontTestRunner \
 	TextSnapshotTest-Runner \
 	XMLSocketTester \
+	extgetvariable_testrunner_v5 \
+	extgetvariable_testrunner_v6 \
+	extgetvariable_testrunner_v7 \
+	extgetvariable_testrunner_v8 \
 	timeline_var_test-Runner \
 	place_object_testrunner \
 	place_object_test2runner \
@@ -1293,6 +1301,38 @@ XMLSocketTester: XMLSocketTester.sh XMLSocketTest.swf
 		XMLSocketTest.swf > $@
 	chmod 755 $@
 
+extgetvariable_v5.swf: extgetvariable.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -r 1 -v 5 -o $@  $(srcdir)/extgetvariable.as
+
+extgetvariable_v6.swf: extgetvariable.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -r 1 -v 6 -o $@  $(srcdir)/extgetvariable.as
+
+extgetvariable_v7.swf: extgetvariable.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -r 1 -v 7 -o $@  $(srcdir)/extgetvariable.as
+
+extgetvariable_v8.swf: extgetvariable.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -r 1 -v 8 -o $@  $(srcdir)/extgetvariable.as
+
+extgetvariable_testrunner_v5: extgetvariable_testrunner.sh extgetvariable_v5.swf
+	sh $(srcdir)/extgetvariable_testrunner.sh $(top_builddir) $(top_srcdir) \
+		5 extgetvariable_v5.swf > $@
+	chmod 755 $@
+
+extgetvariable_testrunner_v6: extgetvariable_testrunner.sh extgetvariable_v6.swf
+	sh $(srcdir)/extgetvariable_testrunner.sh $(top_builddir) $(top_srcdir) \
+		6 extgetvariable_v6.swf > $@
+	chmod 755 $@
+
+extgetvariable_testrunner_v7: extgetvariable_testrunner.sh extgetvariable_v7.swf
+	sh $(srcdir)/extgetvariable_testrunner.sh $(top_builddir) $(top_srcdir) \
+		7 extgetvariable_v7.swf > $@
+	chmod 755 $@
+
+extgetvariable_testrunner_v8: extgetvariable_testrunner.sh extgetvariable_v8.swf
+	sh $(srcdir)/extgetvariable_testrunner.sh $(top_builddir) $(top_srcdir) \
+		8 extgetvariable_v8.swf > $@
+	chmod 755 $@
+
 GradientFillTest.swf: GradientFillTest.as 
 	$(MAKESWF) $(MAKESWF_FLAGS) -v 8 -r 1 -o $@  $(srcdir)/empty.as $(srcdir)/GradientFillTest.as
 
@@ -1556,6 +1596,10 @@ TEST_CASES = \
 	consecutive_goto_frame_testrunner \
 	multi_doactions_and_goto_frame_testrunner \
 	XMLSocketTester \
+	extgetvariable_testrunner_v5 \
+	extgetvariable_testrunner_v6 \
+	extgetvariable_testrunner_v7 \
+	extgetvariable_testrunner_v8 \
 	DrawingApiTestRunner \
 	TextSnapshotTest-Runner \
 	reverse_execute_PlaceObject2_test1runner \
