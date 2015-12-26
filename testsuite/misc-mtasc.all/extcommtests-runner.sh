@@ -20,6 +20,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
 # 
+# 
+# Original author: Nutchanon Wetchasit <Nutchanon.Wetchasit@gmail.com>
+# 
+# The generated test runner checks Gnash for:
+#  * ExternalInterface.addCallback() issues (bug #37223)
+#        <https://savannah.gnu.org/bugs/?37223>
+# 
 # Usage:
 #     ./extcommtests-runner.sh <builddir> <srcdir> <swf>
 # 
@@ -77,7 +84,9 @@ READTIMEOUT=5
 # Test counts
 TESTED=0
 FAILED=0
+XFAILED=0
 PASSED=0
+XPASSED=0
 
 # check_equals(\$op1, \$op2, \$msg)
 # Equality checker and counter
@@ -146,19 +155,61 @@ check_error \$? "Failed to open a named pipe: \$PIPE2PLAYER"
 "${top_builddir}/gui/gnash" -r 0 -t ${timeout} -vv -F 3:4 "${swf}" > "\$LOGFILE" 2>&1 &
 GNASHPID=\$!
 
-# Read for callback registration statement
+# Read for script_call callback registration statement
 read_timeout LINE \$READTIMEOUT <&3
 check_equals \
 	"\$LINE" \
 	'<invoke name="addMethod" returntype="xml"><arguments><string>script_call</string></arguments></invoke>' \
-	"Gnash should properly register an ExternalInterface callback"
+	"Gnash should properly register script_call ExternalInterface callback"
 
-# Call the callback
+# Read for script_nothis1 callback registration statement
+read_timeout LINE \$READTIMEOUT <&3
+check_equals \
+	"\$LINE" \
+	'<invoke name="addMethod" returntype="xml"><arguments><string>script_nothis1</string></arguments></invoke>' \
+	"Gnash should properly register script_nothis1 ExternalInterface callback"
+
+# Read for script_nothis2 callback registration statement
+read_timeout LINE \$READTIMEOUT <&3
+check_equals \
+	"\$LINE" \
+	'<invoke name="addMethod" returntype="xml"><arguments><string>script_nothis2</string></arguments></invoke>' \
+	"Gnash should properly register script_nothis2 ExternalInterface callback"
+
+# Read for script_longarglist callback registration statement
+read_timeout LINE \$READTIMEOUT <&3
+check_equals \
+	"\$LINE" \
+	'<invoke name="addMethod" returntype="xml"><arguments><string>script_longarglist</string></arguments></invoke>' \
+	"Gnash should properly register script_longarglist ExternalInterface callback"
+
+# Call the script_call callback
 echo '<invoke name="script_call" returntype="xml"><arguments><string>Hello</string><string>World</string></arguments></invoke>' >&4
 
 # Read for callback return value statement
 read_timeout LINE \$READTIMEOUT <&3
-check_equals "\$LINE" '<string>Too</string>' "Gnash should return a correct value from ExternalInterface callback"
+check_equals "\$LINE" '<string>Too</string>' "Gnash should return a correct value from script_call ExternalInterface callback"
+
+# Call the script_nothis1 callback
+echo '<invoke name="script_nothis1" returntype="xml"><arguments></arguments></invoke>' >&4
+
+# Read for callback return value statement
+read_timeout LINE \$READTIMEOUT <&3
+check_equals "\$LINE" '<undefined/>' "Gnash should return a correct value from script_nothis1 ExternalInterface callback"
+
+# Call the script_nothis2 callback
+echo '<invoke name="script_nothis2" returntype="xml"><arguments></arguments></invoke>' >&4
+
+# Read for callback return value statement
+read_timeout LINE \$READTIMEOUT <&3
+check_equals "\$LINE" '<undefined/>' "Gnash should return a correct value from script_nothis2 ExternalInterface callback"
+
+# Call the script_longarglist callback
+echo '<invoke name="script_longarglist" returntype="xml"><arguments><string>The</string><string>quick</string><string>brown</string><string>fox</string><string>jumps</string><string>over</string><string>the</string><string>lazy</string><string>dog</string></arguments></invoke>' >&4
+
+# Read for callback return value statement
+read_timeout LINE \$READTIMEOUT <&3
+check_equals "\$LINE" '<string>Pangram</string>' "Gnash should return a correct value from script_longarglist ExternalInterface callback"
 
 # Close pipes
 exec 3<&-
@@ -178,14 +229,22 @@ exec 5< "\$LOGFILE"
 PLAYERPASSED=\`grep "TRACE: PASSED:" <&5 | wc -l\`
 exec 5<&-
 exec 5< "\$LOGFILE"
+PLAYERXPASSED=\`grep "TRACE: XPASSED:" <&5 | wc -l\`
+exec 5<&-
+exec 5< "\$LOGFILE"
 PLAYERFAILED=\`grep "TRACE: FAILED:" <&5 | wc -l\`
 exec 5<&-
+exec 5< "\$LOGFILE"
+PLAYERXFAILED=\`grep "TRACE: XFAILED:" <&5 | wc -l\`
+exec 5<&-
 PASSED=\`expr "\$PASSED" + "\$PLAYERPASSED"\`
+XPASSED=\`expr "\$XPASSED" + "\$PLAYERXPASSED"\`
 FAILED=\`expr "\$FAILED" + "\$PLAYERFAILED"\`
-TESTED=\`expr "\$TESTED" + "\$PLAYERPASSED" + "\$PLAYERFAILED"\`
+XFAILED=\`expr "\$XFAILED" + "\$PLAYERXFAILED"\`
+TESTED=\`expr "\$TESTED" + "\$PLAYERPASSED" + "\$PLAYERXPASSED" + "\$PLAYERFAILED" + "\$PLAYERXFAILED"\`
 
 # Check for total number of test run
-check_totals "8" "There should be 8 tests run"
+check_totals "45" "There should be 45 tests run"
 
 # Remove temporary files
 rm "\$LOGFILE"
