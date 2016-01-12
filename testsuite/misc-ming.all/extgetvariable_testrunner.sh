@@ -247,11 +247,11 @@ echo '<invoke name="GetVariable" returntype="xml"><arguments><string>unassigned_
 
 # Read for return value statement
 read_timeout LINE \$READTIMEOUT <&3
-if [ "${swfversion}" -gt 5 ]
+if [ "${swfversion}" -gt 6 ]
 then
 	check_equals "\$LINE" '<string>undefined</string>' "Gnash should return a correct value from GetVariable call on unassigned variable"
 else
-	xcheck_equals "\$LINE" '<string></string>' "Gnash should return a correct value from GetVariable call on unassigned variable"
+	check_equals "\$LINE" '<string></string>' "Gnash should return a correct value from GetVariable call on unassigned variable"
 fi
 
 # Call string-returning GetVariable() on variable with undefined value
@@ -259,11 +259,11 @@ echo '<invoke name="GetVariable" returntype="xml"><arguments><string>undefined_v
 
 # Read for return value statement
 read_timeout LINE \$READTIMEOUT <&3
-if [ "${swfversion}" -gt 5 ]
+if [ "${swfversion}" -gt 6 ]
 then
 	check_equals "\$LINE" '<string>undefined</string>' "Gnash should return a correct value from GetVariable call on variable with undefined value"
 else
-	xcheck_equals "\$LINE" '<string></string>' "Gnash should return a correct value from GetVariable call on variable with undefined value"
+	check_equals "\$LINE" '<string></string>' "Gnash should return a correct value from GetVariable call on variable with undefined value"
 fi
 
 # Call string-returning GetVariable() on non-existent variable
