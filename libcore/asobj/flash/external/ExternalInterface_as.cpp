@@ -286,7 +286,7 @@ externalinterface_call(const fn_call& fn)
         return val;
     }
 
-    if (fn.nargs > 1) {
+    if (fn.nargs >= 1) {
         const as_value& methodName_as = fn.arg(0);
         const std::string methodName = methodName_as.to_string();
         const std::vector<as_value>& args = fn.getArgs();
