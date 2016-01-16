@@ -144,6 +144,9 @@ private:
     GtkWidget* _menubar;
     GtkWidget* _vbox;
 
+    /// Exit flag, set by quitUI() to prevent entering gtk_main() if Gnash
+    /// terminated in first frame.
+    bool _exiting;
 
     /// Add key press events to the toplevel window.
     //

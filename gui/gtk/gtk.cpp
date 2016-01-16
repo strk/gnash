@@ -144,6 +144,7 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, RunResources& r)
     ,_popup_menu_alt(0)
     ,_menubar(0)
     ,_vbox(0)
+    ,_exiting(false)
     ,_advanceSourceTimer(0)
 {
 }
@@ -255,7 +256,10 @@ GtkGui::run()
     // Kick-start before setting the interval timeout
     advance_movie(this);
 
-    gtk_main();
+    if (!_exiting)
+    {
+        gtk_main();
+    }
     return true;
 }
 
@@ -590,7 +594,12 @@ GtkGui::quitUI()
     // removes other callbacks, but we're about to go away anyway.
     while (g_source_remove_by_user_data(this)) {}
     gtk_widget_destroy(_window);
-    gtk_main_quit();
+
+    _exiting = true;
+    if (gtk_main_level() > 0)
+    {
+        gtk_main_quit();
+    }
 }
 
 /*private*/
