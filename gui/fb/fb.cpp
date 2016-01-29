@@ -175,7 +175,7 @@ FBGui::~FBGui()
     // GNASH_REPORT_FUNCTION;
     
     if (_fd > 0) {
-        disable_terminal();
+        enable_terminal();
         // log_debug("Closing framebuffer device");
         close(_fd);
     }
