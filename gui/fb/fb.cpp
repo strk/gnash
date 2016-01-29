@@ -517,6 +517,12 @@ FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
      _glue->setInvalidatedRegions(ranges);
 }
 
+void
+FBGui::quitUI()
+{
+    terminate_request = true;
+}
+
 char *
 FBGui::find_accessible_tty(int no)
 {

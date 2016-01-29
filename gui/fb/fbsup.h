@@ -119,6 +119,9 @@ public:
     /// Start main rendering loop.
     bool run();
 
+    /// Stop main rendering loop.
+    void quitUI();
+
     // Resize the viewing area within the total framebuffer display
     bool resize_view(int width, int height);
     
