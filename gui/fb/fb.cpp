@@ -153,7 +153,6 @@ terminate_signal(int /*signo*/) {
 
 FBGui::FBGui(unsigned long xid, float scale, bool loop, RunResources& r)
     : Gui(xid, scale, loop, r),
-      _fd(-1),
       _original_vt(-1),
       _original_kd(-1),
       _own_vt(-1),
@@ -174,11 +173,7 @@ FBGui::~FBGui()
 {  
     // GNASH_REPORT_FUNCTION;
     
-    if (_fd > 0) {
-        enable_terminal();
-        // log_debug("Closing framebuffer device");
-        close(_fd);
-    }
+    enable_terminal();
 }
 
 bool
@@ -588,8 +583,6 @@ FBGui::disable_terminal()
     struct vt_stat vts;
     if (ioctl(fd, VT_GETSTATE, &vts) == -1) {
         log_error(_("Could not get current VT state"));
-        close(_fd);
-        _fd = -1;
         close(fd);
         return false;
     }
@@ -618,7 +611,7 @@ FBGui::disable_terminal()
         return false;
     }
   
-    _fd = open(tty, O_RDWR);
+    fd = open(tty, O_RDWR);
     if (fd < 0) {
         log_error(_("Could not open %s"), tty);
         return false;
@@ -714,8 +707,6 @@ FBGui::enable_terminal()
 
     if (ioctl(fd, VT_ACTIVATE, _original_vt)) {
         log_error(_("Could not activate VT number %d"), _original_vt);
-        close(_fd);
-        _fd = -1;
         close(fd);
         return false;
     }

@@ -187,7 +187,6 @@ private:
     /// reverts disable_terminal() changes
     bool enable_terminal();
     
-    int         _fd;
     int         _original_vt;   // virtual terminal that was active at startup
     int         _original_kd;   // keyboard mode at startup
     int         _own_vt;        // virtual terminal we are running in   
