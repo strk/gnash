@@ -4,7 +4,7 @@
 # extcommtests-runner.sh: container-emulated, automated
 #     ExternalInterface test generator
 # 
-# Copyright (C) 2015 Free Software Foundation, Inc.
+# Copyright (C) 2015, 2016 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 # The generated test runner checks Gnash for:
 #  * ExternalInterface.addCallback() issues (bug #37223)
 #        <https://savannah.gnu.org/bugs/?37223>
+#  * Single-argument ExternalInterface.call() issue (bug #46878)
+#        <https://savannah.gnu.org/bugs/?46878>
 # 
 # Usage:
 #     ./extcommtests-runner.sh <builddir> <srcdir> <swf>
@@ -183,6 +185,20 @@ check_equals \
 	'<invoke name="addMethod" returntype="xml"><arguments><string>script_longarglist</string></arguments></invoke>' \
 	"Gnash should properly register script_longarglist ExternalInterface callback"
 
+# Read for js_simple JavaScript function invocation statement
+read_timeout LINE \$READTIMEOUT <&3
+check_equals \
+	"\$LINE" \
+	'<invoke name="js_simple" returntype="xml"><arguments><string>js_simple</string></arguments></invoke>' \
+	"Gnash should call JavaScript's js_simple function correctly"
+
+# Return string value from js_simple function
+echo '<string>Correct</string>' >&4
+
+# Pause a bit, so the next script_call invoke doesn't get mixed up with
+# the previous return value data
+sleep 1
+
 # Call the script_call callback
 echo '<invoke name="script_call" returntype="xml"><arguments><string>Hello</string><string>World</string></arguments></invoke>' >&4
 
@@ -244,7 +260,7 @@ XFAILED=\`expr "\$XFAILED" + "\$PLAYERXFAILED"\`
 TESTED=\`expr "\$TESTED" + "\$PLAYERPASSED" + "\$PLAYERXPASSED" + "\$PLAYERFAILED" + "\$PLAYERXFAILED"\`
 
 # Check for total number of test run
-check_totals "45" "There should be 45 tests run"
+check_totals "47" "There should be 47 tests run"
 
 # Remove temporary files
 rm "\$LOGFILE"

@@ -1,6 +1,6 @@
 // extcomm.as - Host container communication (ExternalInterface) tests
 //
-//   Copyright (C) 2015 Free Software Foundation, Inc.
+//   Copyright (C) 2015, 2016 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -136,5 +136,9 @@ class ExternalCommTest
 				}
 			)
 		);
+
+		// Calling JavaScript function without any argument should give
+		// a correct return value
+		check_equals(ExternalInterface.call("js_simple"), "Correct");
 	}
 }
