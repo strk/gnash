@@ -28,7 +28,8 @@ AUTOMAKE_OPTIONS = dejagnu -Wno-portability
 abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 swfdir = $(shell cd $(top_builddir)/testsuite/actionscript.all; pwd)
 
-COM_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -I"$(top_builddir)"
+COM_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) \
+  -I"$(top_builddir)" -c -1
 DEF_MAKESWF_FLAGS=$(COM_MAKESWF_FLAGS) \
 	-DMEDIADIR='\"$(abs_mediadir)\"' \
 	-DSWFDIR='\"$(swfdir)\"' 
