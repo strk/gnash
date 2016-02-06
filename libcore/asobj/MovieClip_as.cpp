@@ -1494,7 +1494,7 @@ movieclip_lineStyle(const fn_call& fn)
 {
     MovieClip* movieclip = ensure<IsDisplayObject<MovieClip> >(fn);
 
-    if (!fn.nargs) {
+    if (!fn.nargs || fn.arg(0).is_undefined()) {
         movieclip->graphics().resetLineStyle();
         return as_value();
     }
