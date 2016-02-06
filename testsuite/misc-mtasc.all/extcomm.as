@@ -140,5 +140,18 @@ class ExternalCommTest
 		// Calling JavaScript function without any argument should give
 		// a correct return value
 		check_equals(ExternalInterface.call("js_simple"), "Correct");
+
+		// Calling JavaScript function 20 times in row should give all
+		// correct return value
+		var numreadings:Array = new Array(
+			"one", "two", "three", "four", "five", "six", "seven", "eight",
+			"nine", "ten", "eleven", "twelve", "thirteen", "fourteen",
+			"fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"
+		);
+		var i:Number;
+		for(i = 0; i < numreadings.length; i++) {
+			check_equals(ExternalInterface.call("js_readnumber", i + 1),
+			             numreadings[i]);
+		}
 	}
 }

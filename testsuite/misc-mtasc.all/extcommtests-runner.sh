@@ -26,6 +26,8 @@
 # The generated test runner checks Gnash for:
 #  * ExternalInterface.addCallback() issues (bug #37223)
 #        <https://savannah.gnu.org/bugs/?37223>
+#  * ExternalInterface.call()'s delayed return value issue (bug #46131)
+#        <https://savannah.gnu.org/bugs/?46131>
 #  * Single-argument ExternalInterface.call() issue (bug #46878)
 #        <https://savannah.gnu.org/bugs/?46878>
 # 
@@ -195,6 +197,25 @@ check_equals \
 # Return string value from js_simple function
 echo '<string>Correct</string>' >&4
 
+# Test using multiple ExternalInterface.call() in row
+NUMBER=1
+for READING in "one" "two" "three" "four" "five" "six" "seven" "eight" "nine" \
+	"ten" "eleven" "twelve" "thirteen" "fourteen" "fifteen"  "sixteen" \
+	"seventeen" "eighteen" "nineteen" "twenty"
+do
+	# Read for js_readnumber JavaScript function invocation statement
+	read_timeout LINE \$READTIMEOUT <&3
+	check_equals \
+		"\$LINE" \
+		"<invoke name=\"js_readnumber\" returntype=\"xml\"><arguments><string>js_readnumber</string><number>\$NUMBER</number></arguments></invoke>" \
+		"Gnash should call JavaScript's js_readnumber function with parameter \$NUMBER correctly"
+
+	# Return string value from js_readnumber function
+	echo "<string>\$READING</string>" >&4
+
+	NUMBER=\`expr \$NUMBER + 1\`
+done
+
 # Pause a bit, so the next script_call invoke doesn't get mixed up with
 # the previous return value data
 sleep 1
@@ -260,7 +281,7 @@ XFAILED=\`expr "\$XFAILED" + "\$PLAYERXFAILED"\`
 TESTED=\`expr "\$TESTED" + "\$PLAYERPASSED" + "\$PLAYERXPASSED" + "\$PLAYERFAILED" + "\$PLAYERXFAILED"\`
 
 # Check for total number of test run
-check_totals "47" "There should be 47 tests run"
+check_totals "87" "There should be 87 tests run"
 
 # Remove temporary files
 rm "\$LOGFILE"
