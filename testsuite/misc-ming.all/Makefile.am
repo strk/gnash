@@ -349,9 +349,9 @@ DefineTextTest_Runner_DEPENDENCIES = \
 	$(NULL)
 
 Version4Loader.swf: $(srcdir)/Version4Loader.as 
-	$(MAKESWF) $(MAKESWF_FLAGS) -o $@ -v4 $(srcdir)/Version4Loader.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -c -1 -o $@ -v4 $(srcdir)/Version4Loader.as
 Version5Loaded.swf: $(srcdir)/Version5Loaded.as Dejagnu.swf
-	$(MAKESWF) $(MAKESWF_FLAGS) -o $@ Dejagnu.swf -v5 $(srcdir)/Version5Loaded.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -c -1 -o $@ Dejagnu.swf -v5 $(srcdir)/Version5Loaded.as
 MixedVersion4And5Runner: Version4Loader.swf Version5Loaded.swf
 	sh $(srcdir)/../generic-testrunner.sh $(top_builddir) Version5Loaded.swf > $@
 	chmod 755 $@
@@ -1302,7 +1302,7 @@ XMLSocketTester: XMLSocketTester.sh XMLSocketTest.swf
 	chmod 755 $@
 
 extgetvariable_v5.swf: extgetvariable.as
-	$(MAKESWF) $(MAKESWF_FLAGS) -r 1 -v 5 -o $@  $(srcdir)/extgetvariable.as
+	$(MAKESWF) $(MAKESWF_FLAGS) -c -1 -r 1 -v 5 -o $@  $(srcdir)/extgetvariable.as
 
 extgetvariable_v6.swf: extgetvariable.as
 	$(MAKESWF) $(MAKESWF_FLAGS) -r 1 -v 6 -o $@  $(srcdir)/extgetvariable.as
