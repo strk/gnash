@@ -1,7 +1,7 @@
 // ExternalInterface.cpp:  ActionScript "ExternalInterface" support
 //
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
-//   Free Software Foundation, Inc
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+//   2015, 2016 Free Software Foundation, Inc
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -115,7 +115,7 @@ ExternalInterface::_toXML(const as_value &val)
     } else if (val.is_number()) {
         ss << "<number>" << val.to_string() << "</number>";
     } else if (val.is_undefined()) {
-        ss << "<undefined/>";
+        ss << "<void/>";
     } else if (val.is_null()) {
         ss << "<null/>";
         // Exception isn't listed in any docs, but we'll use it for

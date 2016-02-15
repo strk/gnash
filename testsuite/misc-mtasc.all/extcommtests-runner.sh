@@ -232,14 +232,14 @@ echo '<invoke name="script_nothis1" returntype="xml"><arguments></arguments></in
 
 # Read for callback return value statement
 read_timeout LINE \$READTIMEOUT <&3
-check_equals "\$LINE" '<undefined/>' "Gnash should return a correct value from script_nothis1 ExternalInterface callback"
+check_equals "\$LINE" '<void/>' "Gnash should return a correct value from script_nothis1 ExternalInterface callback"
 
 # Call the script_nothis2 callback
 echo '<invoke name="script_nothis2" returntype="xml"><arguments></arguments></invoke>' >&4
 
 # Read for callback return value statement
 read_timeout LINE \$READTIMEOUT <&3
-check_equals "\$LINE" '<undefined/>' "Gnash should return a correct value from script_nothis2 ExternalInterface callback"
+check_equals "\$LINE" '<void/>' "Gnash should return a correct value from script_nothis2 ExternalInterface callback"
 
 # Call the script_longarglist callback
 echo '<invoke name="script_longarglist" returntype="xml"><arguments><string>The</string><string>quick</string><string>brown</string><string>fox</string><string>jumps</string><string>over</string><string>the</string><string>lazy</string><string>dog</string></arguments></invoke>' >&4
