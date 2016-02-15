@@ -1596,9 +1596,13 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         MovieClip *mc = getLevel(0);
         as_object *obj = getObject(mc);
         VM &vm = getVM();
+        as_environment timeline = mc->get_environment();
+        as_environment::ScopeStack scope;
+        as_object *container = NULL;
         std::string var = invoke->args[0].to_string();
-        as_value val;
-        if (obj->get_member(getURI(vm, var), &val)) {
+        scope.push_back(obj);
+        as_value val = getVariable(timeline, var, scope, &container);
+        if (container != NULL) {
             // If the variable exists, GetVariable returns a string
             // representation of its value. Variable with undefined
             // or null value counts as exist too.
