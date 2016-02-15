@@ -1,7 +1,7 @@
 // ExternalInterface_as.cpp:  ActionScript "ExternalInterface" class, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
-//   Free Software Foundation, Inc
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+//   2015, 2016 Free Software Foundation, Inc
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -294,13 +294,7 @@ externalinterface_call(const fn_call& fn)
         std::string result = mr.callExternalJavascript(methodName, args);
         if (!result.empty()) {
             val = ExternalInterface::parseXML(result);
-            // There was an error trying to Invoke the callback
-            if (result == ExternalInterface::makeString("Error")
-                || (result == ExternalInterface::makeString("SecurityError"))) {
-                log_trace(_("VAL: %s"), val);
-                val.set_undefined();
-            }
-        } 
+        }
     }
     
     return val;
