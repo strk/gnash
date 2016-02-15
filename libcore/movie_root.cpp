@@ -1606,7 +1606,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
             // If the variable exists, GetVariable returns a string
             // representation of its value. Variable with undefined
             // or null value counts as exist too.
-            ss << ExternalInterface::toXML(val.to_string(_vm.getSWFVersion()));
+            ss << ExternalInterface::toXML(val.to_string(vm.getSWFVersion()));
             ss << std::endl;
         } else {
             // If the variable does not exist, GetVariable sends null value
