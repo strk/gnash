@@ -1,6 +1,6 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
-//   Free Software Foundation, Inc
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+//   2016 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -949,14 +949,9 @@ nsPluginInstance::processPlayerRequest()
         }
         // We got a result from invoking the Javascript method
         std::stringstream ss;
-        if (invokeResult) {
-            ss << plugin::ExternalInterface::convertNPVariant(&result);
-            NPN_ReleaseVariantValue(&result);
-        } else {
-            // Send response
-            // FIXME: "securityError" also possible, check domain
-            ss << plugin::ExternalInterface::makeString("Error");
-        }
+
+        ss << plugin::ExternalInterface::convertNPVariant(&result);
+        NPN_ReleaseVariantValue(&result);
         size_t ret = _scriptObject->writePlayer(ss.str());
         if (ret != ss.str().size()) {
             log_error("Couldn't write the response to Gnash, network problems.");
