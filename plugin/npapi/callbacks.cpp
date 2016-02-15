@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2010, 2011, 2012 Free Software Foundation, Inc
+//   Copyright (C) 2010, 2011, 2012, 2016 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -699,19 +699,9 @@ remoteCallback (NPObject *npobj, NPIdentifier name, const NPVariant *args,
         return false;
     }
 
-    std::string answer;
     GnashNPVariant parsed = plugin::ExternalInterface::parseXML(data);
-    if (!NPVARIANT_IS_NULL(parsed.get())) {
-        answer = NPStringToString(NPVARIANT_TO_STRING(parsed.get()));
-    }
-    if (answer == "Error") {
-        NULL_TO_NPVARIANT(*result);
-    } else if (answer == "SecurityError") {
-        NULL_TO_NPVARIANT(*result);
-    } else {
-        parsed.copy(*result);
-    }
-    
+    parsed.copy(*result);
+
     // printNPVariant(&parsed.get());
 
     // Returning false makes Javascript stop executing the script.
