@@ -1679,12 +1679,7 @@ movie_root::processInvoke(ExternalInterface::invoke_t *invoke)
         ss << ExternalInterface::toXML(val);
         ss << std::endl;
     } else {
-        std::string result = callExternalCallback(invoke->name, invoke->args);
-        if (result == ExternalInterface::makeString("Error")) {
-            return false;
-        } else if (result == ExternalInterface::makeString("SecurityError")) {
-            return false;
-        }
+        callExternalCallback(invoke->name, invoke->args);
         return true;
     }
 
