@@ -1,6 +1,7 @@
 // MovieClip_as.cpp:  ActionScript "MovieClip" class, for Gnash.
 //
-//   Copyright (C) 2009, 2010, 2011, 2012 Free Software Foundation, Inc.
+//   Copyright (C) 2009, 2010, 2011, 2012, 2014, 2016
+//   Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -1607,8 +1608,14 @@ movieclip_lineStyle(const fn_call& fn)
             b = std::uint8_t((rgbval & 0x0000FF) );
         }
         case 1:
+            double thicknessval = toNumber(fn.arg(0), getVM(fn));
+            if (!isFinite(thicknessval) || isNaN(thicknessval)) {
+                // Infinite (including positive infinite) and NaN are treated
+                // as hairline thickness.
+                thicknessval = 0;
+            }
             thickness = std::uint16_t(pixelsToTwips(clamp<float>(
-                            toNumber(fn.arg(0), getVM(fn)), 0, 255)));
+                            thicknessval, 0, 255)));
             break;
     }
 
