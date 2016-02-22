@@ -1961,13 +1961,8 @@ movie_root::callExternalCallback(const std::string &name,
     }
 
     std::string result;
-    if (val.is_null()) {
-        // Return an error
-        result = ExternalInterface::makeString("Error");
-    } else {
-        result = ExternalInterface::toXML(val);
-    }
-        
+    result = ExternalInterface::toXML(val);
+
     // If the browser is connected, we send an Invoke message to the
     // browser.
     if (_hostfd >= 0) {
