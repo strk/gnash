@@ -230,7 +230,7 @@ IsPlaying (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args */,
             return false;
         }
 
-        GnashNPVariant value = plugin::ExternalInterface::parseXML(data);
+        GnashNPVariant value = plugin::ExternalInterface::parseXML((GnashPluginScriptObject*)npobj, data);
         if (NPVARIANT_TO_BOOLEAN(value.get()) == true) {
             BOOLEAN_TO_NPVARIANT(true, *result);
         } else {
@@ -374,7 +374,7 @@ PercentLoaded (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args
             return false;
         }
         
-        GnashNPVariant value = plugin::ExternalInterface::parseXML(data);
+        GnashNPVariant value = plugin::ExternalInterface::parseXML((GnashPluginScriptObject*)npobj, data);
         if (NPVARIANT_IS_INT32(value.get())) {
             INT32_TO_NPVARIANT(NPVARIANT_TO_INT32(value.get()), *result);
         } else {
@@ -628,7 +628,7 @@ TotalFrames (NPObject *npobj, NPIdentifier /* name */, const NPVariant */*args *
             return false;
         }
 
-        GnashNPVariant value = plugin::ExternalInterface::parseXML(data);
+        GnashNPVariant value = plugin::ExternalInterface::parseXML((GnashPluginScriptObject*)npobj, data);
         if (NPVARIANT_IS_INT32(value.get())) {
             value.copy(*result);
         } else {
@@ -699,7 +699,7 @@ remoteCallback (NPObject *npobj, NPIdentifier name, const NPVariant *args,
         return false;
     }
 
-    GnashNPVariant parsed = plugin::ExternalInterface::parseXML(data);
+    GnashNPVariant parsed = plugin::ExternalInterface::parseXML((GnashPluginScriptObject*)npobj, data);
     parsed.copy(*result);
 
     // printNPVariant(&parsed.get());

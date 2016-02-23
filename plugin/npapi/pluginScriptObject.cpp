@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2010, 2011, 2012 Free Software Foundation, Inc
+//   Copyright (C) 2010, 2011, 2012, 2014, 2016 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ GnashPluginScriptObject::initializeIdentifiers()
 {
     // log_debug("initializeIdentifiers");
 
-//    NPN_Status(_nppinstance, __FUNCTION__);
+//    NPN_Status(nppinstance, __FUNCTION__);
     
 //    http://www.adobe.com/support/flash/publishexport/scriptingwithflash/scriptingwithflash_04.html
     
@@ -247,7 +247,7 @@ GnashPluginScriptObject::initializeIdentifiers()
 
 // Constructor
 GnashPluginScriptObject::GnashPluginScriptObject()
-    : _nppinstance (nullptr),
+    : nppinstance (nullptr),
       _controlfd(-1),
       _hostfd(-1)
 {
@@ -259,7 +259,7 @@ GnashPluginScriptObject::GnashPluginScriptObject()
 
 // Constructor
 GnashPluginScriptObject::GnashPluginScriptObject(NPP npp)
-    : _nppinstance (npp),
+    : nppinstance (npp),
       _controlfd(-1),
       _hostfd(-1)
 {
@@ -519,7 +519,7 @@ GnashPluginScriptObject::Invoke(NPObject */* npobj */, NPIdentifier name,
 
     return false;
     
-//    return NPN_Invoke(_nppinstance, this, name, args, argCount, result);
+//    return NPN_Invoke(nppinstance, this, name, args, argCount, result);
 }
 
 bool
@@ -621,7 +621,7 @@ GnashPluginScriptObject::GetVariable(const std::string &name)
         return GnashNPVariant();
     }
 
-    GnashNPVariant parsed = plugin::ExternalInterface::parseXML(data);
+    GnashNPVariant parsed = plugin::ExternalInterface::parseXML(this, data);
 
     printNPVariant(&parsed.get());
     

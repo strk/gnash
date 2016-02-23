@@ -821,7 +821,7 @@ nsPluginInstance::processPlayerRequest()
         // Extract a message from the packet
         std::string msg = packet.substr(0, pos + term.size());
         std::shared_ptr<plugin::ExternalInterface::invoke_t> invoke =
-            plugin::ExternalInterface::parseInvoke(msg);
+            plugin::ExternalInterface::parseInvoke(_scriptObject, msg);
 
         // drop the parsed message from the packet
         packet.erase(0, msg.size());

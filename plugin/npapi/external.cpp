@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2010, 2011, 2012 Free Software Foundation, Inc
+//   Copyright (C) 2010, 2011, 2012, 2014, 2016 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -200,7 +200,7 @@ ExternalInterface::makeObject (std::map<std::string, std::string> &args)
 //      </arguments>
 // </invoke>
 std::shared_ptr<ExternalInterface::invoke_t>
-ExternalInterface::parseInvoke(const std::string &xml)
+ExternalInterface::parseInvoke(GnashPluginScriptObject *scriptobj, const std::string &xml)
 {
     std::shared_ptr<ExternalInterface::invoke_t> invoke;
     if (xml.empty()) {
@@ -254,7 +254,7 @@ ExternalInterface::parseInvoke(const std::string &xml)
             end   = xml.find("</invoke");
             if (start != std::string::npos && end != std::string::npos) {
                     tag   = xml.substr(start, end-start);
-                    invoke->args = parseArguments(tag);
+                    invoke->args = parseArguments(scriptobj, tag);
                 }
         }
     }
@@ -263,7 +263,7 @@ ExternalInterface::parseInvoke(const std::string &xml)
 }
 
 GnashNPVariant 
-ExternalInterface::parseXML(const std::string &xml)
+ExternalInterface::parseXML(GnashPluginScriptObject *scriptobj, const std::string &xml)
 {
     NPVariant value;
     NULL_TO_NPVARIANT(value);
@@ -318,7 +318,7 @@ ExternalInterface::parseXML(const std::string &xml)
             end = xml.find("</array");
             if ( end != std::string::npos )  {
               std::string str = xml.substr(start, end-start);
-              std::map<std::string, GnashNPVariant> props = parseProperties(str);
+              std::map<std::string, GnashNPVariant> props = parseProperties(scriptobj, str);
               std::map<std::string, GnashNPVariant>::iterator it;
               for (it=props.begin(); it != props.end(); ++it) {
                   NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
@@ -328,20 +328,39 @@ ExternalInterface::parseXML(const std::string &xml)
               OBJECT_TO_NPVARIANT(obj, value);
             }
         } else if (tag == "<object>") {
+            NPObject *jswindow;
+            NPObject *obj;
+            NPVariant objvar;
+
             start = end;
             end = xml.find("</object");
-            if ( end != std::string::npos )  {
-              NPObject *obj =  (NPObject *)NPN_MemAlloc(sizeof(NPObject));
-              obj->referenceCount = 1;
+            while ( end != std::string::npos )  {
+              // To create a new JavaScript Object, we call JavaScript's
+              // window.Object() method and use the returned NPObject.
+              // Then we assign members according to the received XML data.
+              if (NPN_GetValue(scriptobj->nppinstance, NPNVWindowNPObject,
+                               &jswindow) != NPERR_NO_ERROR) {
+                  break;
+              }
+              if (!NPN_Invoke(scriptobj->nppinstance, jswindow,
+                              NPN_GetStringIdentifier("Object"),
+                              NULL, 0, &objvar)) {
+                  NPN_ReleaseObject(jswindow);
+                  break;
+              }
+              obj = NPVARIANT_TO_OBJECT(objvar);
+
               std::string str = xml.substr(start, end-start);
-              std::map<std::string, GnashNPVariant> props = parseProperties(str);
+              std::map<std::string, GnashNPVariant> props = parseProperties(scriptobj, str);
               std::map<std::string, GnashNPVariant>::iterator it;
               for (it=props.begin(); it != props.end(); ++it) {
                   NPIdentifier id = NPN_GetStringIdentifier(it->first.c_str());
                   GnashNPVariant& value = it->second;
-                  NPN_SetProperty(nullptr, obj, id, &value.get());
+                  NPN_SetProperty(scriptobj->nppinstance, obj, id, &value.get());
               }
+              NPN_ReleaseObject(jswindow);
               OBJECT_TO_NPVARIANT(obj, value);
+              break;
             }
         }
     }
@@ -384,7 +403,7 @@ ExternalInterface::convertNPVariant (const NPVariant *value)
 }
 
 std::map<std::string, GnashNPVariant>
-ExternalInterface::parseProperties(const std::string &xml)
+ExternalInterface::parseProperties(GnashPluginScriptObject *scriptobj, const std::string &xml)
 {
     std::map<std::string, GnashNPVariant> props;
 
@@ -404,7 +423,7 @@ ExternalInterface::parseProperties(const std::string &xml)
         start = end + 2;
         end = xml.find("</property>", start) ;
         std::string data = xml.substr(start, end-start);
-        props[id] = parseXML(data);
+        props[id] = parseXML(scriptobj, data);
         start = xml.find(" id=", end);
     }
 
@@ -412,7 +431,7 @@ ExternalInterface::parseProperties(const std::string &xml)
 }
 
 std::vector<GnashNPVariant>
-ExternalInterface::parseArguments(const std::string &xml)
+ExternalInterface::parseArguments(GnashPluginScriptObject *scriptobj, const std::string &xml)
 {
     std::vector<GnashNPVariant> args;
 
@@ -437,7 +456,7 @@ ExternalInterface::parseArguments(const std::string &xml)
         if (data == "</arguments>") {
             break;
         }
-        args.push_back(parseXML(sub));
+        args.push_back(parseXML(scriptobj, sub));
         data.erase(0, end);
     }
 

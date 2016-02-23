@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2010, 2011, 2012 Free Software Foundation, Inc
+//   Copyright (C) 2010, 2011, 2012, 2014, 2016 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 #include "npapi.h"
 #include "npruntime.h"
 
-#include "GnashNPVariant.h"
+#include "pluginScriptObject.h"
 
 namespace gnash {
 
@@ -61,11 +61,11 @@ struct ExternalInterface
     static std::string makeArray (std::vector<std::string> &args);
     static std::string makeObject (std::map<std::string, std::string> &args);
     
-    static GnashNPVariant parseXML(const std::string &xml);
-    static std::shared_ptr<invoke_t> parseInvoke(const std::string &xml);
+    static GnashNPVariant parseXML(GnashPluginScriptObject *scriptobj, const std::string &xml);
+    static std::shared_ptr<invoke_t> parseInvoke(GnashPluginScriptObject *scriptobj, const std::string &xml);
     
-    static std::map<std::string, GnashNPVariant> parseProperties(const std::string &xml);
-    static std::vector<GnashNPVariant> parseArguments(const std::string &xml);
+    static std::map<std::string, GnashNPVariant> parseProperties(GnashPluginScriptObject *scriptobj, const std::string &xml);
+    static std::vector<GnashNPVariant> parseArguments(GnashPluginScriptObject *scriptobj, const std::string &xml);
     static std::string convertNPVariant (const NPVariant *npv);
 };
 

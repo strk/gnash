@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2010, 2011, 2012 Free Software Foundation, Inc
+//   Copyright (C) 2010, 2011, 2012, 2016 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -138,6 +138,10 @@ public:
     void AddProperty(const std::string &name, double num);
     void AddProperty(const std::string &name, int num);
 
+    /// Plugin instance object
+    // nppinstance->pdata should be the nsPluginInstance once NPP_New() is finished.
+    NPP nppinstance;
+
 protected:
     // Internal functions for the API
     void Deallocate();
@@ -155,10 +159,7 @@ protected:
 
 private:
     void initializeIdentifiers();
-    void setInstance(NPP inst) { _nppinstance = inst; };
-    
-    // _nppinstance->pdata should be the nsPluginInstance once NPP_New() is finished.
-    NPP _nppinstance;
+    void setInstance(NPP inst) { nppinstance = inst; };
     
     std::map<NPIdentifier, GnashNPVariant> _properties;
     std::map<NPIdentifier, NPInvokeFunctionPtr> _methods;
