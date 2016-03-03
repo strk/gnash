@@ -57,7 +57,7 @@ private:
 
 // The lookup table in this function is adapted from chroma.c from the VLC
 // codebase; its license permits distribution under GPLv3 and later.
-PixelFormat
+AVPixelFormat
 fourcc_to_ffmpeg(ImgBuf::Type4CC code)
 {
 
@@ -68,40 +68,40 @@ fourcc_to_ffmpeg(ImgBuf::Type4CC code)
     static const struct
     {
         ImgBuf::Type4CC  fourcc;
-        PixelFormat ffmpegcode;
+        AVPixelFormat ffmpegcode;
     } pixfmt_table[] =
     {
         // Planar YUV formats
-        {GNASH_FOURCC('I','4','4','4'), PIX_FMT_YUV444P},
-        {GNASH_FOURCC('J','4','4','4'), PIX_FMT_YUVJ444P},
+        {GNASH_FOURCC('I','4','4','4'), AV_PIX_FMT_YUV444P},
+        {GNASH_FOURCC('J','4','4','4'), AV_PIX_FMT_YUVJ444P},
 
 #if LIBAVUTIL_VERSION_INT >= ((49<<16)+(5<<8)+0)
-        {GNASH_FOURCC('I','4','4','0'), PIX_FMT_YUV440P},
-        {GNASH_FOURCC('J','4','4','0'), PIX_FMT_YUVJ440P},
+        {GNASH_FOURCC('I','4','4','0'), AV_PIX_FMT_YUV440P},
+        {GNASH_FOURCC('J','4','4','0'), AV_PIX_FMT_YUVJ440P},
 #endif
 
-        {GNASH_FOURCC('I','4','2','2'), PIX_FMT_YUV422P},
-        {GNASH_FOURCC('J','4','2','2'), PIX_FMT_YUVJ422P},
+        {GNASH_FOURCC('I','4','2','2'), AV_PIX_FMT_YUV422P},
+        {GNASH_FOURCC('J','4','2','2'), AV_PIX_FMT_YUVJ422P},
 
-        {GNASH_FOURCC('I','4','2','0'), PIX_FMT_YUV420P},
-        {GNASH_FOURCC('Y','V','1','2'), PIX_FMT_YUV420P},
-        {GNASH_FOURCC('I','Y','U','V'), PIX_FMT_YUV420P},
-        {GNASH_FOURCC('J','4','2','0'), PIX_FMT_YUVJ420P},
-        {GNASH_FOURCC('I','4','1','1'), PIX_FMT_YUV411P},
-        {GNASH_FOURCC('I','4','1','0'), PIX_FMT_YUV410P},
-        {GNASH_FOURCC('Y','V','U','9'), PIX_FMT_YUV410P},
+        {GNASH_FOURCC('I','4','2','0'), AV_PIX_FMT_YUV420P},
+        {GNASH_FOURCC('Y','V','1','2'), AV_PIX_FMT_YUV420P},
+        {GNASH_FOURCC('I','Y','U','V'), AV_PIX_FMT_YUV420P},
+        {GNASH_FOURCC('J','4','2','0'), AV_PIX_FMT_YUVJ420P},
+        {GNASH_FOURCC('I','4','1','1'), AV_PIX_FMT_YUV411P},
+        {GNASH_FOURCC('I','4','1','0'), AV_PIX_FMT_YUV410P},
+        {GNASH_FOURCC('Y','V','U','9'), AV_PIX_FMT_YUV410P},
 
 #if LIBAVUTIL_VERSION_INT >= ((49<<16)+(0<<8)+1)
-        {GNASH_FOURCC('N','V','1','2'), PIX_FMT_NV12},
-        {GNASH_FOURCC('N','V','2','1'), PIX_FMT_NV21},
+        {GNASH_FOURCC('N','V','1','2'), AV_PIX_FMT_NV12},
+        {GNASH_FOURCC('N','V','2','1'), AV_PIX_FMT_NV21},
 #endif
 
-        {GNASH_FOURCC('Y','U','Y','2'), PIX_FMT_YUYV422},
-        {GNASH_FOURCC('Y','U','Y','V'), PIX_FMT_YUYV422},
-        {GNASH_FOURCC('U','Y','V','Y'), PIX_FMT_UYVY422},
-        {GNASH_FOURCC('Y','4','1','1'), PIX_FMT_UYYVYY411},
+        {GNASH_FOURCC('Y','U','Y','2'), AV_PIX_FMT_YUYV422},
+        {GNASH_FOURCC('Y','U','Y','V'), AV_PIX_FMT_YUYV422},
+        {GNASH_FOURCC('U','Y','V','Y'), AV_PIX_FMT_UYVY422},
+        {GNASH_FOURCC('Y','4','1','1'), AV_PIX_FMT_UYYVYY411},
 
-        { 0, PIX_FMT_NONE}
+        { 0, AV_PIX_FMT_NONE}
     };
 #undef GNASH_FOURCC
 
@@ -112,13 +112,13 @@ fourcc_to_ffmpeg(ImgBuf::Type4CC code)
         }
     }
    
-    return PIX_FMT_NONE;
+    return AV_PIX_FMT_NONE;
 }
 
 VideoConverterFfmpeg::VideoConverterFfmpeg(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC dstFormat)
     : VideoConverter(srcFormat, dstFormat)
 {
-     if(fourcc_to_ffmpeg(_dst_fmt) == PIX_FMT_NONE) {
+     if(fourcc_to_ffmpeg(_dst_fmt) == AV_PIX_FMT_NONE) {
          throw MediaException(_("VideoConverterFfmpeg cannot convert to the "
                               "requested format"));
      }
@@ -138,9 +138,9 @@ VideoConverterFfmpeg::convert(const ImgBuf& src)
     const int width = src.width;
     const int height = src.height;
 
-    PixelFormat dst_pixFmt = fourcc_to_ffmpeg(_dst_fmt);
-    assert(dst_pixFmt != PIX_FMT_NONE);
-    PixelFormat src_pixFmt = PIX_FMT_RGB24;
+    AVPixelFormat dst_pixFmt = fourcc_to_ffmpeg(_dst_fmt);
+    assert(dst_pixFmt != AV_PIX_FMT_NONE);
+    AVPixelFormat src_pixFmt = AV_PIX_FMT_RGB24;
     
 #ifdef HAVE_SWSCALE_H
 

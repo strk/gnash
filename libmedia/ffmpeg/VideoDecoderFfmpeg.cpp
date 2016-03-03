@@ -51,7 +51,7 @@ namespace {
     void set_vaapi_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx);
     void clear_vaapi_context(AVCodecContext* avctx);
     void reset_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx = nullptr);
-    PixelFormat get_format(AVCodecContext* avctx, const PixelFormat* fmt);
+    AVPixelFormat get_format(AVCodecContext* avctx, const AVPixelFormat* fmt);
 #if LIBAVCODEC_VERSION_MAJOR >= 55
     int get_buffer(AVCodecContext* avctx, AVFrame* pic, int flags);
 #else
@@ -251,16 +251,16 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
                                  const AVFrame& srcFrameRef)
 {
     const AVFrame *srcFrame = &srcFrameRef;
-    PixelFormat srcPixFmt = srcCtx->pix_fmt;
+    AVPixelFormat srcPixFmt = srcCtx->pix_fmt;
 
     const int width = srcCtx->width;
     const int height = srcCtx->height;
 
 #ifdef FFMPEG_VP6A
-    PixelFormat pixFmt = (srcCtx->codec->id == AV_CODEC_ID_VP6A) ?
-        PIX_FMT_RGBA : PIX_FMT_RGB24;
+    AVPixelFormat pixFmt = (srcCtx->codec->id == AV_CODEC_ID_VP6A) ?
+        AV_PIX_FMT_RGBA : AV_PIX_FMT_RGB24;
 #else 
-    PixelFormat pixFmt = PIX_FMT_RGB24;
+    AVPixelFormat pixFmt = AV_PIX_FMT_RGB24;
 #endif 
 
     std::unique_ptr<image::GnashImage> im;
@@ -306,10 +306,10 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 
     switch (pixFmt)
     {
-        case PIX_FMT_RGBA:
+        case AV_PIX_FMT_RGBA:
             im.reset(new image::ImageRGBA(width, height));
             break;
-        case PIX_FMT_RGB24:
+        case AV_PIX_FMT_RGB24:
             im.reset(new image::ImageRGB(width, height));
             break;
         default:
@@ -325,7 +325,7 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
     avpicture_fill(&picture, im->begin(), pixFmt, width, height);
 
 #ifndef HAVE_SWSCALE_H
-    img_convert(&picture, PIX_FMT_RGB24, (AVPicture*)srcFrame,
+    img_convert(&picture, AV_PIX_FMT_RGB24, (AVPicture*)srcFrame,
             srcPixFmt, width, height);
 #else
 
@@ -499,15 +499,15 @@ reset_context(AVCodecContext* avctx, VaapiContextFfmpeg* vactx)
 }
 
 /// AVCodecContext.get_format() implementation
-PixelFormat
-get_format(AVCodecContext* avctx, const PixelFormat* fmt)
+AVPixelFormat
+get_format(AVCodecContext* avctx, const AVPixelFormat* fmt)
 {
 #ifdef HAVE_VA_VA_H
     VaapiContextFfmpeg* const vactx = get_vaapi_context(avctx);
 
     if (vactx) {
-        for (int i = 0; fmt[i] != PIX_FMT_NONE; i++) {
-            if (fmt[i] != PIX_FMT_VAAPI_VLD) continue;
+        for (int i = 0; fmt[i] != AV_PIX_FMT_NONE; i++) {
+            if (fmt[i] != AV_PIX_FMT_VAAPI_VLD) continue;
 
             if (vactx->initDecoder(avctx->width, avctx->height)) {
                 return fmt[i];
