@@ -89,12 +89,13 @@ class ExternalCommTest
 				{
 					// `this` should be an "undefined" object like one in
 					// a function called via `function.call(null)`
-					xcheck_equals(typeof(this), "object");
+					check_equals(typeof(this), "object");
 					check(this == undefined);
 					check(this == null);
 					check(this !== undefined);
-					xcheck(this !== null);
-					xcheck_equals("" + this, "undefined");
+					check(this !== null);
+					check_equals("" + this, "undefined");
+					check(this === _global);
 				}
 			)
 		);
@@ -104,12 +105,13 @@ class ExternalCommTest
 				{
 					// `this` should be an "undefined" object like one in
 					// a function called via `function.call(undefined)`
-					xcheck_equals(typeof(this), "object");
+					check_equals(typeof(this), "object");
 					check(this == undefined);
 					check(this == null);
 					check(this !== undefined);
-					xcheck(this !== null);
-					xcheck_equals("" + this, "undefined");
+					check(this !== null);
+					check_equals("" + this, "undefined");
+					check(this === _global);
 				}
 			)
 		);

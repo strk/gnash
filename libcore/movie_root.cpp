@@ -1942,6 +1942,12 @@ movie_root::callExternalCallback(const std::string &name,
         }
         else instance = instance_iterator->second;
 
+        // Use _global object as "this" instance if the callback is originally
+        // registered with null or undefined one.
+        if (instance == NULL) {
+            instance = &getGlobal(*method);
+        }
+
         // Populate function call arguments
         for (std::vector<as_value>::const_iterator args_iterator
                  = fnargs.begin();

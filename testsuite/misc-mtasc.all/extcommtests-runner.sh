@@ -281,7 +281,7 @@ XFAILED=\`expr "\$XFAILED" + "\$PLAYERXFAILED"\`
 TESTED=\`expr "\$TESTED" + "\$PLAYERPASSED" + "\$PLAYERXPASSED" + "\$PLAYERFAILED" + "\$PLAYERXFAILED"\`
 
 # Check for total number of test run
-check_totals "87" "There should be 87 tests run"
+check_totals "89" "There should be 89 tests run"
 
 # Remove temporary files
 rm "\$LOGFILE"
