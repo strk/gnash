@@ -102,7 +102,7 @@ namespace {
 
         std::uint64_t diff = clocktime::getTicks() - t.startTicks;
         // should we split in seconds/ms ?
-        o << getpid() << ":" << htid << "] " << diff;
+        o << "[" << getpid() << ":" << htid << "] " << diff;
 
         return o;
 
