@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2009, 2010 Free Software
+//   Copyright (C) 2005, 2006, 2007, 2009, 2010, 2011, 2016 Free Software
 //   Foundation, Inc
 //
 // This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,14 @@ check( ! Function.hasOwnProperty('__constructor__') );
 
 // Define a function returning 'this'.name and the given args
 function getThisName(a,b,c) { return this.name+a+b+c; }
+
+#if OUTPUT_VERSION >= 6
+// Define a function for checking 'this' against '_global' object
+function isThisGlobal() { return this===_global; }
+#endif
+
+// Define a function which set a property named 'instanceCheck' to 'this'
+function setThisMember(value) { this.instanceCheck=value; }
 
 // Every newly created function's super class is Object
 check_equals(getThisName.prototype.__proto__, Object.prototype);
@@ -121,6 +129,21 @@ var ret=getThisName.apply(undefined, "7");
   check_equals ( ret , 0 );
 #endif
 
+// Test Function.apply() with 'thisObject' being unspecified, 'undefined',
+// or 'null'
+
+function setThisMember_apply_noarg() { this.instanceCheck = "apply_no_this"; }
+check ( isThisGlobal.apply() );
+check ( isThisGlobal.apply(undefined) );
+check ( isThisGlobal.apply(null) );
+setThisMember_apply_noarg.apply();
+check_equals ( _global.instanceCheck, "apply_no_this" );
+setThisMember.apply(undefined, ["apply_undefined_this"]);
+check_equals ( _global.instanceCheck, "apply_undefined_this" );
+setThisMember.apply(null, ["apply_null_this"]);
+check_equals ( _global.instanceCheck, "apply_null_this" );
+check ( delete _global.instanceCheck );
+
 #else // OUTPUT_VERSION < 6
 
 // No Function.apply... for SWF up to 5
@@ -162,6 +185,33 @@ check_equals(typeof(ret), 'object');
 check_equals(ret, undefined); // an object type which returns 'undefined' as primitive value ?
 check( ! (ret === undefined) ); // an object type which returns 'undefined' as primitive value ?
 check( ! (ret === null) ); // an object type which returns 'undefined' as primitive value ?
+check( ret === _global ); // an object is actually the '_global' ?
+ret = getThis.call(undefined);
+check_equals(c, 3);
+check_equals(typeof(ret), 'object');
+check_equals(ret, undefined); // an object type which returns 'undefined' as primitive value ?
+check( ! (ret === undefined) ); // an object type which returns 'undefined' as primitive value ?
+check( ! (ret === null) ); // an object type which returns 'undefined' as primitive value ?
+check( ret === _global ); // an object is actually the '_global' ?
+ret = getThis.call();
+check_equals(c, 4);
+check_equals(typeof(ret), 'object');
+check_equals(ret, undefined); // an object type which returns 'undefined' as primitive value ?
+check( ! (ret === undefined) ); // an object type which returns 'undefined' as primitive value ?
+check( ! (ret === null) ); // an object type which returns 'undefined' as primitive value ?
+check( ret === _global ); // an object is actually the '_global' ?
+
+// Test Function.call() with 'thisObject' being unspecified, 'undefined',
+// or 'null'
+
+function setThisMember_call_noarg() { this.instanceCheck = "call_no_this"; }
+setThisMember_call_noarg.call();
+check_equals(_global.instanceCheck, "call_no_this");
+setThisMember.call(undefined, "call_undefined_this");
+check_equals(_global.instanceCheck, "call_undefined_this");
+setThisMember.call(null, "call_null_this");
+check_equals(_global.instanceCheck, "call_null_this");
+check(delete _global.instanceCheck);
 
 retCaller = 'custom'; 
 myCaller = function()
@@ -1077,8 +1127,8 @@ check_equals(called, 0);
  check_totals(150); // SWF5
 #endif
 #if OUTPUT_VERSION == 6
- check_totals(239); // SWF6
+ check_totals(263); // SWF6
 #endif
 #if OUTPUT_VERSION >= 7
- check_totals(240); // SWF7,SWF8
+ check_totals(264); // SWF7,SWF8
 #endif
