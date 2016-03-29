@@ -104,13 +104,13 @@ function_apply(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Function.apply() called with no args"));
         );
-        new_fn_call.this_ptr = new as_object(getGlobal(fn));
+        new_fn_call.this_ptr = &getGlobal(fn);
 	}
 	else {
 		// Get the object to use as 'this' reference
 		as_object* obj = toObject(fn.arg(0), getVM(fn));
 
-        if (!obj) obj = new as_object(getGlobal(fn)); 
+        if (!obj) obj = &getGlobal(fn);
 
         new_fn_call.this_ptr = obj;
 
@@ -156,7 +156,7 @@ function_call(const fn_call& fn)
     as_object* tp;
 
     if (!fn.nargs || fn.arg(0).is_undefined() || fn.arg(0).is_null()) {
-        tp = new as_object(getGlobal(fn));
+        tp = &getGlobal(fn);
     }
     else tp = toObject(fn.arg(0), getVM(fn));
 
