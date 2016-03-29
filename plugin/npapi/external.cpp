@@ -372,6 +372,7 @@ ExternalInterface::convertNPVariant (const NPVariant *value)
     
     if (NPVARIANT_IS_DOUBLE(*value)) {
         double num = NPVARIANT_TO_DOUBLE(*value);
+        ss.precision(std::numeric_limits<double>::max_digits10);
         ss << "<number>" << num << "</number>";
     } else if (NPVARIANT_IS_STRING(*value)) {
         std::string str = NPStringToString(NPVARIANT_TO_STRING(*value));
