@@ -293,13 +293,8 @@ ExternalInterface::parseXML(GnashPluginScriptObject *scriptobj, const std::strin
             start = end;
             end = xml.find("</number>");
             std::string str = xml.substr(start, end-start);
-            if (str.find(".") != std::string::npos) {
-                double num = strtod(str.c_str(), nullptr);
-                DOUBLE_TO_NPVARIANT(num, value);
-            } else {
-                int num = strtol(str.c_str(), nullptr, 0);
-                INT32_TO_NPVARIANT(num, value);
-            }
+            double num = strtod(str.c_str(), nullptr);
+            DOUBLE_TO_NPVARIANT(num, value);
         } else if (tag == "<string>") {
             start = end;
             end = xml.find("</string>");
