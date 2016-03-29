@@ -96,6 +96,7 @@ class ExternalCommTest
 					check(this !== null);
 					check_equals("" + this, "undefined");
 					check(this === _global);
+					this.nothis1_value = "script_nothis1";
 				}
 			)
 		);
@@ -112,6 +113,18 @@ class ExternalCommTest
 					check(this !== null);
 					check_equals("" + this, "undefined");
 					check(this === _global);
+					this.nothis2_value = "script_nothis2";
+				}
+			)
+		);
+
+		// Registering callback for checking _global properties shouldn't fail
+		check(
+			ExternalInterface.addCallback("script_globalcheck", mc,
+				function():Void
+				{
+					check_equals(_global.nothis1_value, "script_nothis1");
+					check_equals(_global.nothis2_value, "script_nothis2");
 				}
 			)
 		);

@@ -180,6 +180,13 @@ check_equals \
 	'<invoke name="addMethod" returntype="xml"><arguments><string>script_nothis2</string></arguments></invoke>' \
 	"Gnash should properly register script_nothis2 ExternalInterface callback"
 
+# Read for script_globalcheck callback registration statement
+read_timeout LINE \$READTIMEOUT <&3
+check_equals \
+	"\$LINE" \
+	'<invoke name="addMethod" returntype="xml"><arguments><string>script_globalcheck</string></arguments></invoke>' \
+	"Gnash should properly register script_globalcheck ExternalInterface callback"
+
 # Read for script_longarglist callback registration statement
 read_timeout LINE \$READTIMEOUT <&3
 check_equals \
@@ -241,6 +248,13 @@ echo '<invoke name="script_nothis2" returntype="xml"><arguments></arguments></in
 read_timeout LINE \$READTIMEOUT <&3
 check_equals "\$LINE" '<void/>' "Gnash should return a correct value from script_nothis2 ExternalInterface callback"
 
+# Call the script_globalcheck callback
+echo '<invoke name="script_globalcheck" returntype="xml"><arguments></arguments></invoke>' >&4
+
+# Read for callback return value statement
+read_timeout LINE \$READTIMEOUT <&3
+check_equals "\$LINE" '<void/>' "Gnash should return a correct value from script_globalcheck ExternalInterface callback"
+
 # Call the script_longarglist callback
 echo '<invoke name="script_longarglist" returntype="xml"><arguments><string>The</string><string>quick</string><string>brown</string><string>fox</string><string>jumps</string><string>over</string><string>the</string><string>lazy</string><string>dog</string></arguments></invoke>' >&4
 
@@ -281,7 +295,7 @@ XFAILED=\`expr "\$XFAILED" + "\$PLAYERXFAILED"\`
 TESTED=\`expr "\$TESTED" + "\$PLAYERPASSED" + "\$PLAYERXPASSED" + "\$PLAYERFAILED" + "\$PLAYERXFAILED"\`
 
 # Check for total number of test run
-check_totals "89" "There should be 89 tests run"
+check_totals "94" "There should be 94 tests run"
 
 # Remove temporary files
 rm "\$LOGFILE"
