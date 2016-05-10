@@ -830,11 +830,9 @@ Sound_as::getPosition() const
 unsigned int
 Sound_as::getAudio(std::int16_t* samples, unsigned int nSamples, bool& atEOF)
 {
+#if defined USE_SOUND && defined USE_MEDIA
     std::uint8_t* stream = reinterpret_cast<std::uint8_t*>(samples);
     int len = nSamples*2;
-
-#ifdef USE_SOUND
-#ifdef USE_MEDIA
     //GNASH_REPORT_FUNCTION;
 
     while (len) {
@@ -906,10 +904,10 @@ Sound_as::getAudio(std::int16_t* samples, unsigned int nSamples, bool& atEOF)
 
     atEOF=false;
     return nSamples-(len/2);
-#else   // USE_MEDIA
-    return 0;
-#endif
-#else   // USE_SOUND
+#else   // USE_MEDIA && USE_SOUND
+    UNUSED(samples);
+    UNUSED(nSamples);
+    UNUSED(atEOF);
     return 0;
 #endif
 }

@@ -624,6 +624,8 @@ NetStream_as::getDecodedVideoFrame(std::uint32_t ts)
             break; 
         }
     }
+#else // ndef USE_MEDIA
+    UNUSED(ts);
 #endif  // USE_MEDIA
     
     return video;
@@ -1054,6 +1056,8 @@ NetStream_as::pushDecodedAudioFrames(std::uint32_t ts)
 
         _playHead.setAudioConsumed();
     }
+#else // ndef USE_MEDIA
+    UNUSED(ts);
 #endif  // USE_MEDIA
 }
 
