@@ -1,7 +1,7 @@
 // NetStream.cpp:  ActionScript class for streaming audio/video, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012
-//   Free Software Foundation, Inc
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+//   2016 Free Software Foundation, Inc
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -711,9 +711,10 @@ NetStream_as::decodeNextAudioFrame()
 #endif 
 
     raw->m_ptr = raw->m_data;
-#endif  // USE_MEDIA
-    
     return raw;
+#else   // USE_MEDIA
+    return nullptr;
+#endif
 }
 
 void

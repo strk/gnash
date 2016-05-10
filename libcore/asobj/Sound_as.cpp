@@ -1,6 +1,7 @@
 // Sound_as.cpp:  ActionScript "Sound" class, for Gnash.
 //
-//   Copyright (C) 2009, 2010, 2011, 2012 Free Software Foundation, Inc.
+//   Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2016
+//   Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -364,6 +365,7 @@ Sound_as::probeAudio()
 
     if (!_mediaParser) return; // nothing to do here w/out a media parser
 
+#ifdef USE_MEDIA
     if ( ! _soundLoaded ) {
 #ifdef GNASH_DEBUG_SOUND_AS
         log_debug("Probing audio for load");
@@ -441,6 +443,7 @@ Sound_as::probeAudio()
             assert(_audioDecoder.get());
         }
     }
+#endif  // USE_MEDIA
 #endif  // USE_SOUND
 }
 
@@ -810,12 +813,14 @@ Sound_as::getPosition() const
         return _soundHandler->tell(soundId);
     }
 
+#ifdef USE_MEDIA
     if (_mediaParser) {
         std::uint64_t ts;
         if ( _mediaParser->nextAudioFrameTimestamp(ts) ) {
             return ts;
         }
     }
+#endif  // USE_MEDIA
 #endif  // USE_SOUND
     
     return 0;
@@ -829,6 +834,7 @@ Sound_as::getAudio(std::int16_t* samples, unsigned int nSamples, bool& atEOF)
     int len = nSamples*2;
 
 #ifdef USE_SOUND
+#ifdef USE_MEDIA
     //GNASH_REPORT_FUNCTION;
 
     while (len) {
@@ -900,7 +906,12 @@ Sound_as::getAudio(std::int16_t* samples, unsigned int nSamples, bool& atEOF)
 
     atEOF=false;
     return nSamples-(len/2);
-#endif  // USE_SOUND
+#else   // USE_MEDIA
+    return 0;
+#endif
+#else   // USE_SOUND
+    return 0;
+#endif
 }
 
 // audio callback is running in sound handler thread

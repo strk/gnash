@@ -1,6 +1,6 @@
 // MediaParser.cpp:  Media file parser, for Gnash.
 //
-//   Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012
+//   Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2016
 //   Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -460,42 +460,6 @@ operator<< (std::ostream& os, const videoCodecType& t)
             break;
         case VIDEO_CODEC_H264:
             os << "H264";
-            break;
-        default:
-            os << "unknown/invalid codec " << static_cast<int>(t);
-            break;
-    }
-    return os;
-}
-
-std::ostream&
-operator<< (std::ostream& os, const audioCodecType& t)
-{
-    switch (t)
-    {
-        case AUDIO_CODEC_RAW:
-            os << "Raw";
-            break;
-        case AUDIO_CODEC_ADPCM:
-            os << "ADPCM";
-            break;
-        case AUDIO_CODEC_MP3:
-            os << "MP3";
-            break;
-        case AUDIO_CODEC_UNCOMPRESSED:
-            os << "Uncompressed";
-            break;
-        case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
-            os << "Nellymoser 8Hz mono";
-            break;
-        case AUDIO_CODEC_NELLYMOSER:
-            os << "Nellymoser";
-            break;
-        case AUDIO_CODEC_AAC:
-            os << "Advanced Audio Coding";
-            break;
-        case AUDIO_CODEC_SPEEX:
-            os << "Speex";
             break;
         default:
             os << "unknown/invalid codec " << static_cast<int>(t);
