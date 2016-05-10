@@ -194,6 +194,8 @@ NetStream_as::bufferLength()
 #ifdef USE_MEDIA
     if (_parser.get() == nullptr) return 0;
     return _parser->getBufferLength();
+#else
+    return 0;
 #endif  // USE_MEDIA
 }
 
