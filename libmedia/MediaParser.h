@@ -28,7 +28,7 @@
 #include <deque>
 #include <map>
 #include <vector>
-#include <iosfwd> // for output operator forward declarations
+#include <iostream> // for output operator
 #include <boost/optional.hpp>
 
 #include "IOChannel.h" // for inlines
