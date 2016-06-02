@@ -75,9 +75,10 @@ DrawingWidget::contextMenuEvent(QContextMenuEvent* event)
 }
 
 void
-DrawingWidget::mousePressEvent(QMouseEvent* /* event */)
+DrawingWidget::mousePressEvent(QMouseEvent* event)
 {
-    _gui.notifyMouseClick(true);
+    if(Qt::LeftButton & event->button())
+	_gui.notifyMouseClick(true);
 }
 
 void

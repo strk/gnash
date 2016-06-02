@@ -451,9 +451,10 @@ qwidget::contextMenuEvent(QContextMenuEvent*)
 #endif
 
 void
-qwidget::mousePressEvent(QMouseEvent* /* event */)
+qwidget::mousePressEvent(QMouseEvent* event)
 {
-    _godfather->notifyMouseClick(true);
+    if(Qt::LeftButton & event->button())
+	_godfather->notifyMouseClick(true);
 }
 
 void
