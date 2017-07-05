@@ -55,24 +55,27 @@ public:
         return this;
     }
 
-    virtual std::string name() const { return std::string(); }
+    std::string name() const override { return std::string(); }
 
     /// There are no tokens for an accumulator_type
-    virtual unsigned min_tokens() const { return 0; }
-    virtual unsigned max_tokens() const { return 0; }
+    unsigned min_tokens() const override { return 0; }
+    unsigned max_tokens() const override { return 0; }
+
+    /// Meaningless
+    bool adjacent_tokens_only() const override { return false; }
 
     /// Accumulating from different sources is silly.
-    virtual bool is_composing() const { return false; }
+    bool is_composing() const override { return false; }
 
     /// Requiring one or more appearances is unlikely.
-    virtual bool is_required() const { return false; }
+    bool is_required() const override { return false; }
     
     /// Every appearance of the option simply increments the value
     //
     /// There should never be any tokens.
-    virtual void parse(boost::any& value_store, 
+    void parse(boost::any& value_store, 
                        const std::vector<std::string>& new_tokens,
-                       bool /*utf8*/) const
+                       bool /*utf8*/) const override
     {
         assert(new_tokens.empty());
         if (value_store.empty()) value_store = T();
@@ -80,17 +83,19 @@ public:
     }
 
     /// If the option doesn't appear, this is the default value.
-    virtual bool apply_default(boost::any& value_store) const {
+    bool apply_default(boost::any& value_store) const override
+    {
         value_store = _default;
         return true;
     }
  
     /// Notify the user function with the value of the value store.                              
-    virtual void notify(const boost::any& value_store) const {
+    void notify(const boost::any& value_store) const override
+    {
         if (_notifier) _notifier(boost::any_cast<T>(value_store));
     }
     
-    virtual ~accumulator_type() {}
+    ~accumulator_type() {}
 
 private:
     std::function<void(const T&)> _notifier;
@@ -98,8 +103,7 @@ private:
     T _default;
 };
 
-template<typename T>
-accumulator_type<T>* accumulator() {
+template<typename T> auto accumulator() {
     return new accumulator_type<T>();
 }
 
